@@ -5,9 +5,28 @@ interface SourceStatus {
   name: string;
   table: string;
   lastRefresh: string | null;
+  lastUpdated: string | null;
   recordCount: number;
+  totalRows: number;
   status: "green" | "yellow" | "red";
+  hoursSinceUpdate: number | null;
+  expectedRefreshHours: number;
+  message: string;
 }
+
+const expectedRefreshMap: Record<string, number> = {
+  fcc_filings: 6,
+  sec_filings: 12,
+  patents: 24,
+  contracts: 6,
+  orbital_data: 2,
+  news: 1,
+  federal_register: 24,
+  sbir_awards: 24,
+  sam_opportunities: 6,
+  entities: 168,
+  daily_briefings: 24,
+};
 
 export async function GET() {
   const user = await getAuthUser();
@@ -31,6 +50,7 @@ export async function GET() {
       { name: "Federal Register", table: "federal_register" },
       { name: "SAM.gov Opportunities", table: "sam_opportunities" },
       { name: "SBIR/STTR Awards", table: "sbir_awards" },
+      { name: "Daily Briefings", table: "daily_briefings" },
     ];
 
     const statuses: SourceStatus[] = [];
@@ -41,35 +61,82 @@ export async function GET() {
           .from(source.table)
           .select("*", { count: "exact", head: true });
 
-        // Try to get the most recent record's created_at
+        const totalRows = count || 0;
+        const expectedRefreshHours = expectedRefreshMap[source.table] || 24;
+
         const { data: latest } = await supabase
           .from(source.table)
-          .select("created_at")
+          .select("created_at, updated_at")
           .order("created_at", { ascending: false })
           .limit(1)
           .single();
 
-        const lastRefresh = latest?.created_at || null;
-        const hoursAgo = lastRefresh
+        const lastRefresh = latest?.updated_at || latest?.created_at || null;
+        const hoursSinceUpdate = lastRefresh
           ? (Date.now() - new Date(lastRefresh).getTime()) / (1000 * 60 * 60)
-          : Infinity;
+          : null;
+
+        let status: "green" | "yellow" | "red";
+        let message: string;
+
+        if (totalRows === 0) {
+          status = "red";
+          message = "Table is empty";
+        } else if (hoursSinceUpdate === null) {
+          status = "yellow";
+          message = "Could not determine last update time";
+        } else if (hoursSinceUpdate <= expectedRefreshHours) {
+          status = "green";
+          message = `Updated ${hoursSinceUpdate.toFixed(1)}h ago`;
+        } else if (hoursSinceUpdate <= expectedRefreshHours * 2) {
+          status = "yellow";
+          message = `Stale: ${hoursSinceUpdate.toFixed(1)}h since last update`;
+        } else {
+          status = "red";
+          message = `Critical: ${hoursSinceUpdate.toFixed(1)}h since last update`;
+        }
 
         statuses.push({
           name: source.name,
           table: source.table,
           lastRefresh,
-          recordCount: count || 0,
-          status: hoursAgo < 24 ? "green" : hoursAgo < 72 ? "yellow" : "red",
+          lastUpdated: lastRefresh,
+          recordCount: totalRows,
+          totalRows,
+          status,
+          hoursSinceUpdate: hoursSinceUpdate ? Math.round(hoursSinceUpdate * 10) / 10 : null,
+          expectedRefreshHours,
+          message,
         });
       } catch {
         statuses.push({
           name: source.name,
           table: source.table,
           lastRefresh: null,
+          lastUpdated: null,
           recordCount: 0,
+          totalRows: 0,
           status: "red",
+          hoursSinceUpdate: null,
+          expectedRefreshHours: expectedRefreshMap[source.table] || 24,
+          message: "Table not available",
         });
       }
+    }
+
+    // Get Sentinel's last health check timestamp
+    let sentinelLastCheck: string | null = null;
+    try {
+      const { data: lastLog } = await supabase
+        .from("agent_logs")
+        .select("created_at")
+        .eq("agent_name", "sentinel")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+      sentinelLastCheck = lastLog?.created_at || null;
+    } catch {
+      // agent_logs may not exist yet
     }
 
     const totalEntities = statuses.find((s) => s.table === "entities")?.recordCount || 0;
@@ -77,9 +144,14 @@ export async function GET() {
 
     return apiResponse({
       sources: statuses,
+      sentinel_last_check: sentinelLastCheck,
       summary: {
         totalEntities,
         totalDocuments,
+        total: statuses.length,
+        green: statuses.filter((s) => s.status === "green").length,
+        yellow: statuses.filter((s) => s.status === "yellow").length,
+        red: statuses.filter((s) => s.status === "red").length,
         lastGlobalRefresh: new Date().toISOString(),
       },
     });

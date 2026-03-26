@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Card, Badge, EntityTag, StatusIndicator, Citation } from "@/components/ui";
 import {
@@ -12,20 +12,44 @@ import {
   FileText,
   Clock,
   TrendingUp,
+  RefreshCw,
+  AlertTriangle,
 } from "lucide-react";
 
-// Sample briefing data (from API in production)
-const briefingItems = [
+interface BriefingEntity {
+  id?: string;
+  name: string;
+  slug: string;
+  type: "company" | "agency" | "program";
+}
+
+interface BriefingSource {
+  id: string;
+  title: string;
+  type: string;
+  url: string;
+}
+
+interface BriefingItem {
+  headline: string;
+  synthesis: string;
+  entities: BriefingEntity[];
+  impact: "high" | "medium" | "low";
+  sources: BriefingSource[];
+}
+
+// Sample briefing data (fallback when no real briefing exists)
+const sampleBriefingItems: BriefingItem[] = [
   {
     headline: "SpaceX Secures $1.8B NRO Launch Contract Extension",
     synthesis:
       "The National Reconnaissance Office has extended its launch services contract with SpaceX by $1.8 billion through 2028. This solidifies SpaceX's position as the primary launch provider for classified payloads and may impact ULA's competitive positioning for future NSSL Phase 3 awards.",
     entities: [
-      { id: "1", name: "SpaceX", slug: "spacex", type: "company" as const },
-      { id: "2", name: "NRO", slug: "nro", type: "agency" as const },
-      { id: "3", name: "ULA", slug: "ula", type: "company" as const },
+      { id: "1", name: "SpaceX", slug: "spacex", type: "company" },
+      { id: "2", name: "NRO", slug: "nro", type: "agency" },
+      { id: "3", name: "ULA", slug: "ula", type: "company" },
     ],
-    impact: "high" as const,
+    impact: "high",
     sources: [
       { id: "s1", title: "NRO Contract Award Notice", type: "contract", url: "#" },
       { id: "s2", title: "SAM.gov Opportunity FA8811-24-R-0001", type: "sam", url: "#" },
@@ -36,11 +60,11 @@ const briefingItems = [
     synthesis:
       "Amazon's Project Kuiper received FCC approval for its Gen2 constellation modification, allowing deployment of 7,774 satellites across revised orbital shells. This directly competes with Starlink's V2 Mini constellation and signals accelerating commercial broadband competition in LEO.",
     entities: [
-      { id: "4", name: "Amazon Kuiper", slug: "amazon-kuiper", type: "program" as const },
-      { id: "5", name: "FCC", slug: "fcc", type: "agency" as const },
-      { id: "6", name: "SpaceX Starlink", slug: "spacex-starlink", type: "program" as const },
+      { id: "4", name: "Amazon Kuiper", slug: "amazon-kuiper", type: "program" },
+      { id: "5", name: "FCC", slug: "fcc", type: "agency" },
+      { id: "6", name: "SpaceX Starlink", slug: "spacex-starlink", type: "program" },
     ],
-    impact: "high" as const,
+    impact: "high",
     sources: [
       { id: "s3", title: "FCC Order DA-24-1847", type: "fcc", url: "#" },
       { id: "s4", title: "Federal Register Notice Vol. 89", type: "federal_register", url: "#" },
@@ -51,11 +75,11 @@ const briefingItems = [
     synthesis:
       "L3Harris Technologies filed a patent for an autonomous satellite servicing mechanism designed for GEO orbit operations. This aligns with DARPA's RSGS program requirements and positions L3Harris ahead of Northrop Grumman's MEV technology in the on-orbit servicing market.",
     entities: [
-      { id: "7", name: "L3Harris", slug: "l3harris", type: "company" as const },
-      { id: "8", name: "DARPA", slug: "darpa", type: "agency" as const },
-      { id: "9", name: "Northrop Grumman", slug: "northrop-grumman", type: "company" as const },
+      { id: "7", name: "L3Harris", slug: "l3harris", type: "company" },
+      { id: "8", name: "DARPA", slug: "darpa", type: "agency" },
+      { id: "9", name: "Northrop Grumman", slug: "northrop-grumman", type: "company" },
     ],
-    impact: "medium" as const,
+    impact: "medium",
     sources: [
       { id: "s5", title: "USPTO Patent Application 2024/0187432", type: "patent", url: "#" },
       { id: "s6", title: "DARPA RSGS Program Update", type: "news", url: "#" },
@@ -108,12 +132,66 @@ const impactColors = {
 export default function DashboardPage() {
   const router = useRouter();
   const [query, setQuery] = useState("");
+  const [briefingItems, setBriefingItems] = useState<BriefingItem[]>(sampleBriefingItems);
+  const [isSampleData, setIsSampleData] = useState(true);
+  const [generatedAt, setGeneratedAt] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "long",
     year: "numeric",
     month: "long",
     day: "numeric",
   });
+
+  const fetchBriefing = useCallback(async () => {
+    try {
+      const res = await fetch("/api/v1/briefing");
+      if (!res.ok) return;
+      const json = await res.json();
+      if (json.success && json.data?.items?.length > 0) {
+        const items = json.data.items.map((item: BriefingItem, idx: number) => ({
+          ...item,
+          entities: item.entities.map((e: BriefingEntity, eIdx: number) => ({
+            ...e,
+            id: e.id || `e-${idx}-${eIdx}`,
+          })),
+          sources: item.sources.map((s: BriefingSource, sIdx: number) => ({
+            ...s,
+            id: s.id || `s-${idx}-${sIdx}`,
+          })),
+        }));
+        setBriefingItems(items);
+        setIsSampleData(false);
+        setGeneratedAt(json.data.generated_at || null);
+      }
+    } catch {
+      // Keep sample data on error
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchBriefing();
+  }, [fetchBriefing]);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      const res = await fetch("/api/v1/agents/meridian", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (res.ok) {
+        // Wait a moment then fetch the new briefing
+        await new Promise((r) => setTimeout(r, 1000));
+        await fetchBriefing();
+      }
+    } catch {
+      // Silently fail
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
 
   const handleAsk = () => {
     if (query.trim()) {
@@ -127,20 +205,44 @@ export default function DashboardPage() {
       <section>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900">
-              Daily Intelligence Briefing
-            </h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold text-slate-900">
+                Daily Intelligence Briefing
+              </h1>
+              {isSampleData && (
+                <Badge variant="default" className="text-[10px] uppercase tracking-wider">
+                  <AlertTriangle className="w-3 h-3 mr-1" />
+                  Sample Data
+                </Badge>
+              )}
+            </div>
             <p className="text-sm text-slate-500 mt-1">
-              {today} &middot; Generated by Raptor at 6:00 AM CT
+              {today} &middot; Generated by MERIDIAN at 6:00 AM CT
+              {generatedAt && !isSampleData && (
+                <span className="ml-2 text-slate-400">
+                  &middot; Last generated: {new Date(generatedAt).toLocaleString()}
+                </span>
+              )}
             </p>
           </div>
-          <button
-            onClick={() => router.push("/dashboard/orbital-brief")}
-            className="flex items-center gap-2 text-sm font-medium text-brand-cyan hover:text-brand-cyan-dark transition-colors"
-          >
-            View Full Brief
-            <ArrowRight className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="flex items-center gap-2 text-xs font-medium text-slate-500 hover:text-brand-cyan transition-colors disabled:opacity-50"
+              title="Refresh Briefing (Admin)"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
+              {isRefreshing ? "Generating..." : "Refresh"}
+            </button>
+            <button
+              onClick={() => router.push("/dashboard/orbital-brief")}
+              className="flex items-center gap-2 text-sm font-medium text-brand-cyan hover:text-brand-cyan-dark transition-colors"
+            >
+              View Full Brief
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         <div className="space-y-4">
@@ -173,7 +275,7 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-4 flex-wrap">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       {item.entities.map((entity) => (
-                        <EntityTag key={entity.id} {...entity} />
+                        <EntityTag key={entity.id || entity.slug} name={entity.name} slug={entity.slug} type={entity.type} />
                       ))}
                     </div>
                     <div className="flex items-center gap-1.5">

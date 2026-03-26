@@ -13,6 +13,7 @@ import {
   Settings,
   Key,
   LogOut,
+  Bot,
 } from "lucide-react";
 
 const intelligenceLinks = [
@@ -39,6 +40,11 @@ const intelligenceLinks = [
 ];
 
 const dataLinks = [
+  {
+    label: "Agents",
+    href: "/dashboard/agents",
+    icon: Bot,
+  },
   {
     label: "Regulatory Guide",
     href: "/dashboard/regulatory-guide",
