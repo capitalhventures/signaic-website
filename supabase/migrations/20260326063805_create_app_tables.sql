@@ -1,6 +1,20 @@
 -- Signaic Application Tables
 -- Run this migration against your Supabase project
 
+-- Entities table (companies, agencies, programs tracked by Signaic)
+CREATE TABLE IF NOT EXISTS entities (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  type TEXT CHECK (type IN ('company', 'agency', 'program')),
+  sectors TEXT[],
+  description TEXT,
+  last_activity TIMESTAMPTZ,
+  source_counts JSONB,
+  created_at TIMESTAMPTZ DEFAULT now(),
+  updated_at TIMESTAMPTZ DEFAULT now()
+);
+
 -- Conversations (Ask Raptor chat sessions)
 CREATE TABLE IF NOT EXISTS conversations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -50,11 +64,17 @@ CREATE TABLE IF NOT EXISTS daily_briefings (
 );
 
 -- Enable RLS on all new tables
+ALTER TABLE entities ENABLE ROW LEVEL SECURITY;
 ALTER TABLE conversations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE briefs ENABLE ROW LEVEL SECURITY;
 ALTER TABLE watchlist ENABLE ROW LEVEL SECURITY;
 ALTER TABLE daily_briefings ENABLE ROW LEVEL SECURITY;
+
+-- Entities are readable by all authenticated users
+CREATE POLICY "Authenticated users can view entities"
+  ON entities FOR SELECT
+  USING (auth.role() = 'authenticated');
 
 -- RLS Policies: Users can only access their own data
 
@@ -128,6 +148,8 @@ CREATE POLICY "Authenticated users can view daily briefings"
   USING (auth.role() = 'authenticated');
 
 -- Indexes for performance
+CREATE INDEX IF NOT EXISTS idx_entities_slug ON entities(slug);
+CREATE INDEX IF NOT EXISTS idx_entities_type ON entities(type);
 CREATE INDEX IF NOT EXISTS idx_conversations_user_id ON conversations(user_id);
 CREATE INDEX IF NOT EXISTS idx_conversations_updated_at ON conversations(updated_at DESC);
 CREATE INDEX IF NOT EXISTS idx_messages_conversation_id ON messages(conversation_id);
