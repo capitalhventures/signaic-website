@@ -11,14 +11,16 @@
 - [x] Landing page
 - [x] Vercel deployment
 
-### Day 2 - In Progress
-- [ ] MERIDIAN agent (daily intelligence briefing generation)
-- [ ] SENTINEL agent (data pipeline health monitoring)
-- [ ] ATLAS standing orders (CLAUDE.md)
-- [ ] Agent Dashboard page
-- [ ] Entity seeding (30 space/defense entities)
-- [ ] Regulatory guide expansion (50 countries)
-- [ ] agent_logs database table
+### Day 2 - Complete
+- [x] MERIDIAN agent (daily intelligence briefing generation)
+- [x] SENTINEL agent (data pipeline health monitoring)
+- [x] ATLAS standing orders (CLAUDE.md with Customer vs Admin)
+- [x] Entity seeding (30 space/defense entities)
+- [x] agent_logs database table
+- [x] Command Center live briefing integration
+- [x] Data Sources live Sentinel integration
+- [x] Remove admin items from customer sidebar
+- [x] n8n workflow configs for MERIDIAN and SENTINEL
 
 ### Day 3 - Planned
 - [ ] Data ingestion pipelines (n8n workflows)
@@ -52,3 +54,5 @@
 - All API routes under /api/v1/
 - n8n Cloud Pro for workflow orchestration
 - Vercel for hosting and edge functions
+- Customer sidebar: Intelligence + Data & Reference sections only
+- Admin features under /admin/* routes (Session 2)

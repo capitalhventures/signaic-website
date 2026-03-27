@@ -16,7 +16,6 @@ Signaic is an AI-powered competitive intelligence platform for the space and def
 ## Code Standards
 - Run npm run build after every change. Zero errors.
 - Run /code-review before every push to main.
-- Use /gsd:quick for individual fixes, full GSD for complex features.
 - Commit frequently with descriptive messages.
 - Push to main and deploy with vercel --prod --yes after major changes.
 - NEVER use Inter, Roboto, or Arial fonts.
@@ -28,7 +27,14 @@ Signaic is an AI-powered competitive intelligence platform for the space and def
 - MERIDIAN (Intelligence Analyst): /agents/meridian/ - daily briefing generation
 - SENTINEL (Data Pipeline Manager): /agents/sentinel/ - source health monitoring
 - ATLAS (you): Claude Code - engineering and deployment
+- LEDGER: financial tracking
+- VECTOR: content and GTM
 - Agent endpoints use AGENT_SECRET_KEY, not user JWT.
+
+## Customer vs Admin
+- Customer-facing pages: /dashboard/* (Command Center, Ask Raptor, Orbital Brief, Entities, Regulatory Guide, Data Sources, Settings)
+- Admin-only pages: /admin/* (Agents, Customers, Financials, Contracts, Usage Analytics)
+- Customers must NEVER see admin features. No admin items in customer sidebar.
 
 ## Current Priorities
 1. Production stability and zero-downtime deployments
