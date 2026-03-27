@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 const ADMIN_EMAILS = [
   "ryan@capitalh.io",
   "ryan@signaic.com",
+  "ryanjhasty@gmail.com",
 ];
 
 export async function getAuthUser() {
