@@ -93,10 +93,10 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Mobile hamburger button — fixed top-right */}
+      {/* Mobile hamburger button — fixed top-left */}
       <button
         onClick={() => setOpen(true)}
-        className="fixed top-4 right-4 z-50 md:hidden p-2.5 rounded-lg bg-surface-dark border border-slate-700 text-slate-300 hover:text-white transition-colors shadow-elevated"
+        className="fixed top-4 left-4 z-50 md:hidden p-2.5 rounded-lg bg-surface-dark border border-slate-700 text-slate-300 hover:text-white transition-colors shadow-elevated"
         aria-label="Open navigation"
       >
         <Menu className="w-5 h-5" />
@@ -113,9 +113,9 @@ export function Sidebar() {
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed right-0 top-0 bottom-0 w-[280px] bg-surface-dark border-l border-slate-800 flex flex-col z-50 transition-transform duration-300 ease-in-out",
+          "fixed left-0 top-0 bottom-0 w-[280px] bg-surface-dark border-r border-slate-800 flex flex-col z-50 transition-transform duration-300 ease-in-out",
           // On mobile: slide in/out
-          open ? "translate-x-0" : "translate-x-full",
+          open ? "translate-x-0" : "-translate-x-full",
           // On desktop: always visible
           "md:translate-x-0"
         )}
@@ -169,7 +169,7 @@ export function Sidebar() {
                       {link.label}
                     </Link>
                     {active && (
-                      <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-brand-cyan rounded-l-full" />
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-brand-cyan rounded-r-full" />
                     )}
                   </li>
                 );
@@ -216,7 +216,7 @@ export function Sidebar() {
                           {link.label}
                         </Link>
                         {active && (
-                          <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-brand-cyan rounded-l-full" />
+                          <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-brand-cyan rounded-r-full" />
                         )}
                       </>
                     )}
