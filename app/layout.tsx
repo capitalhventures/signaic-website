@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, JetBrains_Mono, Orbitron } from "next/font/google";
+import { Space_Grotesk, JetBrains_Mono, Orbitron, Outfit, DM_Sans } from "next/font/google";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -17,6 +17,18 @@ const jetbrainsMono = JetBrains_Mono({
 const orbitron = Orbitron({
   subsets: ["latin"],
   variable: "--font-orbitron",
+  display: "swap",
+});
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-outfit",
+  display: "swap",
+});
+
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  variable: "--font-dm-sans",
   display: "swap",
 });
 
@@ -57,7 +69,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} ${orbitron.variable} font-sans antialiased`}
+        className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} ${orbitron.variable} ${outfit.variable} ${dmSans.variable} font-sans antialiased`}
       >
         {children}
       </body>

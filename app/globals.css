@@ -137,3 +137,147 @@
 .animate-spin-very-slow {
   animation: spin-very-slow 60s linear infinite;
 }
+
+/* === Landing Page Styles === */
+
+/* Hero video fade-in */
+.hero-video {
+  opacity: 0;
+  transition: opacity 1.5s ease;
+}
+.hero-video.loaded {
+  opacity: 1;
+}
+
+/* Hero text entrance */
+@keyframes landing-fu {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.landing-line-1 { opacity: 0; animation: landing-fu 0.8s ease forwards 0.3s; }
+.landing-line-2 { opacity: 0; animation: landing-fu 0.8s ease forwards 0.6s; }
+.landing-hero-sub { opacity: 0; animation: landing-fu 0.8s ease forwards 0.9s; }
+.landing-hero-actions { opacity: 0; animation: landing-fu 0.8s ease forwards 1.1s; }
+.landing-hero-stats { opacity: 0; animation: landing-fu 0.8s ease forwards 1.3s; }
+
+/* Badge dot pulse */
+@keyframes badge-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.badge-dot {
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+
+/* Ticker scroll */
+@keyframes ticker-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.ticker-track {
+  display: flex;
+  animation: ticker-scroll 35s linear infinite;
+  width: max-content;
+}
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+/* Section fade-in on scroll */
+.landing-fade-in {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.7s, transform 0.7s;
+}
+.landing-fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Mega dropdown */
+.mega-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  min-width: 560px;
+  background: rgba(4,8,16,0.97);
+  backdrop-filter: blur(30px);
+  border: 1px solid rgba(255,255,255,0.04);
+  border-radius: 16px;
+  padding: 1.25rem;
+  transition: all 0.3s;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+  z-index: 100;
+}
+.nav-item-landing:hover .mega-dropdown {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: all;
+  transform: translateX(-50%) translateY(0);
+}
+.nav-item-landing:hover .chevron-icon {
+  transform: rotate(180deg);
+}
+.chevron-icon {
+  transition: transform 0.2s;
+}
+
+/* Process grid connecting line */
+.process-grid-line::before {
+  content: '';
+  position: absolute;
+  top: 28px;
+  left: calc(16.66% + 1rem);
+  right: calc(16.66% + 1rem);
+  height: 1px;
+  background: linear-gradient(90deg, #06b6d4, #6366f1);
+  opacity: 0.2;
+}
+
+/* Mobile nav */
+@media (max-width: 768px) {
+  .landing-nav-links,
+  .landing-nav-cta {
+    display: none;
+  }
+  .landing-mobile-toggle {
+    display: block;
+  }
+  .landing-nav-links.active {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba(4,8,16,0.97);
+    backdrop-filter: blur(20px);
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .mega-dropdown {
+    position: static;
+    transform: none;
+    min-width: 100%;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    visibility: hidden;
+    padding: 0;
+    border: none;
+    box-shadow: none;
+  }
+  .nav-item-landing.open .mega-dropdown {
+    opacity: 1;
+    max-height: 1000px;
+    visibility: visible;
+    padding: 0.5rem;
+  }
+  .process-grid-line::before {
+    display: none;
+  }
+}

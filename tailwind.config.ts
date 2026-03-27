@@ -25,6 +25,8 @@ const config: Config = {
         sans: ["var(--font-space-grotesk)", "system-ui", "sans-serif"],
         mono: ["var(--font-jetbrains-mono)", "monospace"],
         display: ["var(--font-orbitron)", "sans-serif"],
+        outfit: ["var(--font-outfit)", "sans-serif"],
+        dm: ["var(--font-dm-sans)", "sans-serif"],
       },
       boxShadow: {
         "card": "0 1px 3px 0 rgb(0 0 0 / 0.04), 0 1px 2px -1px rgb(0 0 0 / 0.04)",
