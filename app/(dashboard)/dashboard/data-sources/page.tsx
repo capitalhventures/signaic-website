@@ -133,7 +133,7 @@ export default function DataSourcesPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
         <Card>
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
             Total Sources

@@ -65,7 +65,7 @@ export default function FinancialPage() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
           <div className="flex items-center gap-2 mb-2">
             <TrendingUp className="w-4 h-4 text-brand-cyan" />

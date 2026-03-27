@@ -172,10 +172,10 @@ function AskRaptorContent() {
   };
 
   return (
-    <div className="flex h-[calc(100vh-64px)] -m-8">
-      {/* Chat History Sidebar */}
+    <div className="flex h-[calc(100vh-80px)] md:h-[calc(100vh-64px)] -m-4 md:-m-8">
+      {/* Chat History Sidebar — hidden on mobile */}
       {showHistory && (
-        <div className="w-72 border-r border-slate-200 bg-white flex flex-col">
+        <div className="hidden md:flex w-72 border-r border-slate-200 bg-white flex-col">
           <div className="p-4 border-b border-slate-100">
             <Button
               onClick={startNewConversation}
@@ -243,7 +243,7 @@ function AskRaptorContent() {
                 Ask about regulatory filings, competitive intelligence, orbital
                 data, and more.
               </p>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 max-w-2xl w-full">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 max-w-2xl w-full">
                 {starterQueries.map((starter, idx) => (
                   <button
                     key={idx}

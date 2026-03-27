@@ -177,7 +177,7 @@ export default function EntitiesPage() {
       </div>
 
       {/* Search and Filters */}
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
         <div className="flex-1">
           <SearchInput
             placeholder="Search entities..."
@@ -185,7 +185,7 @@ export default function EntitiesPage() {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           {["", "company", "agency", "program"].map((type) => (
             <button
               key={type}
@@ -304,7 +304,7 @@ export default function EntitiesPage() {
                     <h4 className="text-sm font-semibold text-slate-900 mb-2">
                       Source Documents
                     </h4>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                       {Object.entries(entity.sourceCounts).map(
                         ([source, count]) =>
                           count > 0 && (

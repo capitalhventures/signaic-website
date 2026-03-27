@@ -4,12 +4,12 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-surface-dark">
       {/* Nav */}
-      <nav className="flex items-center justify-between px-8 py-5 max-w-7xl mx-auto">
-        <div className="font-display font-black text-2xl tracking-wider text-white select-none">
+      <nav className="flex items-center justify-between px-4 sm:px-8 py-5 max-w-7xl mx-auto">
+        <div className="font-display font-black text-xl sm:text-2xl tracking-wider text-white select-none">
           SIG<span className="text-brand-cyan">/</span>N
           <span className="text-brand-cyan">AI</span>C
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 sm:gap-4">
           <Link
             href="/login"
             className="text-sm text-slate-300 hover:text-white transition-colors font-medium"
@@ -18,7 +18,7 @@ export default function Home() {
           </Link>
           <Link
             href="/signup"
-            className="inline-flex items-center px-4 py-2 bg-brand-cyan text-white text-sm font-medium rounded-lg hover:bg-brand-cyan-dark transition-colors"
+            className="inline-flex items-center px-3 sm:px-4 py-2 bg-brand-cyan text-white text-sm font-medium rounded-lg hover:bg-brand-cyan-dark transition-colors"
           >
             Get Started
           </Link>
@@ -26,7 +26,7 @@ export default function Home() {
       </nav>
 
       {/* Hero */}
-      <section className="max-w-7xl mx-auto px-8 pt-24 pb-32">
+      <section className="max-w-7xl mx-auto px-4 sm:px-8 pt-16 sm:pt-24 pb-20 sm:pb-32">
         <div className="max-w-3xl">
           <div className="inline-flex items-center px-3 py-1 rounded-full bg-brand-cyan/10 border border-brand-cyan/20 mb-6">
             <span className="w-1.5 h-1.5 rounded-full bg-brand-cyan mr-2" />
@@ -61,7 +61,7 @@ export default function Home() {
       </section>
 
       {/* Features Grid */}
-      <section className="max-w-7xl mx-auto px-8 pb-32">
+      <section className="max-w-7xl mx-auto px-4 sm:px-8 pb-20 sm:pb-32">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {[
             {
@@ -100,7 +100,7 @@ export default function Home() {
       </section>
 
       {/* Data Sources */}
-      <section className="max-w-7xl mx-auto px-8 pb-32">
+      <section className="max-w-7xl mx-auto px-4 sm:px-8 pb-20 sm:pb-32">
         <div className="text-center mb-12">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
             Intelligence from Authoritative Sources
@@ -133,7 +133,7 @@ export default function Home() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800 py-8 px-8">
+      <footer className="border-t border-slate-800 py-8 px-4 sm:px-8">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="font-display font-black text-lg tracking-wider text-slate-600 select-none">
             SIG<span className="text-brand-cyan/50">/</span>N

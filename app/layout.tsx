@@ -21,10 +21,32 @@ const orbitron = Orbitron({
 });
 
 export const metadata: Metadata = {
-  title: "Signaic | AI-Powered Competitive Intelligence",
+  title: {
+    default: "Signaic | AI-Powered Competitive Intelligence",
+    template: "%s | Signaic",
+  },
   description:
     "Defense-grade competitive intelligence for the space and defense sector. Powered by AI.",
   metadataBase: new URL("https://signaic.com"),
+  openGraph: {
+    title: "Signaic | AI-Powered Competitive Intelligence",
+    description:
+      "Defense-grade competitive intelligence for the space and defense sector. Automated pipelines, daily briefings, and AI-powered analysis.",
+    url: "https://signaic.com",
+    siteName: "Signaic",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Signaic | AI-Powered Competitive Intelligence",
+    description:
+      "Defense-grade competitive intelligence for the space and defense sector.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({

@@ -1,0 +1,7 @@
+# Signaic robots.txt
+User-agent: *
+Allow: /
+Disallow: /dashboard/admin/
+Disallow: /api/
+
+Sitemap: https://signaic.com/sitemap.xml

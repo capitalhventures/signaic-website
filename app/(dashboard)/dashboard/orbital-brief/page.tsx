@@ -88,7 +88,7 @@ export default function OrbitalBriefPage() {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <div className="flex gap-8">
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
         {/* Main Content */}
         <div className="flex-1 space-y-6">
           {/* Header */}
@@ -110,7 +110,7 @@ export default function OrbitalBriefPage() {
             </h2>
 
             {/* Date Range */}
-            <div className="grid grid-cols-2 gap-4 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1.5">
                   Start Date
@@ -222,7 +222,7 @@ export default function OrbitalBriefPage() {
         </div>
 
         {/* Recent Briefs Sidebar */}
-        <div className="w-72 flex-shrink-0">
+        <div className="w-full lg:w-72 flex-shrink-0">
           <h3 className="text-sm font-semibold text-slate-900 mb-3">
             Recent Briefs
           </h3>

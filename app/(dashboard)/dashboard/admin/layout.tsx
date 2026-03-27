@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { requireAdmin } from "@/lib/admin";
 import Link from "next/link";
 import {
@@ -5,6 +6,12 @@ import {
   Bot,
   DollarSign,
 } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Admin Panel",
+  description: "Signaic admin panel — user management, agent operations, and system health monitoring.",
+  robots: { index: false, follow: false },
+};
 
 const adminNav = [
   { label: "Overview", href: "/dashboard/admin", icon: Shield },
@@ -23,7 +30,7 @@ export default async function AdminLayout({
   return (
     <div>
       {/* Admin header bar */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-brand-cyan/10 flex items-center justify-center">
             <Shield className="w-4 h-4 text-brand-cyan" />
@@ -46,7 +53,7 @@ export default async function AdminLayout({
       </div>
 
       {/* Admin sub-nav */}
-      <div className="flex items-center gap-1 mb-6 border-b border-slate-200 pb-3">
+      <div className="flex items-center gap-1 mb-6 border-b border-slate-200 pb-3 overflow-x-auto">
         {adminNav.map((item) => {
           const Icon = item.icon;
           return (
