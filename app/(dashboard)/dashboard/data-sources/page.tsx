@@ -63,7 +63,7 @@ const descriptionMap: Record<string, string> = {
   sbir_awards: "Small Business Innovation Research awards and solicitations",
   sam_opportunities: "System for Award Management contract opportunities",
   entities: "Tracked companies, agencies, and programs",
-  daily_briefings: "MERIDIAN-generated daily intelligence briefings",
+  daily_briefings: "AI-generated daily intelligence briefings",
 };
 
 function formatLastRefresh(lastUpdated: string | null, hoursSinceUpdate: number | null): string {
@@ -127,7 +127,7 @@ export default function DataSourcesPage() {
         {sentinelLastCheck && (
           <div className="flex items-center gap-2 mt-2 text-xs text-slate-400">
             <Shield className="w-3.5 h-3.5 text-brand-cyan" />
-            Last checked by SENTINEL: {new Date(sentinelLastCheck).toLocaleString()}
+            Last checked: {new Date(sentinelLastCheck).toLocaleString()}
           </div>
         )}
       </div>
