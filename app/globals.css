@@ -83,3 +83,57 @@
   background-size: 200% 100%;
   animation: skeleton 1.5s ease-in-out infinite;
 }
+
+@keyframes drift-slow {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(30px, -20px);
+  }
+}
+
+@keyframes drift-slow-reverse {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-20px, 30px);
+  }
+}
+
+@keyframes hero-enter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin-very-slow {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+.animate-drift-slow {
+  animation: drift-slow 15s ease-in-out infinite;
+}
+
+.animate-drift-slow-reverse {
+  animation: drift-slow-reverse 18s ease-in-out infinite;
+}
+
+.animate-hero-enter {
+  animation: hero-enter 1s ease-out forwards;
+}
+
+.animate-spin-very-slow {
+  animation: spin-very-slow 60s linear infinite;
+}
