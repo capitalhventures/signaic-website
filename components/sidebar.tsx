@@ -17,6 +17,7 @@ import {
   LogOut,
   Menu,
   X,
+  Shield,
 } from "lucide-react";
 
 const intelligenceLinks = [
@@ -53,6 +54,9 @@ const dataLinks = [
     href: "/dashboard/data-sources",
     icon: Database,
   },
+];
+
+const settingsLinks = [
   {
     label: "Settings",
     href: "/dashboard/settings",
@@ -64,6 +68,12 @@ const dataLinks = [
     icon: Key,
     comingSoon: true,
   },
+];
+
+const ADMIN_EMAILS = [
+  "ryan@capitalh.io",
+  "ryan@signaic.com",
+  "ryanjhasty@gmail.com",
 ];
 
 function getUserDisplayName(user: { email?: string; user_metadata?: Record<string, unknown> } | null): string {
@@ -79,12 +89,16 @@ export function Sidebar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [userName, setUserName] = useState("User");
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Fetch user info from Supabase auth
   useEffect(() => {
     const supabase = createClient();
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUserName(getUserDisplayName(user));
+      if (user?.email) {
+        setIsAdmin(ADMIN_EMAILS.includes(user.email.toLowerCase()));
+      }
     });
   }, []);
 
@@ -206,12 +220,49 @@ export function Sidebar() {
                 const active = isActive(link.href);
                 return (
                   <li key={link.href} className="relative">
+                    <Link
+                      href={link.href}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                        active
+                          ? "bg-brand-cyan/10 text-brand-cyan"
+                          : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+                      )}
+                    >
+                      <link.icon
+                        className={cn(
+                          "w-5 h-5",
+                          active ? "text-brand-cyan" : "text-slate-500"
+                        )}
+                        strokeWidth={1.5}
+                      />
+                      {link.label}
+                    </Link>
+                    {active && (
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-brand-cyan rounded-r-full" />
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          {/* Settings Section */}
+          <div className="mb-6">
+            <p className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-600">
+              Settings
+            </p>
+            <ul className="space-y-0.5">
+              {settingsLinks.map((link) => {
+                const active = isActive(link.href);
+                return (
+                  <li key={link.href} className="relative">
                     {link.comingSoon ? (
                       <span className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-600 cursor-not-allowed">
                         <link.icon className="w-5 h-5 text-slate-600" strokeWidth={1.5} />
                         {link.label}
                         <span className="ml-auto text-[10px] text-slate-600 bg-slate-800 px-1.5 py-0.5 rounded">
-                          soon
+                          SOON
                         </span>
                       </span>
                     ) : (
@@ -245,6 +296,24 @@ export function Sidebar() {
             </ul>
           </div>
         </nav>
+
+        {/* Admin link — only visible to admin users */}
+        {isAdmin && (
+          <div className="px-3 pb-2">
+            <Link
+              href="/dashboard/admin"
+              className={cn(
+                "flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-colors",
+                pathname.startsWith("/dashboard/admin")
+                  ? "text-brand-cyan bg-brand-cyan/10"
+                  : "text-slate-500 hover:text-slate-300 hover:bg-slate-800"
+              )}
+            >
+              <Shield className="w-3.5 h-3.5" strokeWidth={1.5} />
+              Admin Panel
+            </Link>
+          </div>
+        )}
 
         {/* User section */}
         <div className="border-t border-slate-800 p-4">
