@@ -58,25 +58,25 @@ function DdIcon({ children }: { children: React.ReactNode }) {
 
 /* ─── Mega dropdown data ─── */
 const platformItems = [
-  { title: "Intelligence Briefings", desc: "Weekly AI-synthesized competitive reports", icon: <><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" /><rect x="9" y="3" width="6" height="4" rx="1" /><path d="M9 14l2 2 4-4" /></> },
-  { title: "Competitive Dashboard", desc: "Real-time monitoring across 12+ sources", icon: <><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="4" rx="1" /><rect x="14" y="10" width="7" height="11" rx="1" /><rect x="3" y="13" width="7" height="8" rx="1" /></> },
-  { title: "Predictive Analytics", desc: "ML models forecasting approvals and awards", icon: <><path d="M21 21H4.6c-.56 0-.84 0-1.05-.11a1 1 0 0 1-.44-.44C3 20.24 3 19.96 3 19.4V3" /><path d="m7 14 4-4 4 4 6-6" /></> },
-  { title: "Market Entry Playbooks", desc: "Country-by-country regulatory playbooks", icon: <><path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" /></> },
-  { title: "API Access", desc: "Integrate intelligence into your tools", icon: <><path d="M16 18l2-2-2-2" /><path d="M8 18l-2-2 2-2" /><path d="M7 6h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H7" /><path d="M17 6h-2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" /></> },
-  { title: "Custom Reporting", desc: "Board-ready reports and M&A packages", icon: <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" /><path d="M14 2v6h6" /><path d="M16 13H8" /><path d="M16 17H8" /></> },
+  { title: "Intelligence Briefings", desc: "Weekly AI-synthesized competitive reports", href: "#how-it-works", icon: <><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" /><rect x="9" y="3" width="6" height="4" rx="1" /><path d="M9 14l2 2 4-4" /></> },
+  { title: "Competitive Dashboard", desc: "Real-time monitoring across 12+ sources", href: "#how-it-works", icon: <><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="4" rx="1" /><rect x="14" y="10" width="7" height="11" rx="1" /><rect x="3" y="13" width="7" height="8" rx="1" /></> },
+  { title: "Predictive Analytics", desc: "ML models forecasting approvals and awards", href: "#how-it-works", icon: <><path d="M21 21H4.6c-.56 0-.84 0-1.05-.11a1 1 0 0 1-.44-.44C3 20.24 3 19.96 3 19.4V3" /><path d="m7 14 4-4 4 4 6-6" /></> },
+  { title: "Market Entry Playbooks", desc: "Country-by-country regulatory playbooks", href: "#how-it-works", icon: <><path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" /></> },
+  { title: "API Access", desc: "Integrate intelligence into your tools", href: "#how-it-works", icon: <><path d="M16 18l2-2-2-2" /><path d="M8 18l-2-2 2-2" /><path d="M7 6h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H7" /><path d="M17 6h-2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" /></> },
+  { title: "Custom Reporting", desc: "Board-ready reports and M&A packages", href: "#how-it-works", icon: <><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" /><path d="M14 2v6h6" /><path d="M16 13H8" /><path d="M16 17H8" /></> },
 ];
 
 const industryItems = [
-  { title: "Satellite Operators", desc: "Constellation operators and service providers", icon: <><circle cx="12" cy="12" r="3" /><path d="M3 12a9 9 0 0 1 9-9" /><path d="M21 12a9 9 0 0 1-9 9" /><path d="M3.6 9h16.8" /><path d="M3.6 15h16.8" /></> },
-  { title: "Defense & Aerospace", desc: "Defense primes, startups, and contractors", icon: <><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></> },
-  { title: "Space Investors", desc: "VCs, PE firms, and family offices", icon: <><path d="M2 20h20" /><path d="M5 20V8l5-5 5 5v12" /><path d="M19 20V13l-4-4" /><rect x="9" y="12" width="2" height="4" /></> },
-  { title: "Government & Military", desc: "Space Force, NRO, allied agencies", icon: <><path d="M3 21h18" /><path d="M5 21V7l7-4 7 4v14" /><path d="M9 21v-4h6v4" /></> },
+  { title: "Satellite Operators", desc: "Constellation operators and service providers", href: "#industries", icon: <><circle cx="12" cy="12" r="3" /><path d="M3 12a9 9 0 0 1 9-9" /><path d="M21 12a9 9 0 0 1-9 9" /><path d="M3.6 9h16.8" /><path d="M3.6 15h16.8" /></> },
+  { title: "Defense & Aerospace", desc: "Defense primes, startups, and contractors", href: "#industries", icon: <><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></> },
+  { title: "Space Investors", desc: "VCs, PE firms, and family offices", href: "#industries", icon: <><path d="M2 20h20" /><path d="M5 20V8l5-5 5 5v12" /><path d="M19 20V13l-4-4" /><rect x="9" y="12" width="2" height="4" /></> },
+  { title: "Government & Military", desc: "Space Force, NRO, allied agencies", href: "#industries", icon: <><path d="M3 21h18" /><path d="M5 21V7l7-4 7 4v14" /><path d="M9 21v-4h6v4" /></> },
 ];
 
 const aboutItems = [
-  { title: "Our Story", desc: "Why we built Signaic and where we're going", icon: <><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></> },
-  { title: "Our Approach", desc: "How we transform raw data into intelligence", icon: <><path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" /></> },
-  { title: "Data Sources", desc: "12+ public sources powering continuous intelligence", icon: <><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" /><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" /></> },
+  { title: "Our Story", desc: "Why we built Signaic and where we're going", href: "#about", icon: <><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></> },
+  { title: "Our Approach", desc: "How we transform raw data into intelligence", href: "#how-it-works", icon: <><path d="M12 2L2 7l10 5 10-5-10-5z" /><path d="M2 17l10 5 10-5" /><path d="M2 12l10 5 10-5" /></> },
+  { title: "Data Sources", desc: "12+ public sources powering continuous intelligence", href: "#data-sources", icon: <><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" /><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" /></> },
 ];
 
 /* ─── Ticker data source items ─── */
@@ -196,9 +196,9 @@ export default function Home() {
       >
         <div className="max-w-[1200px] mx-auto px-8 flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 text-white font-outfit font-bold text-2xl tracking-tight whitespace-nowrap">
+          <Link href="/" className="flex items-center gap-3 text-white font-display font-bold text-2xl tracking-wider whitespace-nowrap">
             <SignaicLogo size={36} id="nav-lg" />
-            SIGN<span className="text-[#06b6d4]">AI</span>C
+            SIG<span className="text-[#06b6d4]">/</span>N<span className="text-[#06b6d4]">AI</span>C
           </Link>
 
           {/* Desktop nav links */}
@@ -211,7 +211,7 @@ export default function Home() {
               <div className={`mega-dropdown ${openDropdown === "platform" ? "open" : ""}`}>
                 <div className="grid grid-cols-2 gap-1">
                   {platformItems.map((item) => (
-                    <a key={item.title} href="#" className="flex items-start gap-3 p-3 rounded-[10px] hover:bg-white/[0.04] transition-colors">
+                    <a key={item.title} href={item.href} className="flex items-start gap-3 p-3 rounded-[10px] hover:bg-white/[0.04] transition-colors">
                       <DdIcon>{item.icon}</DdIcon>
                       <div>
                         <h4 className="font-outfit text-[0.88rem] font-semibold text-white mb-0.5">{item.title}</h4>
@@ -231,7 +231,7 @@ export default function Home() {
               <div className={`mega-dropdown ${openDropdown === "industries" ? "open" : ""}`}>
                 <div className="grid grid-cols-2 gap-1">
                   {industryItems.map((item) => (
-                    <a key={item.title} href="#" className="flex items-start gap-3 p-3 rounded-[10px] hover:bg-white/[0.04] transition-colors">
+                    <a key={item.title} href={item.href} className="flex items-start gap-3 p-3 rounded-[10px] hover:bg-white/[0.04] transition-colors">
                       <DdIcon>{item.icon}</DdIcon>
                       <div>
                         <h4 className="font-outfit text-[0.88rem] font-semibold text-white mb-0.5">{item.title}</h4>
@@ -251,7 +251,7 @@ export default function Home() {
               <div className={`mega-dropdown ${openDropdown === "about" ? "open" : ""}`} style={{ minWidth: 380 }}>
                 <div className="grid grid-cols-1 gap-1">
                   {aboutItems.map((item) => (
-                    <a key={item.title} href="#" className="flex items-start gap-3 p-3 rounded-[10px] hover:bg-white/[0.04] transition-colors">
+                    <a key={item.title} href={item.href} className="flex items-start gap-3 p-3 rounded-[10px] hover:bg-white/[0.04] transition-colors">
                       <DdIcon>{item.icon}</DdIcon>
                       <div>
                         <h4 className="font-outfit text-[0.88rem] font-semibold text-white mb-0.5">{item.title}</h4>
@@ -265,7 +265,7 @@ export default function Home() {
 
             {/* Contact */}
             <li className="nav-item-landing relative">
-              <a href="#" className="flex items-center gap-1 px-4 py-2 font-outfit text-[0.9rem] font-medium text-[#7a859c] hover:text-white transition-colors">
+              <a href="mailto:ryan@signaic.com" className="flex items-center gap-1 px-4 py-2 font-outfit text-[0.9rem] font-medium text-[#7a859c] hover:text-white transition-colors">
                 Contact
               </a>
             </li>
@@ -301,10 +301,10 @@ export default function Home() {
         {mobileOpen && (
           <div className="md:hidden" style={{ background: "rgba(4,8,16,0.97)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
             <div className="px-8 py-4 flex flex-col gap-2">
-              <a href="#" className="font-outfit text-[0.9rem] font-medium text-[#7a859c] py-2">Platform</a>
-              <a href="#" className="font-outfit text-[0.9rem] font-medium text-[#7a859c] py-2">Industries</a>
-              <a href="#" className="font-outfit text-[0.9rem] font-medium text-[#7a859c] py-2">About</a>
-              <a href="#" className="font-outfit text-[0.9rem] font-medium text-[#7a859c] py-2">Contact</a>
+              <a href="#how-it-works" className="font-outfit text-[0.9rem] font-medium text-[#7a859c] py-2">Platform</a>
+              <a href="#industries" className="font-outfit text-[0.9rem] font-medium text-[#7a859c] py-2">Industries</a>
+              <a href="#about" className="font-outfit text-[0.9rem] font-medium text-[#7a859c] py-2">About</a>
+              <a href="mailto:ryan@signaic.com" className="font-outfit text-[0.9rem] font-medium text-[#7a859c] py-2">Contact</a>
               <div className="flex items-center gap-4 pt-4 border-t border-white/[0.04]">
                 <Link href="/login" className="font-outfit text-[0.9rem] font-medium text-[#7a859c]">Sign In</Link>
                 <Link href="/signup" className="inline-flex items-center gap-2 px-6 py-2.5 font-outfit text-[0.88rem] font-semibold text-black rounded-full" style={{ background: "#06b6d4" }}>
@@ -414,7 +414,7 @@ export default function Home() {
       </section>
 
       {/* ═══ HOW IT WORKS ═══ */}
-      <section className="py-24" style={{ background: "#040810" }}>
+      <section id="how-it-works" className="py-24" style={{ background: "#040810" }}>
         <div className="max-w-[1200px] mx-auto px-8">
           <div className="landing-fade-in max-w-[600px] mx-auto text-center mb-14">
             <span className="font-outfit text-[0.7rem] font-semibold tracking-[0.15em] uppercase text-[#06b6d4]">
@@ -440,6 +440,232 @@ export default function Home() {
                 </div>
                 <h3 className="font-outfit font-bold text-[1.15rem] text-white mb-3">{step.title}</h3>
                 <p className="text-[0.9rem] text-[#7a859c] leading-relaxed">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ INDUSTRIES ═══ */}
+      <section id="industries" className="py-24" style={{ background: "#010204" }}>
+        <div className="max-w-[1200px] mx-auto px-8">
+          <div className="landing-fade-in max-w-[600px] mx-auto text-center mb-14">
+            <span className="font-outfit text-[0.7rem] font-semibold tracking-[0.15em] uppercase text-[#06b6d4]">
+              Who We Serve
+            </span>
+            <h2 className="font-outfit font-bold leading-[1.15] tracking-tight text-white mt-3" style={{ fontSize: "clamp(1.8rem, 3vw, 2.4rem)" }}>
+              Built for the Space &amp;<br />Defense Ecosystem
+            </h2>
+            <p className="text-[#7a859c] mt-4 text-base leading-relaxed">
+              From satellite operators to defense primes, from space investors to government agencies — Signaic delivers tailored intelligence for every stakeholder.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { title: "Satellite Operators", desc: "Track competitor constellations, FCC filings, spectrum allocations, and orbital slot registrations in real time.", icon: <><circle cx="12" cy="12" r="3" /><path d="M3 12a9 9 0 0 1 9-9" /><path d="M21 12a9 9 0 0 1-9 9" /><path d="M3.6 9h16.8" /><path d="M3.6 15h16.8" /></> },
+              { title: "Defense & Aerospace", desc: "Monitor contract awards, SBIR opportunities, patent filings, and M&A activity across the defense industrial base.", icon: <><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></> },
+              { title: "Space Investors", desc: "Due diligence intelligence, company tracking, funding round monitoring, and market trend analysis for space ventures.", icon: <><path d="M2 20h20" /><path d="M5 20V8l5-5 5 5v12" /><path d="M19 20V13l-4-4" /><rect x="9" y="12" width="2" height="4" /></> },
+              { title: "Government & Military", desc: "Allied nation activity tracking, commercial space capability assessments, and regulatory landscape monitoring.", icon: <><path d="M3 21h18" /><path d="M5 21V7l7-4 7 4v14" /><path d="M9 21v-4h6v4" /></> },
+            ].map((item) => (
+              <div key={item.title} className="landing-fade-in p-6 rounded-2xl border transition-colors" style={{ background: "rgba(4,8,16,0.6)", borderColor: "rgba(255,255,255,0.04)" }}>
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ background: "rgba(6,182,212,0.1)" }}>
+                  <svg className="w-6 h-6 text-[#06b6d4]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                    {item.icon}
+                  </svg>
+                </div>
+                <h3 className="font-outfit font-bold text-white text-lg mb-2">{item.title}</h3>
+                <p className="text-[0.88rem] text-[#7a859c] leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ ORBITAL BRIEF SIGNUP ═══ */}
+      <section className="py-20" style={{ background: "#040810" }}>
+        <div className="max-w-[1200px] mx-auto px-8">
+          <div
+            className="landing-fade-in relative rounded-3xl overflow-hidden"
+            style={{
+              background: "linear-gradient(135deg, rgba(6,182,212,0.08), rgba(99,102,241,0.08))",
+              border: "1px solid rgba(6,182,212,0.15)",
+            }}
+          >
+            <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at top right, rgba(6,182,212,0.06), transparent 60%)" }} />
+            <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-8 items-center p-10 lg:p-16">
+              <div>
+                <span className="font-outfit text-[0.7rem] font-semibold tracking-[0.15em] uppercase text-[#06b6d4]">
+                  Weekly Intelligence Report
+                </span>
+                <h2 className="font-outfit font-bold text-white mt-3 leading-[1.15]" style={{ fontSize: "clamp(1.6rem, 3vw, 2.2rem)" }}>
+                  Subscribe to<br />The Orbital Brief
+                </h2>
+                <p className="text-[#7a859c] mt-4 text-[0.95rem] leading-relaxed max-w-[480px]">
+                  A weekly AI-synthesized intelligence briefing covering contract awards, regulatory changes, patent filings, and competitive movements across the space and defense sector. Delivered every Monday.
+                </p>
+                <ul className="mt-6 space-y-3">
+                  {["AI-synthesized from 12+ public sources", "Contract awards & competitive signals", "Regulatory changes & spectrum allocations", "Customizable entity watchlists"].map((item) => (
+                    <li key={item} className="flex items-center gap-3 text-[0.88rem] text-[#7a859c]">
+                      <svg className="w-4 h-4 text-[#06b6d4] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-8">
+                  <Link
+                    href="/signup"
+                    className="inline-flex items-center gap-2 px-8 py-3 font-outfit text-[0.95rem] font-semibold text-black rounded-full transition-all hover:shadow-[0_0_25px_rgba(6,182,212,0.3)] hover:-translate-y-px"
+                    style={{ background: "#06b6d4" }}
+                  >
+                    Subscribe — $500/mo <ArrowIcon />
+                  </Link>
+                  <p className="text-[0.78rem] text-[#3e4758] mt-3">Cancel anytime. First briefing delivered within 24 hours.</p>
+                </div>
+              </div>
+              <div className="hidden lg:block">
+                <div className="rounded-2xl p-6 space-y-4" style={{ background: "rgba(1,2,4,0.6)", border: "1px solid rgba(255,255,255,0.06)" }}>
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-2 h-2 rounded-full bg-[#06b6d4]" />
+                    <span className="font-outfit text-xs font-semibold text-[#06b6d4] uppercase tracking-wider">Sample Briefing Preview</span>
+                  </div>
+                  {[
+                    { label: "HIGH", color: "text-red-400 bg-red-400/10", title: "SpaceX Secures $1.8B NRO Contract Extension" },
+                    { label: "HIGH", color: "text-red-400 bg-red-400/10", title: "FCC Approves Kuiper Gen2 Constellation Mod" },
+                    { label: "MED", color: "text-amber-400 bg-amber-400/10", title: "L3Harris Patents Satellite Servicing Mechanism" },
+                  ].map((item) => (
+                    <div key={item.title} className="flex items-start gap-3 p-3 rounded-lg" style={{ background: "rgba(255,255,255,0.02)" }}>
+                      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded ${item.color}`}>{item.label}</span>
+                      <span className="text-sm text-slate-300">{item.title}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ ABOUT ═══ */}
+      <section id="about" className="py-24" style={{ background: "#010204" }}>
+        <div className="max-w-[1200px] mx-auto px-8">
+          <div className="landing-fade-in max-w-[600px] mx-auto text-center mb-14">
+            <span className="font-outfit text-[0.7rem] font-semibold tracking-[0.15em] uppercase text-[#06b6d4]">
+              About Signaic
+            </span>
+            <h2 className="font-outfit font-bold leading-[1.15] tracking-tight text-white mt-3" style={{ fontSize: "clamp(1.8rem, 3vw, 2.4rem)" }}>
+              The Team Behind<br />the Intelligence
+            </h2>
+          </div>
+
+          {/* Founder */}
+          <div className="landing-fade-in max-w-[800px] mx-auto mb-16">
+            <div className="flex flex-col md:flex-row items-center gap-8 p-8 rounded-2xl" style={{ background: "rgba(4,8,16,0.6)", border: "1px solid rgba(255,255,255,0.04)" }}>
+              <div className="w-32 h-32 rounded-2xl bg-gradient-to-br from-[#06b6d4]/20 to-[#6366f1]/20 flex-shrink-0 overflow-hidden">
+                {/* Founder photo placeholder — replace with actual image */}
+                <div className="w-full h-full flex items-center justify-center">
+                  <svg className="w-16 h-16 text-[#06b6d4]/30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M20 21a8 8 0 1 0-16 0" />
+                  </svg>
+                </div>
+              </div>
+              <div>
+                <h3 className="font-outfit font-bold text-xl text-white mb-1">Ryan Hasty</h3>
+                <p className="text-[#06b6d4] font-outfit text-sm font-medium mb-3">Founder &amp; CEO</p>
+                <p className="text-[#7a859c] text-[0.9rem] leading-relaxed">
+                  Experienced in venture capital, aerospace engineering, and AI systems. Ryan founded Signaic to give space and defense professionals the same caliber of competitive intelligence that Wall Street takes for granted — automated, continuous, and AI-synthesized.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Team + Advisors */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 max-w-[800px] mx-auto">
+            {/* Team */}
+            <div className="landing-fade-in">
+              <h3 className="font-outfit font-semibold text-white text-lg mb-6 flex items-center gap-2">
+                <svg className="w-5 h-5 text-[#06b6d4]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                  <circle cx="9" cy="7" r="4" />
+                  <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                </svg>
+                Team
+              </h3>
+              <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex items-center gap-4 p-4 rounded-xl" style={{ background: "rgba(4,8,16,0.4)", border: "1px solid rgba(255,255,255,0.03)" }}>
+                    <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <circle cx="12" cy="8" r="4" />
+                        <path d="M20 21a8 8 0 1 0-16 0" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-slate-500">Coming Soon</p>
+                      <p className="text-xs text-slate-600">Position TBD</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Strategic Advisors */}
+            <div className="landing-fade-in">
+              <h3 className="font-outfit font-semibold text-white text-lg mb-6 flex items-center gap-2">
+                <svg className="w-5 h-5 text-[#6366f1]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                  <path d="M2 17l10 5 10-5" />
+                  <path d="M2 12l10 5 10-5" />
+                </svg>
+                Strategic Advisors
+              </h3>
+              <div className="space-y-4">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex items-center gap-4 p-4 rounded-xl" style={{ background: "rgba(4,8,16,0.4)", border: "1px solid rgba(255,255,255,0.03)" }}>
+                    <div className="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-slate-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                        <circle cx="12" cy="8" r="4" />
+                        <path d="M20 21a8 8 0 1 0-16 0" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-slate-500">Coming Soon</p>
+                      <p className="text-xs text-slate-600">Advisory Role TBD</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ DATA SOURCES ═══ */}
+      <section id="data-sources" className="py-24" style={{ background: "#040810" }}>
+        <div className="max-w-[1200px] mx-auto px-8">
+          <div className="landing-fade-in max-w-[600px] mx-auto text-center mb-14">
+            <span className="font-outfit text-[0.7rem] font-semibold tracking-[0.15em] uppercase text-[#06b6d4]">
+              Intelligence Sources
+            </span>
+            <h2 className="font-outfit font-bold leading-[1.15] tracking-tight text-white mt-3" style={{ fontSize: "clamp(1.8rem, 3vw, 2.4rem)" }}>
+              12+ Public Sources,<br />One Unified View
+            </h2>
+            <p className="text-[#7a859c] mt-4 text-base leading-relaxed">
+              We continuously ingest data from government databases, regulatory filings, patent offices, financial disclosures, and industry feeds — all public, all legal, all automated.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-w-[900px] mx-auto">
+            {tickerItems.map((item) => (
+              <div key={item.name} className="landing-fade-in flex items-center gap-3 p-4 rounded-xl transition-colors" style={{ background: "rgba(4,8,16,0.4)", border: "1px solid rgba(255,255,255,0.04)" }}>
+                <svg className="w-5 h-5 text-[#06b6d4] flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  {item.icon}
+                </svg>
+                <span className="text-sm font-medium text-[#7a859c]">{item.name}</span>
               </div>
             ))}
           </div>
@@ -485,9 +711,9 @@ export default function Home() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr] gap-12 mb-12">
             {/* Brand */}
             <div>
-              <Link href="/" className="flex items-center gap-3 text-white font-outfit font-bold text-[1.3rem] tracking-tight whitespace-nowrap">
+              <Link href="/" className="flex items-center gap-3 text-white font-display font-bold text-[1.3rem] tracking-wider whitespace-nowrap">
                 <SignaicLogo size={28} id="footer-lg" />
-                SIGN<span className="text-[#06b6d4]">AI</span>C
+                SIG<span className="text-[#06b6d4]">/</span>N<span className="text-[#06b6d4]">AI</span>C
               </Link>
               <p className="text-[#7a859c] text-[0.85rem] mt-4 leading-relaxed max-w-[280px]">
                 AI-powered competitive intelligence for the space and defense sector.
