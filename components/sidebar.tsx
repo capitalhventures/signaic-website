@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 import {
   LayoutDashboard,
   MessageSquare,
@@ -65,9 +66,27 @@ const dataLinks = [
   },
 ];
 
+function getUserDisplayName(user: { email?: string; user_metadata?: Record<string, unknown> } | null): string {
+  if (!user) return "User";
+  const meta = user.user_metadata;
+  if (meta?.full_name && typeof meta.full_name === "string") return meta.full_name;
+  if (meta?.name && typeof meta.name === "string") return meta.name;
+  if (user.email) return user.email.split("@")[0];
+  return "User";
+}
+
 export function Sidebar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [userName, setUserName] = useState("User");
+
+  // Fetch user info from Supabase auth
+  useEffect(() => {
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      setUserName(getUserDisplayName(user));
+    });
+  }, []);
 
   // Close sidebar on route change (mobile)
   useEffect(() => {
@@ -231,10 +250,10 @@ export function Sidebar() {
         <div className="border-t border-slate-800 p-4">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-brand-cyan/20 flex items-center justify-center">
-              <span className="text-xs font-bold text-brand-cyan">U</span>
+              <span className="text-xs font-bold text-brand-cyan">{userName.charAt(0).toUpperCase()}</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-slate-200 truncate">User</p>
+              <p className="text-sm font-medium text-slate-200 truncate">{userName}</p>
             </div>
             <form action="/auth/signout" method="post">
               <button
