@@ -1,0 +1,116 @@
+import { apiResponse, apiError } from "@/lib/api-utils";
+import { Resend } from "resend";
+
+export async function POST(request: Request) {
+  try {
+    const { email, confirmationUrl } = await request.json();
+
+    if (!email) {
+      return apiError("Email is required", 400);
+    }
+
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      return apiError("RESEND_API_KEY not configured", 500);
+    }
+
+    const resend = new Resend(apiKey);
+
+    // TODO: Once signaic.com domain is verified in Resend, change from to: noreply@signaic.com
+    const fromAddress = "onboarding@resend.dev";
+
+    const { error } = await resend.emails.send({
+      from: `SIG/NAIC <${fromAddress}>`,
+      to: email,
+      subject: "Confirm your SIG/NAIC account",
+      html: getConfirmationEmailHtml(confirmationUrl || "#"),
+    });
+
+    if (error) {
+      return apiError("Failed to send confirmation email", 500);
+    }
+
+    return apiResponse({ sent: true });
+  } catch {
+    return apiError("Internal server error", 500);
+  }
+}
+
+function getConfirmationEmailHtml(confirmationUrl: string): string {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirm your SIG/NAIC account</title>
+</head>
+<body style="margin:0;padding:0;background-color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0f172a;">
+    <tr>
+      <td align="center" style="padding:40px 20px;">
+        <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;">
+          <!-- Logo -->
+          <tr>
+            <td align="center" style="padding-bottom:32px;">
+              <span style="font-size:32px;font-weight:900;letter-spacing:3px;color:#ffffff;">
+                SIG<span style="color:#06b6d4;">/</span>N<span style="color:#06b6d4;">AI</span>C
+              </span>
+            </td>
+          </tr>
+          <!-- Card -->
+          <tr>
+            <td style="background-color:#1e293b;border-radius:16px;border:1px solid rgba(100,116,139,0.3);padding:40px;">
+              <!-- Cyan accent bar -->
+              <div style="width:48px;height:4px;background-color:#06b6d4;border-radius:2px;margin-bottom:24px;"></div>
+
+              <h1 style="margin:0 0 16px;color:#ffffff;font-size:22px;font-weight:600;">
+                Verify your email address
+              </h1>
+
+              <p style="margin:0 0 24px;color:#94a3b8;font-size:15px;line-height:1.6;">
+                Thanks for creating a SIG/NAIC account. Click the button below to confirm your email and get access to the intelligence platform.
+              </p>
+
+              <!-- CTA Button -->
+              <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
+                <tr>
+                  <td style="background-color:#06b6d4;border-radius:8px;">
+                    <a href="${confirmationUrl}" target="_blank" style="display:inline-block;padding:14px 32px;color:#0f172a;font-size:15px;font-weight:600;text-decoration:none;">
+                      Confirm Email Address
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin:0 0 16px;color:#64748b;font-size:13px;line-height:1.5;">
+                Or copy and paste this URL into your browser:
+              </p>
+              <p style="margin:0 0 24px;color:#06b6d4;font-size:12px;word-break:break-all;line-height:1.5;">
+                ${confirmationUrl}
+              </p>
+
+              <div style="border-top:1px solid rgba(100,116,139,0.2);padding-top:20px;margin-top:8px;">
+                <p style="margin:0;color:#475569;font-size:12px;line-height:1.5;">
+                  This link expires in 24 hours. If you didn't create a SIG/NAIC account, you can safely ignore this email.
+                </p>
+              </div>
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="padding-top:24px;">
+              <p style="margin:0;color:#475569;font-size:12px;">
+                SIG/NAIC &mdash; AI-Powered Competitive Intelligence for Space & Defense
+              </p>
+              <p style="margin:8px 0 0;color:#334155;font-size:11px;">
+                signaic.com
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}

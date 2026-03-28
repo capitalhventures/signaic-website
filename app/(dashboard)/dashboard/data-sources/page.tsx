@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Card, StatusIndicator } from "@/components/ui";
+import { Card } from "@/components/ui";
 import { Database, RefreshCw, Clock, Shield } from "lucide-react";
 
 interface SourceHealth {
   name: string;
   table: string;
-  status: "green" | "yellow" | "red";
+  status: "green" | "yellow" | "red" | "coming_soon";
   totalRows: number;
   lastUpdated: string | null;
   hoursSinceUpdate: number | null;
@@ -20,23 +20,9 @@ interface DataSource {
   description: string;
   lastRefresh: string;
   recordCount: string;
-  status: "green" | "yellow" | "red";
+  status: "green" | "yellow" | "red" | "coming_soon";
   refreshFrequency: string;
 }
-
-const fallbackSources: DataSource[] = [
-  { name: "FCC Filings", description: "Federal Communications Commission electronic filings and orders", lastRefresh: "Checking...", recordCount: "--", status: "green", refreshFrequency: "Every 6 hours" },
-  { name: "SEC Filings", description: "Securities and Exchange Commission EDGAR filings", lastRefresh: "Checking...", recordCount: "--", status: "green", refreshFrequency: "Every 12 hours" },
-  { name: "Patents (USPTO)", description: "United States Patent and Trademark Office applications and grants", lastRefresh: "Checking...", recordCount: "--", status: "green", refreshFrequency: "Daily" },
-  { name: "Government Contracts", description: "Federal contract awards and modifications from FPDS", lastRefresh: "Checking...", recordCount: "--", status: "green", refreshFrequency: "Every 6 hours" },
-  { name: "Orbital Data", description: "Satellite catalog, TLEs, and orbital parameters", lastRefresh: "Checking...", recordCount: "--", status: "green", refreshFrequency: "Every 2 hours" },
-  { name: "News", description: "Aggregated space and defense industry news sources", lastRefresh: "Checking...", recordCount: "--", status: "green", refreshFrequency: "Every hour" },
-  { name: "Entities", description: "Tracked companies, agencies, and programs", lastRefresh: "Checking...", recordCount: "--", status: "green", refreshFrequency: "On-demand" },
-  { name: "Federal Register", description: "Federal Register notices and proposed rules", lastRefresh: "Checking...", recordCount: "--", status: "green", refreshFrequency: "Daily" },
-  { name: "SAM.gov Opportunities", description: "System for Award Management contract opportunities", lastRefresh: "Checking...", recordCount: "--", status: "green", refreshFrequency: "Every 6 hours" },
-  { name: "SBIR/STTR Awards", description: "Small Business Innovation Research awards and solicitations", lastRefresh: "Checking...", recordCount: "--", status: "green", refreshFrequency: "Daily" },
-  { name: "Embeddings Index", description: "Vector embeddings for semantic search (pgvector)", lastRefresh: "Checking...", recordCount: "--", status: "green", refreshFrequency: "Continuous" },
-];
 
 const refreshFrequencyMap: Record<string, string> = {
   fcc_filings: "Every 6 hours",
@@ -73,10 +59,40 @@ function formatLastRefresh(lastUpdated: string | null, hoursSinceUpdate: number 
   return `${Math.round(hoursSinceUpdate / 24)} days ago`;
 }
 
+function statusLabel(status: string): string {
+  switch (status) {
+    case "green": return "Active";
+    case "yellow": return "Stale";
+    case "red": return "Down";
+    case "coming_soon": return "Coming Soon";
+    default: return "Unknown";
+  }
+}
+
+function statusColor(status: string): string {
+  switch (status) {
+    case "green": return "text-emerald-600";
+    case "yellow": return "text-amber-600";
+    case "red": return "text-red-600";
+    case "coming_soon": return "text-slate-400";
+    default: return "text-slate-400";
+  }
+}
+
+function statusDot(status: string): string {
+  switch (status) {
+    case "green": return "bg-emerald-500";
+    case "yellow": return "bg-amber-500";
+    case "red": return "bg-red-500";
+    case "coming_soon": return "bg-slate-300";
+    default: return "bg-slate-300";
+  }
+}
+
 export default function DataSourcesPage() {
   const [liveData, setLiveData] = useState<SourceHealth[] | null>(null);
   const [sentinelLastCheck, setSentinelLastCheck] = useState<string | null>(null);
-  const [useFallback, setUseFallback] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchStatus() {
@@ -87,32 +103,30 @@ export default function DataSourcesPage() {
         if (json.success && json.data?.sources) {
           setLiveData(json.data.sources);
           setSentinelLastCheck(json.data.sentinel_last_check || null);
-          setUseFallback(false);
         }
       } catch {
-        // Keep fallback data
+        // Keep loading state
+      } finally {
+        setLoading(false);
       }
     }
     fetchStatus();
   }, []);
 
-  const displaySources = useFallback
-    ? fallbackSources
-    : (liveData || []).map((s) => ({
-        name: s.name,
-        description: descriptionMap[s.table] || s.table,
-        lastRefresh: formatLastRefresh(s.lastUpdated, s.hoursSinceUpdate),
-        recordCount: s.totalRows.toLocaleString(),
-        status: s.status,
-        refreshFrequency: refreshFrequencyMap[s.table] || "Unknown",
-      }));
+  const displaySources: DataSource[] = (liveData || []).map((s) => ({
+    name: s.name,
+    description: descriptionMap[s.table] || s.table,
+    lastRefresh: s.status === "coming_soon" ? "\u2014" : formatLastRefresh(s.lastUpdated, s.hoursSinceUpdate),
+    recordCount: s.status === "coming_soon" ? "\u2014" : s.totalRows.toLocaleString(),
+    status: s.status,
+    refreshFrequency: refreshFrequencyMap[s.table] || "Unknown",
+  }));
 
   const healthyCount = displaySources.filter((s) => s.status === "green").length;
   const degradedCount = displaySources.filter((s) => s.status === "yellow").length;
   const downCount = displaySources.filter((s) => s.status === "red").length;
-  const totalRecords = useFallback
-    ? "--"
-    : (liveData || []).reduce((sum, s) => sum + s.totalRows, 0).toLocaleString();
+  const comingSoonCount = displaySources.filter((s) => s.status === "coming_soon").length;
+  const totalRecords = (liveData || []).reduce((sum, s) => sum + s.totalRows, 0).toLocaleString();
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">
@@ -139,23 +153,23 @@ export default function DataSourcesPage() {
             Total Sources
           </p>
           <p className="text-3xl font-bold text-slate-900 mt-1 font-mono">
-            {displaySources.length}
+            {loading ? "--" : displaySources.length}
           </p>
         </Card>
         <Card>
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            Healthy
+            Active
           </p>
           <p className="text-3xl font-bold text-emerald-600 mt-1 font-mono">
-            {healthyCount}
+            {loading ? "--" : healthyCount}
           </p>
         </Card>
         <Card>
           <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            Degraded
+            Stale
           </p>
           <p className="text-3xl font-bold text-amber-600 mt-1 font-mono">
-            {degradedCount}
+            {loading ? "--" : degradedCount}
           </p>
         </Card>
         <Card>
@@ -163,7 +177,7 @@ export default function DataSourcesPage() {
             Down
           </p>
           <p className="text-3xl font-bold text-red-600 mt-1 font-mono">
-            {downCount}
+            {loading ? "--" : downCount}
           </p>
         </Card>
         <Card>
@@ -171,7 +185,7 @@ export default function DataSourcesPage() {
             Total Records
           </p>
           <p className="text-3xl font-bold text-slate-900 mt-1 font-mono">
-            {totalRecords}
+            {loading ? "--" : totalRecords}
           </p>
         </Card>
       </div>
@@ -200,10 +214,24 @@ export default function DataSourcesPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
-              {displaySources.map((source) => (
+              {loading && (
+                <tr>
+                  <td colSpan={5} className="text-center py-8 text-sm text-slate-400">
+                    Loading data sources...
+                  </td>
+                </tr>
+              )}
+              {!loading && displaySources.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="text-center py-8 text-sm text-slate-400">
+                    Unable to load source status
+                  </td>
+                </tr>
+              )}
+              {!loading && displaySources.map((source) => (
                 <tr
                   key={source.name}
-                  className="hover:bg-slate-50 transition-colors"
+                  className={`hover:bg-slate-50 transition-colors ${source.status === "coming_soon" ? "opacity-60" : ""}`}
                 >
                   <td className="px-6 py-4">
                     <p className="text-sm font-medium text-slate-900">
@@ -214,7 +242,12 @@ export default function DataSourcesPage() {
                     </p>
                   </td>
                   <td className="px-6 py-4">
-                    <StatusIndicator status={source.status} pulse={false} />
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full ${statusDot(source.status)}`} />
+                      <span className={`text-sm font-medium ${statusColor(source.status)}`}>
+                        {statusLabel(source.status)}
+                      </span>
+                    </div>
                   </td>
                   <td className="px-6 py-4">
                     <span className="text-sm text-slate-600 flex items-center gap-1.5">
@@ -239,6 +272,12 @@ export default function DataSourcesPage() {
           </table>
         </div>
       </Card>
+
+      {comingSoonCount > 0 && !loading && (
+        <p className="text-xs text-slate-400 text-center">
+          {comingSoonCount} source{comingSoonCount !== 1 ? "s" : ""} pending pipeline configuration
+        </p>
+      )}
     </div>
   );
 }

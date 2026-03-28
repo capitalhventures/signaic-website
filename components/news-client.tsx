@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatDistanceToNow } from "date-fns";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, RefreshCw, Clock } from "lucide-react";
 import { ExportButton } from "@/components/export-button";
 import { exportTableToPDF } from "@/lib/export-pdf";
 
@@ -35,13 +35,23 @@ function sentimentColor(sentiment: string | null) {
 
 const PAGE_SIZE = 20;
 
-export function NewsClient({ news }: { news: NewsArticle[] }) {
+export function NewsClient({
+  news,
+  isAdmin,
+  lastRefreshed,
+}: {
+  news: NewsArticle[];
+  isAdmin?: boolean;
+  lastRefreshed?: string | null;
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const highlightId = searchParams.get("highlight");
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const visible = news.slice(0, visibleCount);
   const highlightRef = useRef<HTMLDivElement>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshResult, setRefreshResult] = useState<string | null>(null);
 
   const uniqueSources = useMemo(() => {
     const sources = new Set<string>();
@@ -60,7 +70,7 @@ export function NewsClient({ news }: { news: NewsArticle[] }) {
       a.published_date
         ? new Date(a.published_date).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })
         : "Unknown",
-      a.companies?.name || "—",
+      a.companies?.name || "\u2014",
       a.summary || "No summary available.",
     ]);
     exportTableToPDF({
@@ -71,6 +81,25 @@ export function NewsClient({ news }: { news: NewsArticle[] }) {
       filters: filterLabel,
       filename: `signaic-intelligence-digest-${Date.now()}.pdf`,
     });
+  }
+
+  async function handleRefresh() {
+    setRefreshing(true);
+    setRefreshResult(null);
+    try {
+      const res = await fetch("/api/v1/news/refresh", { method: "POST" });
+      const json = await res.json();
+      if (json.success) {
+        setRefreshResult(`${json.data.inserted} new articles added`);
+        setTimeout(() => router.refresh(), 1500);
+      } else {
+        setRefreshResult(json.error || "Refresh failed");
+      }
+    } catch {
+      setRefreshResult("Refresh failed");
+    } finally {
+      setRefreshing(false);
+    }
   }
 
   useEffect(() => {
@@ -86,49 +115,78 @@ export function NewsClient({ news }: { news: NewsArticle[] }) {
           <h1 className="text-2xl font-bold font-[family-name:var(--font-chakra-petch)] text-[#00D4FF]">
             News
           </h1>
-          <ExportButton
-            label="Export PDF"
-            options={[
-              {
-                label: "Export All Articles",
-                onClick: () => handleExport(news),
-              },
-              {
-                label: "Export Positive Only",
-                onClick: () =>
-                  handleExport(
-                    news.filter((a) => a.sentiment?.toLowerCase() === "positive"),
-                    "Sentiment: Positive"
-                  ),
-              },
-              {
-                label: "Export Negative Only",
-                onClick: () =>
-                  handleExport(
-                    news.filter((a) => a.sentiment?.toLowerCase() === "negative"),
-                    "Sentiment: Negative"
-                  ),
-              },
-              ...uniqueSources.map((source) => ({
-                label: `Source: ${source}`,
-                onClick: () =>
-                  handleExport(
-                    news.filter((a) => a.source === source),
-                    `Source: ${source}`
-                  ),
-              })),
-            ]}
-          />
+          <div className="flex items-center gap-3">
+            {isAdmin && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRefresh}
+                disabled={refreshing}
+                className="border-[#d1d5db] text-[#666666] gap-2"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
+                {refreshing ? "Refreshing..." : "Refresh"}
+              </Button>
+            )}
+            <ExportButton
+              label="Export PDF"
+              options={[
+                {
+                  label: "Export All Articles",
+                  onClick: () => handleExport(news),
+                },
+                {
+                  label: "Export Positive Only",
+                  onClick: () =>
+                    handleExport(
+                      news.filter((a) => a.sentiment?.toLowerCase() === "positive"),
+                      "Sentiment: Positive"
+                    ),
+                },
+                {
+                  label: "Export Negative Only",
+                  onClick: () =>
+                    handleExport(
+                      news.filter((a) => a.sentiment?.toLowerCase() === "negative"),
+                      "Sentiment: Negative"
+                    ),
+                },
+                ...uniqueSources.map((source) => ({
+                  label: `Source: ${source}`,
+                  onClick: () =>
+                    handleExport(
+                      news.filter((a) => a.source === source),
+                      `Source: ${source}`
+                    ),
+                })),
+              ]}
+            />
+          </div>
         </div>
         <p className="text-[#666666] text-sm mt-1">
           Space & defense industry news
         </p>
-        <div className="mt-2 text-xs text-[#888888] bg-[#f8f9fa] border border-[#e2e4e8] rounded-md px-3 py-2 max-w-xl">
-          <span className="font-medium text-[#666666]">Sentiment guide:</span>{" "}
-          <span className="text-green-700">Positive</span> = favorable industry development,{" "}
-          <span className="text-[#666666]">Neutral</span> = factual/informational,{" "}
-          <span className="text-red-700">Negative</span> = concerning development or risk signal
+        <div className="flex items-center gap-4 mt-2">
+          <div className="text-xs text-[#888888] bg-[#f8f9fa] border border-[#e2e4e8] rounded-md px-3 py-2 max-w-xl">
+            <span className="font-medium text-[#666666]">Sentiment guide:</span>{" "}
+            <span className="text-green-700">Positive</span> = favorable industry development,{" "}
+            <span className="text-[#666666]">Neutral</span> = factual/informational,{" "}
+            <span className="text-red-700">Negative</span> = concerning development or risk signal
+          </div>
         </div>
+        {(lastRefreshed || refreshResult) && (
+          <div className="flex items-center gap-3 mt-2 text-xs text-[#888888]">
+            {lastRefreshed && (
+              <span className="flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                Last refreshed: {formatDistanceToNow(new Date(lastRefreshed), { addSuffix: true })}
+              </span>
+            )}
+            {refreshResult && (
+              <span className="text-[#06b6d4]">{refreshResult}</span>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

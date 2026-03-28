@@ -14,9 +14,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
+import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp, ExternalLink, RefreshCw, Clock } from "lucide-react";
 import { ExportButton } from "@/components/export-button";
 import { exportTableToPDF } from "@/lib/export-pdf";
+import { formatDistanceToNow } from "date-fns";
 
 interface OrbitalObject {
   id: string;
@@ -38,12 +39,22 @@ const orbitTypes = ["All", "LEO", "MEO", "GEO", "HEO"];
 
 const PAGE_SIZE_OPTIONS = [10, 50, 100] as const;
 
-export function OrbitalDataClient({ objects }: { objects: OrbitalObject[] }) {
+export function OrbitalDataClient({
+  objects,
+  isAdmin,
+  lastRefreshed,
+}: {
+  objects: OrbitalObject[];
+  isAdmin?: boolean;
+  lastRefreshed?: string | null;
+}) {
   const [filter, setFilter] = useState("All");
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState<number>(10);
   const [sortAsc, setSortAsc] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshResult, setRefreshResult] = useState<string | null>(null);
   const router = useRouter();
 
   const filtered = useMemo(() => {
@@ -54,7 +65,6 @@ export function OrbitalDataClient({ objects }: { objects: OrbitalObject[] }) {
             (o) => o.orbit_type?.toUpperCase() === filter
           );
 
-    // Sort by launch_date descending by default
     result.sort((a, b) => {
       const aVal = a.launch_date || "";
       const bVal = b.launch_date || "";
@@ -99,10 +109,10 @@ export function OrbitalDataClient({ objects }: { objects: OrbitalObject[] }) {
     const rows = sourceData.map((o) => [
       o.object_name || "Unknown",
       o.norad_cat_id || "N/A",
-      o.companies?.name || "—",
+      o.companies?.name || "\u2014",
       o.orbit_type || "Unknown",
       o.launch_date || "N/A",
-      o.inclination != null ? `${o.inclination.toFixed(1)}°` : "N/A",
+      o.inclination != null ? `${o.inclination.toFixed(1)}\u00B0` : "N/A",
       o.period != null ? o.period.toFixed(1) : "N/A",
       o.apoapsis != null ? o.apoapsis.toFixed(0) : "N/A",
       o.periapsis != null ? o.periapsis.toFixed(0) : "N/A",
@@ -118,7 +128,7 @@ export function OrbitalDataClient({ objects }: { objects: OrbitalObject[] }) {
 
     exportTableToPDF({
       title: operatorFilter
-        ? `Orbital Objects — ${operatorFilter}`
+        ? `Orbital Objects \u2014 ${operatorFilter}`
         : "Orbital Objects",
       subtitle: `${sourceData.length} tracked objects`,
       columns,
@@ -128,6 +138,25 @@ export function OrbitalDataClient({ objects }: { objects: OrbitalObject[] }) {
         ? `orbital-${operatorFilter.toLowerCase().replace(/\s+/g, "-")}.pdf`
         : "orbital-objects.pdf",
     });
+  }
+
+  async function handleRefresh() {
+    setRefreshing(true);
+    setRefreshResult(null);
+    try {
+      const res = await fetch("/api/v1/orbital/refresh", { method: "POST" });
+      const json = await res.json();
+      if (json.success) {
+        setRefreshResult(`${json.data.upserted} objects updated`);
+        setTimeout(() => router.refresh(), 1500);
+      } else {
+        setRefreshResult(json.error || "Refresh failed");
+      }
+    } catch {
+      setRefreshResult("Refresh failed");
+    } finally {
+      setRefreshing(false);
+    }
   }
 
   const showAll = pageSize === 0;
@@ -147,17 +176,44 @@ export function OrbitalDataClient({ objects }: { objects: OrbitalObject[] }) {
           <p className="text-[#666666] text-sm mt-1">
             Tracked objects from Space-Track.org
           </p>
+          {(lastRefreshed || refreshResult) && (
+            <div className="flex items-center gap-3 mt-2 text-xs text-[#888888]">
+              {lastRefreshed && (
+                <span className="flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  Last refreshed: {formatDistanceToNow(new Date(lastRefreshed), { addSuffix: true })}
+                </span>
+              )}
+              {refreshResult && (
+                <span className="text-[#06b6d4]">{refreshResult}</span>
+              )}
+            </div>
+          )}
         </div>
-        <ExportButton
-          label="Export PDF"
-          options={[
-            { label: "Export All Objects", onClick: () => handleExport() },
-            ...uniqueOperators.map((name) => ({
-              label: name,
-              onClick: () => handleExport(name),
-            })),
-          ]}
-        />
+        <div className="flex items-center gap-3">
+          {isAdmin && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="border-[#d1d5db] text-[#666666] gap-2"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
+              {refreshing ? "Refreshing..." : "Refresh"}
+            </Button>
+          )}
+          <ExportButton
+            label="Export PDF"
+            options={[
+              { label: "Export All Objects", onClick: () => handleExport() },
+              ...uniqueOperators.map((name) => ({
+                label: name,
+                onClick: () => handleExport(name),
+              })),
+            ]}
+          />
+        </div>
       </div>
 
       <Tabs value={filter} onValueChange={(val) => { setFilter(val); setPage(0); }}>
@@ -237,7 +293,7 @@ export function OrbitalDataClient({ objects }: { objects: OrbitalObject[] }) {
                       {obj.launch_date || "N/A"}
                     </TableCell>
                     <TableCell className="text-sm text-[#333333]">
-                      {obj.inclination != null ? `${obj.inclination.toFixed(1)}°` : "N/A"}
+                      {obj.inclination != null ? `${obj.inclination.toFixed(1)}\u00B0` : "N/A"}
                     </TableCell>
                     <TableCell className="text-sm text-[#333333]">
                       {obj.period != null ? `${obj.period.toFixed(1)} min` : "N/A"}
@@ -249,15 +305,20 @@ export function OrbitalDataClient({ objects }: { objects: OrbitalObject[] }) {
                       {obj.periapsis != null ? `${obj.periapsis.toFixed(0)} km` : "N/A"}
                     </TableCell>
                     <TableCell>
-                      <a
-                        href={`https://www.n2yo.com/satellite/?s=${obj.norad_cat_id}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="text-[#00D4FF] hover:text-[#00D4FF]/80"
+                      <span
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.open(
+                            obj.norad_cat_id
+                              ? `https://www.space-track.org/basicspacedata/query/class/gp/NORAD_CAT_ID/${obj.norad_cat_id}/format/html`
+                              : "https://www.space-track.org",
+                            "_blank"
+                          );
+                        }}
+                        className="text-[#00D4FF] hover:text-[#00D4FF]/80 cursor-pointer"
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
+                      </span>
                     </TableCell>
                   </TableRow>
                   {expandedId === obj.id && (
@@ -282,7 +343,7 @@ export function OrbitalDataClient({ objects }: { objects: OrbitalObject[] }) {
                           </div>
                           <div>
                             <span className="text-[#666666]">Inclination:</span>
-                            <p className="text-[#333333] mt-0.5">{obj.inclination != null ? `${obj.inclination.toFixed(2)}°` : "N/A"}</p>
+                            <p className="text-[#333333] mt-0.5">{obj.inclination != null ? `${obj.inclination.toFixed(2)}\u00B0` : "N/A"}</p>
                           </div>
                           <div>
                             <span className="text-[#666666]">Period:</span>

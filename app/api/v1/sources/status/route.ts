@@ -1,5 +1,5 @@
 import { apiResponse, apiError, getAuthUser, checkRateLimit } from "@/lib/api-utils";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 interface SourceStatus {
   name: string;
@@ -8,7 +8,7 @@ interface SourceStatus {
   lastUpdated: string | null;
   recordCount: number;
   totalRows: number;
-  status: "green" | "yellow" | "red";
+  status: "green" | "yellow" | "red" | "coming_soon";
   hoursSinceUpdate: number | null;
   expectedRefreshHours: number;
   message: string;
@@ -37,7 +37,7 @@ export async function GET() {
   }
 
   try {
-    const supabase = createClient();
+    const supabase = createAdminClient();
 
     const sources = [
       { name: "FCC Filings", table: "fcc_filings" },
@@ -57,12 +57,45 @@ export async function GET() {
 
     for (const source of sources) {
       try {
-        const { count } = await supabase
+        const { count, error: countError } = await supabase
           .from(source.table)
           .select("*", { count: "exact", head: true });
 
+        if (countError) {
+          // Table doesn't exist or is inaccessible
+          statuses.push({
+            name: source.name,
+            table: source.table,
+            lastRefresh: null,
+            lastUpdated: null,
+            recordCount: 0,
+            totalRows: 0,
+            status: "coming_soon",
+            hoursSinceUpdate: null,
+            expectedRefreshHours: expectedRefreshMap[source.table] || 24,
+            message: "Coming soon",
+          });
+          continue;
+        }
+
         const totalRows = count || 0;
         const expectedRefreshHours = expectedRefreshMap[source.table] || 24;
+
+        if (totalRows === 0) {
+          statuses.push({
+            name: source.name,
+            table: source.table,
+            lastRefresh: null,
+            lastUpdated: null,
+            recordCount: 0,
+            totalRows: 0,
+            status: "red",
+            hoursSinceUpdate: null,
+            expectedRefreshHours,
+            message: "Table is empty",
+          });
+          continue;
+        }
 
         const { data: latest } = await supabase
           .from(source.table)
@@ -79,16 +112,13 @@ export async function GET() {
         let status: "green" | "yellow" | "red";
         let message: string;
 
-        if (totalRows === 0) {
-          status = "red";
-          message = "Table is empty";
-        } else if (hoursSinceUpdate === null) {
+        if (hoursSinceUpdate === null) {
           status = "yellow";
           message = "Could not determine last update time";
         } else if (hoursSinceUpdate <= expectedRefreshHours) {
           status = "green";
           message = `Updated ${hoursSinceUpdate.toFixed(1)}h ago`;
-        } else if (hoursSinceUpdate <= expectedRefreshHours * 2) {
+        } else if (hoursSinceUpdate <= expectedRefreshHours * 3) {
           status = "yellow";
           message = `Stale: ${hoursSinceUpdate.toFixed(1)}h since last update`;
         } else {
@@ -116,10 +146,10 @@ export async function GET() {
           lastUpdated: null,
           recordCount: 0,
           totalRows: 0,
-          status: "red",
+          status: "coming_soon",
           hoursSinceUpdate: null,
           expectedRefreshHours: expectedRefreshMap[source.table] || 24,
-          message: "Table not available",
+          message: "Coming soon",
         });
       }
     }
@@ -152,6 +182,7 @@ export async function GET() {
         green: statuses.filter((s) => s.status === "green").length,
         yellow: statuses.filter((s) => s.status === "yellow").length,
         red: statuses.filter((s) => s.status === "red").length,
+        coming_soon: statuses.filter((s) => s.status === "coming_soon").length,
         lastGlobalRefresh: new Date().toISOString(),
       },
     });

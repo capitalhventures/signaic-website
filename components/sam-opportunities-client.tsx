@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -13,9 +14,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Search, ExternalLink, ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from "lucide-react";
+import { Search, ExternalLink, ChevronLeft, ChevronRight, ChevronDown, ChevronUp, RefreshCw, Clock } from "lucide-react";
 import { ExportButton } from "@/components/export-button";
 import { exportTableToPDF } from "@/lib/export-pdf";
+import { formatDistanceToNow } from "date-fns";
 
 interface Opportunity {
   id: string;
@@ -50,10 +52,15 @@ function deadlineColor(deadline: string | null): string {
 export function SamOpportunitiesClient({
   opportunities,
   error,
+  isAdmin,
+  lastRefreshed,
 }: {
   opportunities: Opportunity[];
   error?: string;
+  isAdmin?: boolean;
+  lastRefreshed?: string | null;
 }) {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [setAsideFilter, setSetAsideFilter] = useState("all");
   const [agencyFilter, setAgencyFilter] = useState("all");
@@ -65,6 +72,8 @@ export function SamOpportunitiesClient({
   const [pageSize, setPageSize] = useState(10);
   const [sortField, setSortField] = useState<SortField>("posted_date");
   const [sortAsc, setSortAsc] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshResult, setRefreshResult] = useState<string | null>(null);
 
   const uniqueSetAsides = useMemo(() => {
     const set = new Set<string>();
@@ -181,6 +190,25 @@ export function SamOpportunitiesClient({
     []
   );
 
+  async function handleRefresh() {
+    setRefreshing(true);
+    setRefreshResult(null);
+    try {
+      const res = await fetch("/api/v1/sam/refresh", { method: "POST" });
+      const json = await res.json();
+      if (json.success) {
+        setRefreshResult(`${json.data.inserted} new opportunities added`);
+        setTimeout(() => router.refresh(), 1500);
+      } else {
+        setRefreshResult(json.error || "Refresh failed");
+      }
+    } catch {
+      setRefreshResult("Refresh failed");
+    } finally {
+      setRefreshing(false);
+    }
+  }
+
   const effectivePageSize = pageSize === 0 ? filtered.length : pageSize;
   const pageCount = effectivePageSize > 0 ? Math.ceil(filtered.length / effectivePageSize) : 1;
   const pageData = pageSize === 0 ? filtered : filtered.slice(page * pageSize, (page + 1) * pageSize);
@@ -210,40 +238,67 @@ export function SamOpportunitiesClient({
           <p className="text-[#666666] text-sm mt-1">
             Active opportunities from SAM.gov for space, defense, and telecom.
           </p>
+          {(lastRefreshed || refreshResult) && (
+            <div className="flex items-center gap-3 mt-2 text-xs text-[#888888]">
+              {lastRefreshed && (
+                <span className="flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  Last refreshed: {formatDistanceToNow(new Date(lastRefreshed), { addSuffix: true })}
+                </span>
+              )}
+              {refreshResult && (
+                <span className="text-[#06b6d4]">{refreshResult}</span>
+              )}
+            </div>
+          )}
         </div>
-        <ExportButton
-          label="Export PDF"
-          options={[
-            {
-              label: "Export All Opportunities",
-              onClick: () => handleExport(filtered, search ? `Search: "${search}"` : undefined),
-            },
-            ...uniqueNaics.slice(0, 15).map((code) => ({
-              label: `Export NAICS: ${code}`,
-              onClick: () =>
-                handleExport(
-                  filtered.filter((o) => o.naics_code === code),
-                  `NAICS: ${code}`
-                ),
-            })),
-            ...uniqueAgencies.slice(0, 15).map((agency) => ({
-              label: `Export Agency: ${agency}`,
-              onClick: () =>
-                handleExport(
-                  filtered.filter((o) => o.agency?.startsWith(agency)),
-                  `Agency: ${agency}`
-                ),
-            })),
-            ...uniqueSetAsides.slice(0, 10).map((sa) => ({
-              label: `Export Set-Aside: ${sa}`,
-              onClick: () =>
-                handleExport(
-                  filtered.filter((o) => o.set_aside_type === sa),
-                  `Set-Aside: ${sa}`
-                ),
-            })),
-          ]}
-        />
+        <div className="flex items-center gap-3">
+          {isAdmin && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="border-[#d1d5db] text-[#666666] gap-2"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? "animate-spin" : ""}`} />
+              {refreshing ? "Refreshing..." : "Refresh"}
+            </Button>
+          )}
+          <ExportButton
+            label="Export PDF"
+            options={[
+              {
+                label: "Export All Opportunities",
+                onClick: () => handleExport(filtered, search ? `Search: "${search}"` : undefined),
+              },
+              ...uniqueNaics.slice(0, 15).map((code) => ({
+                label: `Export NAICS: ${code}`,
+                onClick: () =>
+                  handleExport(
+                    filtered.filter((o) => o.naics_code === code),
+                    `NAICS: ${code}`
+                  ),
+              })),
+              ...uniqueAgencies.slice(0, 15).map((agency) => ({
+                label: `Export Agency: ${agency}`,
+                onClick: () =>
+                  handleExport(
+                    filtered.filter((o) => o.agency?.startsWith(agency)),
+                    `Agency: ${agency}`
+                  ),
+              })),
+              ...uniqueSetAsides.slice(0, 10).map((sa) => ({
+                label: `Export Set-Aside: ${sa}`,
+                onClick: () =>
+                  handleExport(
+                    filtered.filter((o) => o.set_aside_type === sa),
+                    `Set-Aside: ${sa}`
+                  ),
+              })),
+            ]}
+          />
+        </div>
       </div>
 
       {error && (
@@ -403,7 +458,7 @@ export function SamOpportunitiesClient({
                     className="text-center text-[#666666] py-8"
                   >
                     {opportunities.length === 0
-                      ? "SAM.gov contract opportunities are currently being refreshed. The SAM.gov API has a daily rate limit — data will be available after the next scheduled sync. Last checked: March 23, 2026."
+                      ? "No SAM.gov opportunities loaded yet. Use the Refresh button to fetch live data."
                       : "No opportunities match your filters"}
                   </TableCell>
                 </TableRow>
@@ -461,15 +516,13 @@ export function SamOpportunitiesClient({
                   </TableCell>
                   <TableCell>
                     {opp.sam_gov_url && (
-                      <a
-                        href={opp.sam_gov_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[#00D4FF] hover:underline inline-flex items-center gap-1 text-xs"
+                      <span
+                        onClick={() => window.open(opp.sam_gov_url!, "_blank")}
+                        className="text-[#00D4FF] hover:underline inline-flex items-center gap-1 text-xs cursor-pointer"
                       >
                         View
                         <ExternalLink className="w-3 h-3" />
-                      </a>
+                      </span>
                     )}
                   </TableCell>
                 </TableRow>
