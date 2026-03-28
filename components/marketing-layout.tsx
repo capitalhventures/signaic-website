@@ -24,12 +24,6 @@ const platformItems: DropdownItem[] = [
     path: "/platform",
   },
   {
-    title: "Ask Raptor",
-    description:
-      "Your AI-powered competitive intelligence analyst. Ask any question in plain English across every data source. Get structured, cited answers synthesized from filings, contracts, patents, and more in seconds.",
-    path: "/ask-raptor",
-  },
-  {
     title: "Data Sources",
     description:
       "30+ authoritative government and industry data feeds including FCC, USPTO, USASpending, SEC EDGAR, Space-Track, and real-time news. All aggregated, searchable, and AI-queryable.",

@@ -234,9 +234,9 @@ export function LandingPage() {
                   Example prompts
                 </p>
                 {[
-                  "Who won the most Space Force contracts this quarter?",
-                  "Compare Kuiper vs Starlink FCC filing activity",
-                  "What patents has L3Harris filed for LEO ground systems?",
+                  "Cross-reference L3Harris patent filings with their recent SBIR awards. Are they building toward a specific orbital servicing capability?",
+                  "Which satellite operators filed the most FCC experimental STAs in the last 90 days, and how do their spectrum requests overlap with existing Ku/Ka allocations?",
+                  "Analyze the contract award patterns between Space Force and commercial launch providers over the last 2 years. Who is gaining share?",
                 ].map((prompt) => (
                   <button
                     key={prompt}
