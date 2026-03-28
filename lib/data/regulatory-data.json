@@ -1,0 +1,1561 @@
+[
+  {
+    "country": "United States",
+    "region": "Americas",
+    "regulator_name": "FCC (Federal Communications Commission)",
+    "regulator_url": "https://www.fcc.gov",
+    "regulator_contact_url": "https://www.fcc.gov/about/contact",
+    "foreign_ownership_restrictions": "Section 310(b) of the Communications Act restricts foreign ownership of broadcast and common carrier licensees to 20% direct and 25% indirect, subject to FCC review. Satellite services under Title III may face different thresholds. FCC has a Team Telecom national security review process for foreign ownership.",
+    "data_sovereignty": "No federal data localization mandate for satellite operators. Sector-specific rules apply (ITAR for defense-related data, HIPAA for health data). CFIUS review possible for foreign acquisitions involving sensitive data.",
+    "spectrum_licensing": "FCC allocates spectrum per the Table of Frequency Allocations. Satellite operators apply through the International Bureau for space station and earth station licenses. Processing rounds for NGSO systems. Coordination with NTIA for federal spectrum.",
+    "landing_rights": "Earth station licenses required for receive and transmit. Market access petitions for foreign-licensed satellites seeking US market access under the DISCO II framework.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "6-18 months depending on complexity and processing round status",
+    "application_portal_url": "https://www.fcc.gov/licensing-databases/licensing",
+    "key_requirements": [
+      "Space station license application via FCC International Bureau",
+      "Earth station license for ground segment",
+      "Orbital debris mitigation plan required",
+      "Bonding requirements for NGSO constellations",
+      "Coordination with NTIA for government spectrum bands",
+      "Team Telecom national security review for foreign applicants"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Common carrier or private radio license from FCC",
+      "non_terrestrial": "Space station license and earth station authorization",
+      "interconnection": "Regulated under Title II for common carriers"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "FCC International Bureau", "url": "https://www.fcc.gov/international"},
+      {"label": "FCC Space Bureau", "url": "https://www.fcc.gov/space"}
+    ]
+  },
+  {
+    "country": "United Kingdom",
+    "region": "Europe",
+    "regulator_name": "Ofcom (Office of Communications)",
+    "regulator_url": "https://www.ofcom.org.uk",
+    "regulator_contact_url": "https://www.ofcom.org.uk/about-ofcom/contact-us",
+    "foreign_ownership_restrictions": "No explicit foreign ownership restrictions for satellite operators. The National Security and Investment Act 2021 gives government power to review acquisitions in communications sector on national security grounds.",
+    "data_sovereignty": "UK GDPR and Data Protection Act 2018 apply. Adequate data protection under EU standards. No specific satellite data localization requirements.",
+    "spectrum_licensing": "Ofcom manages spectrum allocation. Satellite operators require spectrum authorization. Shared spectrum access framework for certain bands.",
+    "landing_rights": "Satellite network license required from Ofcom for providing services in the UK. Wireless telegraphy license for earth stations.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "3-6 months for standard applications",
+    "application_portal_url": "https://www.ofcom.org.uk/manage-your-licence/radiocommunication-licences",
+    "key_requirements": [
+      "Ofcom satellite network license",
+      "Earth station wireless telegraphy license",
+      "UK Space Agency orbital license for UK-launched satellites",
+      "Compliance with UK GDPR",
+      "Orbital debris mitigation plan"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "General Conditions of Entitlement for electronic communications",
+      "non_terrestrial": "Satellite network license from Ofcom",
+      "interconnection": "General Conditions framework"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "Ofcom Satellite Licensing", "url": "https://www.ofcom.org.uk/manage-your-licence/radiocommunication-licences/satellite-earth-station"},
+      {"label": "UK Space Agency", "url": "https://www.gov.uk/government/organisations/uk-space-agency"}
+    ]
+  },
+  {
+    "country": "Canada",
+    "region": "Americas",
+    "regulator_name": "ISED (Innovation, Science and Economic Development Canada)",
+    "regulator_url": "https://ised-isde.canada.ca",
+    "regulator_contact_url": "https://ised-isde.canada.ca/site/spectrum-management-telecommunications/en/contact-us",
+    "foreign_ownership_restrictions": "Canadian Telecommunications Act limits foreign ownership of facilities-based carriers to 20% direct / 33.3% indirect through holding company. Satellite operators classified as carriers are subject to these limits. Exemptions possible for foreign satellite operators providing services via Canadian earth stations.",
+    "data_sovereignty": "PIPEDA (Personal Information Protection and Electronic Documents Act) governs private sector data. No strict satellite data localization, but cross-border transfer rules apply.",
+    "spectrum_licensing": "ISED manages Canadian Table of Frequency Allocations. Satellite operators apply for radio licenses. Domestic satellite licensing through the Licensing and Spectrum Management branch.",
+    "landing_rights": "Foreign satellite operators must obtain landing rights approval. Earth station licenses required from ISED.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "6-12 months",
+    "application_portal_url": "https://ised-isde.canada.ca/site/spectrum-management-telecommunications/en/learn-more/key-telecommunications-policies/radiocommunication-and-broadcasting-regulatory-policy",
+    "key_requirements": [
+      "Radio license for satellite operations",
+      "Landing rights approval for foreign satellite systems",
+      "Canadian ownership compliance for carriers",
+      "PIPEDA data protection compliance",
+      "Coordination with US for cross-border spectrum"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Basic international telecommunications services license",
+      "non_terrestrial": "Radio license and satellite service authorization",
+      "interconnection": "CRTC-regulated interconnection framework"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "ISED Spectrum Management", "url": "https://ised-isde.canada.ca/site/spectrum-management-telecommunications/en"},
+      {"label": "CRTC", "url": "https://crtc.gc.ca"}
+    ]
+  },
+  {
+    "country": "Germany",
+    "region": "Europe",
+    "regulator_name": "BNetzA (Bundesnetzagentur)",
+    "regulator_url": "https://www.bundesnetzagentur.de",
+    "regulator_contact_url": "https://www.bundesnetzagentur.de/EN/General/Contact/contact_node.html",
+    "foreign_ownership_restrictions": "No specific foreign ownership restrictions for satellite operators under German telecommunications law. EU framework applies. Foreign direct investment screening under AWV (Außenwirtschaftsverordnung) for critical infrastructure.",
+    "data_sovereignty": "EU GDPR applies directly. Federal Data Protection Act (BDSG) supplements GDPR. No specific satellite data localization requirements beyond GDPR compliance.",
+    "spectrum_licensing": "BNetzA manages German frequency allocation plan. Satellite operators need frequency assignment. EU harmonized spectrum decisions apply.",
+    "landing_rights": "Earth station licenses from BNetzA. EU mutual recognition framework simplifies access for EU-licensed operators.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "3-6 months within EU framework",
+    "application_portal_url": "https://www.bundesnetzagentur.de/EN/Areas/Telecommunications/Companies/FrequencyManagement/frequencymanagement_node.html",
+    "key_requirements": [
+      "Frequency assignment from BNetzA",
+      "Earth station license",
+      "GDPR compliance",
+      "Notification to BNetzA for telecommunications services",
+      "Foreign investment screening for critical infrastructure"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "TKG notification requirement for telecom services",
+      "non_terrestrial": "Frequency assignment and satellite service notification",
+      "interconnection": "EU framework interconnection obligations"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "BNetzA Telecommunications", "url": "https://www.bundesnetzagentur.de/EN/Areas/Telecommunications/telecommunications_node.html"},
+      {"label": "German Telecommunications Act (TKG)", "url": "https://www.gesetze-im-internet.de/tkg_2021/"}
+    ]
+  },
+  {
+    "country": "France",
+    "region": "Europe",
+    "regulator_name": "ARCEP (Autorité de Régulation des Communications Électroniques, des Postes et de la Distribution de la Presse)",
+    "regulator_url": "https://www.arcep.fr",
+    "regulator_contact_url": "https://www.arcep.fr/en/about-arcep/contact.html",
+    "foreign_ownership_restrictions": "No explicit foreign ownership restrictions for satellite operators. Foreign investment screening applies to strategic sectors under French Monetary and Financial Code (Article L151-3). Space and defense activities subject to government review.",
+    "data_sovereignty": "EU GDPR applies. CNIL (Commission Nationale de l'Informatique et des Libertés) enforces data protection. No specific satellite data localization requirements beyond GDPR.",
+    "spectrum_licensing": "ARCEP manages spectrum. ANFR (Agence Nationale des Fréquences) coordinates frequency assignments. Satellite operators need authorization for spectrum use.",
+    "landing_rights": "Authorization from ARCEP for satellite communications services. Earth station frequency assignments from ANFR.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "3-6 months within EU framework",
+    "application_portal_url": "https://www.arcep.fr/en/regulation/operators.html",
+    "key_requirements": [
+      "ARCEP authorization for satellite services",
+      "ANFR frequency assignment for earth stations",
+      "CNES authorization for space operations (French Space Operations Act)",
+      "GDPR compliance",
+      "Foreign investment screening for strategic activities"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Declaration to ARCEP for telecom services",
+      "non_terrestrial": "Satellite operator authorization and frequency assignment",
+      "interconnection": "EU framework interconnection obligations"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "ARCEP Regulation", "url": "https://www.arcep.fr/en/regulation.html"},
+      {"label": "ANFR Frequency Management", "url": "https://www.anfr.fr/en/"}
+    ]
+  },
+  {
+    "country": "Italy",
+    "region": "Europe",
+    "regulator_name": "AGCOM (Autorità per le Garanzie nelle Comunicazioni)",
+    "regulator_url": "https://www.agcom.it",
+    "regulator_contact_url": "https://www.agcom.it/en/contacts",
+    "foreign_ownership_restrictions": "No specific foreign ownership restrictions for satellite operators under Italian law. EU framework applies. Golden power rules allow government intervention in strategic sectors including telecommunications and defense.",
+    "data_sovereignty": "EU GDPR applies. Garante per la protezione dei dati personali enforces data protection. No specific satellite data localization requirements.",
+    "spectrum_licensing": "MISE (Ministry of Economic Development) manages spectrum allocation. AGCOM regulates electronic communications. Satellite operators need frequency authorization.",
+    "landing_rights": "Authorization from MISE for satellite earth stations. General authorization regime for electronic communications services.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "3-6 months within EU framework",
+    "application_portal_url": "https://www.agcom.it/en/authorizations",
+    "key_requirements": [
+      "General authorization for electronic communications",
+      "Frequency authorization from MISE",
+      "GDPR compliance",
+      "Golden power review for strategic acquisitions",
+      "ASI coordination for space operations"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "General authorization for electronic communications networks and services",
+      "non_terrestrial": "Satellite service authorization and frequency license",
+      "interconnection": "EU framework interconnection obligations"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "AGCOM", "url": "https://www.agcom.it/en/"},
+      {"label": "Italian Space Agency (ASI)", "url": "https://www.asi.it/en/"}
+    ]
+  },
+  {
+    "country": "Spain",
+    "region": "Europe",
+    "regulator_name": "CNMC (Comisión Nacional de los Mercados y la Competencia)",
+    "regulator_url": "https://www.cnmc.es",
+    "regulator_contact_url": "https://www.cnmc.es/en/contact",
+    "foreign_ownership_restrictions": "No specific foreign ownership restrictions for satellite operators. EU framework applies. Foreign direct investment screening under Law 19/2003 for strategic sectors.",
+    "data_sovereignty": "EU GDPR applies. AEPD (Agencia Española de Protección de Datos) enforces data protection. No specific satellite data localization.",
+    "spectrum_licensing": "SETSI (Secretaría de Estado de Telecomunicaciones e Infraestructuras Digitales) manages spectrum. Satellite operators need frequency concessions.",
+    "landing_rights": "General authorization for electronic communications. Individual license for spectrum use.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "3-6 months within EU framework",
+    "application_portal_url": "https://avancedigital.mineco.gob.es/en-us/Paginas/index.aspx",
+    "key_requirements": [
+      "General authorization notification to CNMC",
+      "Frequency concession from SETSI",
+      "GDPR compliance",
+      "CDTI coordination for space activities"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "General authorization for electronic communications",
+      "non_terrestrial": "Satellite service authorization and frequency concession",
+      "interconnection": "EU framework interconnection obligations"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "CNMC Telecommunications", "url": "https://www.cnmc.es/en/ambitos-de-actuacion/telecomunicaciones"},
+      {"label": "SETSI", "url": "https://avancedigital.mineco.gob.es/"}
+    ]
+  },
+  {
+    "country": "Netherlands",
+    "region": "Europe",
+    "regulator_name": "ACM (Authority for Consumers and Markets) / Agentschap Telecom",
+    "regulator_url": "https://www.acm.nl/en",
+    "regulator_contact_url": "https://www.acm.nl/en/contact",
+    "foreign_ownership_restrictions": "No specific foreign ownership restrictions for satellite operators. EU framework applies. Dutch foreign investment screening for vital providers of telecom services.",
+    "data_sovereignty": "EU GDPR applies. AP (Autoriteit Persoonsgegevens) enforces data protection. No satellite-specific data localization.",
+    "spectrum_licensing": "Agentschap Telecom manages spectrum. Satellite operators need frequency registration or license.",
+    "landing_rights": "Registration or license from Agentschap Telecom for earth stations. EU general authorization for services.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "2-4 months within EU framework",
+    "application_portal_url": "https://www.agentschaptelecom.nl/english",
+    "key_requirements": [
+      "Registration with ACM for electronic communications",
+      "Frequency license from Agentschap Telecom",
+      "GDPR compliance",
+      "Foreign investment screening for vital telecom providers"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Registration with ACM",
+      "non_terrestrial": "Frequency license and service registration",
+      "interconnection": "EU framework interconnection obligations"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "Agentschap Telecom", "url": "https://www.agentschaptelecom.nl/english"},
+      {"label": "ACM Telecommunications", "url": "https://www.acm.nl/en/about-acm/our-organisation/acm-divisions/telecommunications-post-and-transport"}
+    ]
+  },
+  {
+    "country": "Sweden",
+    "region": "Europe",
+    "regulator_name": "PTS (Post- och telestyrelsen)",
+    "regulator_url": "https://pts.se/en",
+    "regulator_contact_url": "https://pts.se/en/about-pts/contact-us/",
+    "foreign_ownership_restrictions": "No specific foreign ownership restrictions for satellite operators. EU framework applies. Swedish Protective Security Act may apply to critical telecommunications infrastructure.",
+    "data_sovereignty": "EU GDPR applies. IMY (Integritetsskyddsmyndigheten) enforces data protection. No satellite-specific data localization.",
+    "spectrum_licensing": "PTS manages spectrum allocation. Satellite operators need frequency permits.",
+    "landing_rights": "Frequency permit from PTS for earth stations. Notification for electronic communications services.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "2-4 months within EU framework",
+    "application_portal_url": "https://pts.se/en/the-work-of-pts/spectrum/",
+    "key_requirements": [
+      "Notification to PTS for electronic communications",
+      "Frequency permit for earth stations",
+      "GDPR compliance",
+      "Protective security assessment for critical infrastructure"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Notification to PTS",
+      "non_terrestrial": "Frequency permit and service notification",
+      "interconnection": "EU framework interconnection obligations"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "PTS Spectrum", "url": "https://pts.se/en/the-work-of-pts/spectrum/"},
+      {"label": "Swedish Space Agency", "url": "https://www.rymdstyrelsen.se/en/"}
+    ]
+  },
+  {
+    "country": "Norway",
+    "region": "Europe",
+    "regulator_name": "Nkom (Nasjonal kommunikasjonsmyndighet)",
+    "regulator_url": "https://www.nkom.no/en",
+    "regulator_contact_url": "https://www.nkom.no/en/about-nkom/contact-us",
+    "foreign_ownership_restrictions": "No specific foreign ownership restrictions for satellite operators. EEA framework applies (Norway is not an EU member but follows EU telecom directives through EEA). National security screening for critical infrastructure acquisitions.",
+    "data_sovereignty": "Norwegian Personal Data Act implements GDPR-equivalent protections (EEA). Datatilsynet enforces. No satellite-specific data localization.",
+    "spectrum_licensing": "Nkom manages spectrum. Satellite operators need frequency authorization.",
+    "landing_rights": "Frequency authorization from Nkom for earth stations. Registration for electronic communications.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "2-4 months",
+    "application_portal_url": "https://www.nkom.no/en/frequency-management",
+    "key_requirements": [
+      "Registration with Nkom for electronic communications",
+      "Frequency authorization for earth stations",
+      "GDPR-equivalent data protection compliance",
+      "Norwegian Space Agency coordination"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Registration with Nkom",
+      "non_terrestrial": "Frequency authorization and service registration",
+      "interconnection": "EEA framework obligations"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "Nkom Frequency Management", "url": "https://www.nkom.no/en/frequency-management"},
+      {"label": "Norwegian Space Agency", "url": "https://www.romsenter.no/en"}
+    ]
+  },
+  {
+    "country": "UAE",
+    "region": "MENA",
+    "regulator_name": "TDRA (Telecommunications and Digital Government Regulatory Authority)",
+    "regulator_url": "https://tdra.gov.ae",
+    "regulator_contact_url": "https://tdra.gov.ae/en/about/contact-us",
+    "foreign_ownership_restrictions": "Telecommunications services require licensing from TDRA. Foreign ownership in telecommunications is restricted — operators must be UAE-incorporated entities. Free zones (e.g., ADGM, DIFC) may have different rules for technology companies. Strategic partnerships with local entities typical.",
+    "data_sovereignty": "Federal Decree-Law No. 45 of 2021 on Personal Data Protection. Data localization requirements for certain government and sensitive data. Satellite operators may need to store certain data locally.",
+    "spectrum_licensing": "TDRA manages UAE National Frequency Plan. Satellite operators need spectrum license. Ka-band and Ku-band available subject to coordination.",
+    "landing_rights": "TDRA authorization required for all satellite services in the UAE. Licensed operators only (Etisalat/e& and du historically, but market opening).",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "3-9 months",
+    "application_portal_url": "https://tdra.gov.ae/en/services",
+    "key_requirements": [
+      "TDRA telecommunications license",
+      "Spectrum authorization",
+      "UAE-incorporated entity requirement",
+      "Data protection compliance (Federal Decree-Law 45/2021)",
+      "Type approval for ground equipment"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Individual license from TDRA",
+      "non_terrestrial": "Satellite service license and spectrum authorization",
+      "interconnection": "TDRA-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "TDRA Licensing", "url": "https://tdra.gov.ae/en/services"},
+      {"label": "UAE Space Agency", "url": "https://space.gov.ae/en"}
+    ]
+  },
+  {
+    "country": "Saudi Arabia",
+    "region": "MENA",
+    "regulator_name": "CST (Communications, Space and Technology Commission)",
+    "regulator_url": "https://www.cst.gov.sa",
+    "regulator_contact_url": "https://www.cst.gov.sa/en/Pages/Contact-Us.aspx",
+    "foreign_ownership_restrictions": "Foreign investment in telecommunications allowed up to 100% since 2021 reforms, subject to licensing conditions. CST approval required. National security review applies.",
+    "data_sovereignty": "Personal Data Protection Law (PDPL) enacted 2021. Data localization requirements for certain categories of data. Satellite operators may need to ensure data processing compliance within KSA.",
+    "spectrum_licensing": "CST manages Saudi National Frequency Plan. Satellite operators need spectrum assignment. Vision 2030 driving expansion of satellite services licensing.",
+    "landing_rights": "CST authorization required for satellite landing rights. Unified license framework being modernized.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "3-9 months",
+    "application_portal_url": "https://www.cst.gov.sa/en/Pages/Licensing.aspx",
+    "key_requirements": [
+      "CST telecommunications service license",
+      "Spectrum assignment authorization",
+      "PDPL data protection compliance",
+      "Saudi Space Agency coordination for space operations",
+      "Type approval for equipment"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Unified telecommunications license from CST",
+      "non_terrestrial": "Satellite service provider license",
+      "interconnection": "CST-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "CST Licensing", "url": "https://www.cst.gov.sa/en/Pages/Licensing.aspx"},
+      {"label": "Saudi Space Agency", "url": "https://www.spa.gov.sa"}
+    ]
+  },
+  {
+    "country": "India",
+    "region": "Asia-Pacific",
+    "regulator_name": "DoT (Department of Telecommunications) / TRAI (Telecom Regulatory Authority of India)",
+    "regulator_url": "https://dot.gov.in",
+    "regulator_contact_url": "https://dot.gov.in/contact-us",
+    "foreign_ownership_restrictions": "100% FDI allowed in telecommunications since 2021 reforms (up to 49% automatic route, beyond 49% requires government approval). Satellite communications FDI under review — IN-SPACe authorization required for space activities.",
+    "data_sovereignty": "Digital Personal Data Protection Act 2023. Data localization requirements for certain sensitive personal data. Government data must be stored in India. Satellite operators handling Indian data subject to localization rules.",
+    "spectrum_licensing": "DoT/WPC (Wireless Planning & Coordination Wing) manages spectrum. Indian Space Policy 2023 liberalizing satellite communications. IN-SPACe as single-window for space activities.",
+    "landing_rights": "DoT authorization for satellite gateway earth stations. GMPCS (Global Mobile Personal Communications by Satellite) license framework. Recent reforms creating SATCOM licensing framework.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "6-18 months — regulatory framework evolving rapidly",
+    "application_portal_url": "https://dot.gov.in/unified-licence",
+    "key_requirements": [
+      "GMPCS or SATCOM license from DoT",
+      "IN-SPACe authorization for space activities",
+      "WPC frequency authorization",
+      "FDI approval above 49%",
+      "Data localization compliance (DPDP Act)",
+      "Security conditions and lawful interception capability"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Unified License from DoT",
+      "non_terrestrial": "SATCOM or GMPCS authorization",
+      "interconnection": "TRAI-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "DoT Licensing", "url": "https://dot.gov.in/unified-licence"},
+      {"label": "IN-SPACe", "url": "https://www.inspace.gov.in"}
+    ]
+  },
+  {
+    "country": "Japan",
+    "region": "Asia-Pacific",
+    "regulator_name": "MIC (Ministry of Internal Affairs and Communications)",
+    "regulator_url": "https://www.soumu.go.jp/english/",
+    "regulator_contact_url": "https://www.soumu.go.jp/english/contact/index.html",
+    "foreign_ownership_restrictions": "Foreign ownership in telecommunications generally unrestricted. NTT has specific foreign ownership limits (33.3%). Satellite operators not subject to foreign ownership restrictions unless classified as designated telecommunications carriers.",
+    "data_sovereignty": "Act on the Protection of Personal Information (APPI). No strict data localization requirement, but cross-border transfer rules apply. Adequate data protection framework recognized by EU.",
+    "spectrum_licensing": "MIC manages spectrum allocation. Radio station license required for earth stations. Satellite operators coordinate through MIC Telecommunications Bureau.",
+    "landing_rights": "Telecommunications business notification to MIC. Radio station license for earth stations.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "3-6 months",
+    "application_portal_url": "https://www.soumu.go.jp/english/tec/index.html",
+    "key_requirements": [
+      "Telecommunications business notification to MIC",
+      "Radio station license for earth stations",
+      "Technical standards compliance",
+      "APPI data protection compliance",
+      "JAXA coordination for space operations"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Notification or registration with MIC depending on service type",
+      "non_terrestrial": "Radio station license and telecommunications business registration",
+      "interconnection": "MIC-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "MIC Telecommunications", "url": "https://www.soumu.go.jp/english/tec/index.html"},
+      {"label": "JAXA", "url": "https://global.jaxa.jp"}
+    ]
+  },
+  {
+    "country": "South Korea",
+    "region": "Asia-Pacific",
+    "regulator_name": "MSIT (Ministry of Science and ICT) / KCC (Korea Communications Commission)",
+    "regulator_url": "https://www.msit.go.kr/eng/index.do",
+    "regulator_contact_url": "https://www.msit.go.kr/eng/bbs/list.do?sCode=eng&mId=4&mPid=2",
+    "foreign_ownership_restrictions": "Foreign ownership in facilities-based telecommunications limited to 49%. Satellite operators providing services in Korea subject to this cap. Special permission required for foreign operators.",
+    "data_sovereignty": "Personal Information Protection Act (PIPA). Cross-border data transfer requires consent or equivalent protection. Financial and medical data have stricter localization requirements.",
+    "spectrum_licensing": "MSIT manages spectrum allocation. Radio station license required. Korea Radio Research Agency (RRA) handles technical standards.",
+    "landing_rights": "MSIT authorization for satellite telecommunications services. Facilities-based or resale license required.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "6-12 months",
+    "application_portal_url": "https://www.msit.go.kr/eng/index.do",
+    "key_requirements": [
+      "MSIT telecommunications license",
+      "Radio station license",
+      "Foreign ownership compliance (49% cap)",
+      "PIPA data protection compliance",
+      "Technical certification from RRA"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Facilities-based or resale telecommunications license",
+      "non_terrestrial": "Satellite telecommunications service license",
+      "interconnection": "KCC-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "MSIT", "url": "https://www.msit.go.kr/eng/index.do"},
+      {"label": "Korea Aerospace Research Institute", "url": "https://www.kari.re.kr/eng.do"}
+    ]
+  },
+  {
+    "country": "Australia",
+    "region": "Asia-Pacific",
+    "regulator_name": "ACMA (Australian Communications and Media Authority)",
+    "regulator_url": "https://www.acma.gov.au",
+    "regulator_contact_url": "https://www.acma.gov.au/contact-us",
+    "foreign_ownership_restrictions": "No specific foreign ownership restrictions for satellite operators. Foreign Investment Review Board (FIRB) screening applies for significant investments in telecommunications infrastructure. Telstra has specific foreign ownership limits.",
+    "data_sovereignty": "Privacy Act 1988 and Australian Privacy Principles (APPs). No general data localization requirement. Critical infrastructure designation under SOCI Act may impose data handling requirements.",
+    "spectrum_licensing": "ACMA manages spectrum. Satellite operators need apparatus license or spectrum license. Australian Radiofrequency Spectrum Plan aligns with ITU allocations.",
+    "landing_rights": "Carrier license or nominated carrier declaration for satellite services. ACMA apparatus license for earth stations.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "3-6 months",
+    "application_portal_url": "https://www.acma.gov.au/licences-and-registrations",
+    "key_requirements": [
+      "Carrier license or nominated carrier declaration",
+      "ACMA apparatus license for earth stations",
+      "FIRB approval for significant foreign investments",
+      "SOCI Act compliance for critical infrastructure",
+      "Privacy Act compliance"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Carrier license for network infrastructure",
+      "non_terrestrial": "Carrier license and spectrum authorization",
+      "interconnection": "ACCC-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "ACMA Licensing", "url": "https://www.acma.gov.au/licences-and-registrations"},
+      {"label": "Australian Space Agency", "url": "https://www.space.gov.au"}
+    ]
+  },
+  {
+    "country": "Brazil",
+    "region": "Americas",
+    "regulator_name": "Anatel (Agência Nacional de Telecomunicações)",
+    "regulator_url": "https://www.gov.br/anatel",
+    "regulator_contact_url": "https://www.gov.br/anatel/pt-br/canais_atendimento",
+    "foreign_ownership_restrictions": "No foreign ownership restrictions for telecommunications since Constitutional Amendment 36/2002. Foreign satellite operators can obtain landing rights. Local representation required.",
+    "data_sovereignty": "LGPD (Lei Geral de Proteção de Dados) — Brazil's data protection law. ANPD enforces. No strict satellite data localization, but data protection officer appointment required for certain data processing.",
+    "spectrum_licensing": "Anatel manages spectrum allocation. Satellite operators need right of exploitation (direito de exploração). Radio frequency authorization required.",
+    "landing_rights": "Anatel authorization for foreign satellite systems to serve Brazilian market. Landing rights application through Anatel.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "6-12 months",
+    "application_portal_url": "https://www.gov.br/anatel/pt-br/regulado/outorga",
+    "key_requirements": [
+      "Anatel satellite service authorization",
+      "Landing rights for foreign satellites",
+      "Local legal representation",
+      "LGPD data protection compliance",
+      "Radio frequency authorization",
+      "Equipment certification"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Authorization or concession from Anatel",
+      "non_terrestrial": "Satellite service exploitation right",
+      "interconnection": "Anatel-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "Anatel Satellite", "url": "https://www.gov.br/anatel/pt-br/regulado/outorga"},
+      {"label": "Brazilian Space Agency (AEB)", "url": "https://www.gov.br/aeb"}
+    ]
+  },
+  {
+    "country": "Morocco",
+    "region": "Africa",
+    "regulator_name": "ANRT (Agence Nationale de Réglementation des Télécommunications)",
+    "regulator_url": "https://www.anrt.ma",
+    "regulator_contact_url": "https://www.anrt.ma/en/contact",
+    "foreign_ownership_restrictions": "Foreign operators must partner with local licensed entity. No explicit foreign ownership cap for satellite services, but landing rights require ANRT authorization.",
+    "data_sovereignty": "Telecommunications data processing governed by Law 09-08. CDR data must be accessible to ANRT upon request. No strict data localization requirement for satellite operators currently, but data protection authority (CNDP) oversight applies.",
+    "spectrum_licensing": "Spectrum allocated by ANRT. Satellite operators need frequency assignment authorization. Ka-band and Ku-band coordination through ITU BR framework.",
+    "landing_rights": "Required for all satellite services offering connectivity in Morocco. Application through ANRT with technical dossier.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "6-12 months for full authorization",
+    "application_portal_url": "https://www.anrt.ma/en/missions/telecom-regulation",
+    "key_requirements": [
+      "ANRT authorization for satellite landing rights",
+      "Frequency coordination through ITU framework",
+      "Local partnership or representation required",
+      "Compliance with Law 09-08 on data protection",
+      "Technical dossier submission including coverage maps"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "License required from ANRT for all telecom services",
+      "non_terrestrial": "Separate satellite service authorization required",
+      "interconnection": "Interconnection agreements regulated by ANRT"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "ANRT Telecom Regulation", "url": "https://www.anrt.ma/en/missions/telecom-regulation"},
+      {"label": "Law 24-96 on Telecommunications", "url": "https://www.anrt.ma/en/legal-framework"}
+    ]
+  },
+  {
+    "country": "Nigeria",
+    "region": "Africa",
+    "regulator_name": "NCC (Nigerian Communications Commission)",
+    "regulator_url": "https://www.ncc.gov.ng",
+    "regulator_contact_url": "https://www.ncc.gov.ng/contact-us",
+    "foreign_ownership_restrictions": "No explicit foreign ownership restrictions for satellite operators. Foreign companies must register in Nigeria. Local content requirements may apply under NCDP (Nigerian Content Development and Monitoring Board).",
+    "data_sovereignty": "Nigeria Data Protection Act 2023 (NDPA). NDPC (Nigeria Data Protection Commission) enforces. Cross-border data transfer subject to adequacy assessment. Verify with local counsel for satellite-specific requirements.",
+    "spectrum_licensing": "NCC manages spectrum. Satellite operators need spectrum license. NASRDA (National Space Research and Development Agency) coordinates space activities.",
+    "landing_rights": "NCC authorization required for satellite services in Nigeria. Gateway license for earth stations.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "6-12 months",
+    "application_portal_url": "https://www.ncc.gov.ng/licensing-telecoms",
+    "key_requirements": [
+      "NCC satellite network services license",
+      "Spectrum license for earth stations",
+      "Nigerian company registration",
+      "NDPA data protection compliance",
+      "NASRDA coordination for space activities",
+      "Type approval for equipment"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Individual or class license from NCC",
+      "non_terrestrial": "Satellite network services license",
+      "interconnection": "NCC-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "NCC Licensing", "url": "https://www.ncc.gov.ng/licensing-telecoms"},
+      {"label": "NASRDA", "url": "https://www.nasrda.gov.ng"}
+    ]
+  },
+  {
+    "country": "South Africa",
+    "region": "Africa",
+    "regulator_name": "ICASA (Independent Communications Authority of South Africa)",
+    "regulator_url": "https://www.icasa.org.za",
+    "regulator_contact_url": "https://www.icasa.org.za/pages/contact-us",
+    "foreign_ownership_restrictions": "Electronic Communications Act allows up to 100% foreign ownership in telecommunications, but BEE (Broad-Based Black Economic Empowerment) requirements apply. 30% historically disadvantaged person ownership requirement for license applicants.",
+    "data_sovereignty": "POPIA (Protection of Personal Information Act) enacted 2020, enforced by Information Regulator. Cross-border data transfer subject to adequate protection requirements. No satellite-specific localization.",
+    "spectrum_licensing": "ICASA manages spectrum. Satellite operators need radio frequency spectrum license. Individual electronic communications service license.",
+    "landing_rights": "ICASA individual electronic communications service (I-ECS) license. Radio frequency spectrum license for earth stations.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "6-12 months",
+    "application_portal_url": "https://www.icasa.org.za/pages/licensing",
+    "key_requirements": [
+      "I-ECS license from ICASA",
+      "Radio frequency spectrum license",
+      "BEE compliance requirements",
+      "POPIA data protection compliance",
+      "SANSA coordination for space activities"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "I-ECS or I-ECN license from ICASA",
+      "non_terrestrial": "I-ECS license with satellite service endorsement",
+      "interconnection": "ICASA-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "ICASA Licensing", "url": "https://www.icasa.org.za/pages/licensing"},
+      {"label": "SANSA", "url": "https://www.sansa.org.za"}
+    ]
+  },
+  {
+    "country": "Singapore",
+    "region": "Asia-Pacific",
+    "regulator_name": "IMDA (Infocomm Media Development Authority)",
+    "regulator_url": "https://www.imda.gov.sg",
+    "regulator_contact_url": "https://www.imda.gov.sg/about-imda/contact-us",
+    "foreign_ownership_restrictions": "No foreign ownership restrictions for satellite operators. Open market policy. Designated entities in critical infrastructure subject to ownership review.",
+    "data_sovereignty": "Personal Data Protection Act (PDPA) 2012. No general data localization requirement. Financial services have sector-specific rules (MAS guidelines). Singapore aims to be a data hub.",
+    "spectrum_licensing": "IMDA manages spectrum. Satellite operators need spectrum right. Light-touch licensing regime for satellite services.",
+    "landing_rights": "Facilities-based operator (FBO) or service-based operator (SBO) license. Spectrum right for earth stations.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "2-4 months",
+    "application_portal_url": "https://www.imda.gov.sg/regulations-and-licensing-listing/Spectrum-Management",
+    "key_requirements": [
+      "IMDA FBO or SBO license",
+      "Spectrum right allocation",
+      "PDPA data protection compliance",
+      "Equipment registration"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "FBO or SBO license from IMDA",
+      "non_terrestrial": "Satellite service operator license and spectrum right",
+      "interconnection": "IMDA-regulated interconnection for designated operators"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "IMDA Licensing", "url": "https://www.imda.gov.sg/regulations-and-licensing-listing"},
+      {"label": "IMDA Spectrum", "url": "https://www.imda.gov.sg/regulations-and-licensing-listing/Spectrum-Management"}
+    ]
+  },
+  {
+    "country": "Indonesia",
+    "region": "Asia-Pacific",
+    "regulator_name": "Kominfo (Ministry of Communication and Informatics)",
+    "regulator_url": "https://www.kominfo.go.id",
+    "regulator_contact_url": "https://www.kominfo.go.id/content/detail/3320/kontak-kami/0/kontak_kami",
+    "foreign_ownership_restrictions": "Foreign ownership in telecommunications limited to 67% for network providers, 49% for application/content providers. Satellite operators may be subject to these limits depending on service classification. Local partner required.",
+    "data_sovereignty": "Government Regulation 71/2019 on Electronic Systems. Data localization requirements for public electronic systems and certain strategic data. Personal Data Protection Law (PDP Law) enacted 2022 with transition period.",
+    "spectrum_licensing": "Kominfo manages spectrum. SDPPI (Directorate General of Resources and Devices) handles frequency allocation. Satellite operators need frequency allocation permit.",
+    "landing_rights": "Telecommunications service provider license from Kominfo. Frequency allocation for earth stations from SDPPI.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "6-18 months — complex regulatory environment",
+    "application_portal_url": "https://www.kominfo.go.id",
+    "key_requirements": [
+      "Telecommunications service provider license",
+      "Frequency allocation permit from SDPPI",
+      "Foreign ownership compliance",
+      "Local partner requirement",
+      "Data localization compliance for certain data categories",
+      "Equipment type approval (SDPPI)"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Telecommunications service provider license",
+      "non_terrestrial": "Satellite service provider license and frequency allocation",
+      "interconnection": "Kominfo-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "Kominfo", "url": "https://www.kominfo.go.id"},
+      {"label": "LAPAN (Space Agency)", "url": "https://www.lapan.go.id"}
+    ]
+  },
+  {
+    "country": "Mexico",
+    "region": "Americas",
+    "regulator_name": "IFT (Instituto Federal de Telecomunicaciones)",
+    "regulator_url": "https://www.ift.org.mx",
+    "regulator_contact_url": "https://www.ift.org.mx/conocenos/contacto",
+    "foreign_ownership_restrictions": "100% foreign ownership allowed in telecommunications since 2014 constitutional reform. Satellite operations subject to concession from IFT. Landing rights available for foreign satellite systems.",
+    "data_sovereignty": "Federal Law on Protection of Personal Data (LFPDPPP). INAI enforces. No satellite-specific data localization requirements. Cross-border data transfer allowed with consent or adequate protection.",
+    "spectrum_licensing": "IFT manages spectrum allocation. Satellite operators need orbital resources concession. Frequency band concessions granted by IFT.",
+    "landing_rights": "IFT authorization for foreign satellite operators to provide services in Mexico. Landing rights through bilateral agreements or individual authorization.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "6-12 months",
+    "application_portal_url": "https://www.ift.org.mx/industria/tramites-y-servicios",
+    "key_requirements": [
+      "IFT concession for satellite services",
+      "Landing rights authorization for foreign satellites",
+      "Frequency band concession",
+      "LFPDPPP data protection compliance",
+      "Mexican Space Agency coordination"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Concession or authorization from IFT",
+      "non_terrestrial": "Satellite concession and orbital resource assignment",
+      "interconnection": "IFT-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "IFT Licensing", "url": "https://www.ift.org.mx/industria/tramites-y-servicios"},
+      {"label": "Mexican Space Agency (AEM)", "url": "https://www.gob.mx/aem"}
+    ]
+  },
+  {
+    "country": "Israel",
+    "region": "MENA",
+    "regulator_name": "MOC (Ministry of Communications)",
+    "regulator_url": "https://www.gov.il/en/departments/ministry_of_communications",
+    "regulator_contact_url": "https://www.gov.il/en/departments/ministry_of_communications/contactinfo",
+    "foreign_ownership_restrictions": "No general foreign ownership restrictions for satellite services. National security review applies. Satellite operators serving Israeli market need MOC authorization.",
+    "data_sovereignty": "Privacy Protection Law 5741-1981 and Privacy Protection Regulations. Israel has EU adequacy decision for data transfers. No satellite-specific data localization requirements. Verify with local counsel for defense-related data.",
+    "spectrum_licensing": "MOC manages spectrum. Satellite operators need frequency license. Israel Space Agency (ISA) coordinates space activities.",
+    "landing_rights": "MOC authorization for satellite services. General license or special license depending on service type.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "3-9 months",
+    "application_portal_url": "https://www.gov.il/en/departments/ministry_of_communications",
+    "key_requirements": [
+      "MOC general or special telecommunications license",
+      "Frequency license",
+      "Privacy Protection Law compliance",
+      "ISA coordination for space activities",
+      "National security clearance for sensitive applications"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "General or special license from MOC",
+      "non_terrestrial": "Satellite service authorization",
+      "interconnection": "MOC-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "MOC Licensing", "url": "https://www.gov.il/en/departments/ministry_of_communications"},
+      {"label": "Israel Space Agency", "url": "https://www.space.gov.il/en"}
+    ]
+  },
+  {
+    "country": "Turkey",
+    "region": "Europe",
+    "regulator_name": "BTK (Bilgi Teknolojileri ve İletişim Kurumu / Information and Communication Technologies Authority)",
+    "regulator_url": "https://www.btk.gov.tr",
+    "regulator_contact_url": "https://www.btk.gov.tr/en-EN/contact",
+    "foreign_ownership_restrictions": "No general foreign ownership restrictions for telecommunications. However, satellite operators need BTK authorization, and national security review applies. Turkish Space Agency (TUA) coordinates space policy.",
+    "data_sovereignty": "Law No. 6698 on Protection of Personal Data (KVKK). Data Protection Authority (KVK Board) enforces. Cross-border data transfer requires adequate protection or explicit consent. Data localization pushed for certain government and financial data.",
+    "spectrum_licensing": "BTK manages spectrum. Satellite operators need frequency usage right. National Frequency Plan aligned with CEPT and ITU.",
+    "landing_rights": "BTK authorization for satellite services in Turkey. Earth station license required.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "6-12 months",
+    "application_portal_url": "https://www.btk.gov.tr/en-EN/authorization",
+    "key_requirements": [
+      "BTK satellite service authorization",
+      "Frequency usage right",
+      "KVKK data protection compliance",
+      "TUA coordination for space activities",
+      "Equipment conformity certificate"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Authorization from BTK",
+      "non_terrestrial": "Satellite service authorization and frequency usage right",
+      "interconnection": "BTK-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "BTK Authorization", "url": "https://www.btk.gov.tr/en-EN/authorization"},
+      {"label": "Turkish Space Agency (TUA)", "url": "https://tua.gov.tr"}
+    ]
+  },
+  {
+    "country": "Colombia",
+    "region": "Americas",
+    "regulator_name": "MinTIC (Ministerio de Tecnologías de la Información y las Comunicaciones) / ANE (Agencia Nacional del Espectro)",
+    "regulator_url": "https://www.mintic.gov.co",
+    "regulator_contact_url": "https://www.mintic.gov.co/portal/inicio/Atencion-y-Servicio-a-la-Ciudadania/",
+    "foreign_ownership_restrictions": "No explicit foreign ownership restrictions for telecommunications or satellite operators. Foreign companies must register in Colombia. Local legal representation required.",
+    "data_sovereignty": "Law 1581 of 2012 on Personal Data Protection (Habeas Data). SIC (Superintendencia de Industria y Comercio) enforces. Cross-border data transfer allowed to countries with adequate protection levels. No satellite-specific data localization requirements.",
+    "spectrum_licensing": "ANE manages spectrum policy and planning. MinTIC grants spectrum permits. Satellite operators need frequency authorization. National Spectrum Plan aligned with ITU allocations.",
+    "landing_rights": "MinTIC authorization required for satellite services in Colombia. Earth station license from ANE for frequency use.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "6-12 months",
+    "application_portal_url": "https://www.mintic.gov.co/portal/inicio/Tramites/",
+    "key_requirements": [
+      "MinTIC telecommunications license or registration",
+      "ANE spectrum authorization for earth stations",
+      "Local legal representation in Colombia",
+      "Law 1581 data protection compliance",
+      "Equipment homologation",
+      "Coordination with Colombian Space Commission (CCE)"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Registration or license from MinTIC",
+      "non_terrestrial": "Satellite service authorization and spectrum permit",
+      "interconnection": "CRC-regulated interconnection framework"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "MinTIC", "url": "https://www.mintic.gov.co"},
+      {"label": "ANE Spectrum", "url": "https://www.ane.gov.co"}
+    ]
+  },
+  {
+    "country": "Chile",
+    "region": "Americas",
+    "regulator_name": "Subtel (Subsecretaría de Telecomunicaciones)",
+    "regulator_url": "https://www.subtel.gob.cl",
+    "regulator_contact_url": "https://www.subtel.gob.cl/contacto/",
+    "foreign_ownership_restrictions": "No foreign ownership restrictions for telecommunications or satellite operators. Open market policy. Foreign companies may operate directly or through Chilean subsidiaries.",
+    "data_sovereignty": "Law 19.628 on Protection of Private Life. Updated data protection bill (modeled on GDPR) under legislative process. No satellite-specific data localization requirements currently.",
+    "spectrum_licensing": "Subtel manages spectrum allocation. Satellite operators need concession or permit for spectrum use. Competitive bidding for scarce spectrum.",
+    "landing_rights": "Subtel authorization for satellite services. Concession for public telecommunications services using satellite.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "4-8 months",
+    "application_portal_url": "https://www.subtel.gob.cl/tramites/",
+    "key_requirements": [
+      "Subtel telecommunications concession or permit",
+      "Spectrum authorization",
+      "Law 19.628 data protection compliance",
+      "Equipment certification",
+      "Chilean Space Agency (ACE) coordination for space activities"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Concession or permit from Subtel",
+      "non_terrestrial": "Satellite service concession and spectrum authorization",
+      "interconnection": "Subtel-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "Subtel", "url": "https://www.subtel.gob.cl"},
+      {"label": "Chilean Space Agency (ACE)", "url": "https://www.minciencia.gob.cl"}
+    ]
+  },
+  {
+    "country": "Argentina",
+    "region": "Americas",
+    "regulator_name": "ENACOM (Ente Nacional de Comunicaciones)",
+    "regulator_url": "https://www.enacom.gob.ar",
+    "regulator_contact_url": "https://www.enacom.gob.ar/contacto",
+    "foreign_ownership_restrictions": "No explicit foreign ownership cap for telecommunications. Foreign satellite operators need ENACOM authorization for landing rights. Local legal representation required. Reciprocity conditions may apply.",
+    "data_sovereignty": "Personal Data Protection Law 25.326. AAIP (Agencia de Acceso a la Información Pública) enforces. Argentina has EU adequacy status. No satellite-specific data localization requirements.",
+    "spectrum_licensing": "ENACOM manages spectrum allocation. Satellite operators need frequency authorization. National Frequency Allocation Plan aligned with ITU.",
+    "landing_rights": "ENACOM authorization required for foreign satellite operators. Landing rights granted based on reciprocity and coordination.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "6-12 months",
+    "application_portal_url": "https://www.enacom.gob.ar/tramites",
+    "key_requirements": [
+      "ENACOM satellite service license",
+      "Landing rights authorization for foreign satellites",
+      "Frequency authorization",
+      "Local legal representation",
+      "Law 25.326 data protection compliance",
+      "CONAE coordination for space activities"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "License from ENACOM under Argentina Digital Law",
+      "non_terrestrial": "Satellite service authorization and spectrum license",
+      "interconnection": "ENACOM-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "ENACOM", "url": "https://www.enacom.gob.ar"},
+      {"label": "CONAE (Space Agency)", "url": "https://www.argentina.gob.ar/ciencia/conae"}
+    ]
+  },
+  {
+    "country": "Peru",
+    "region": "Americas",
+    "regulator_name": "MTC (Ministerio de Transportes y Comunicaciones) / OSIPTEL",
+    "regulator_url": "https://www.gob.pe/mtc",
+    "regulator_contact_url": "https://www.gob.pe/mtc#contacto",
+    "foreign_ownership_restrictions": "No foreign ownership restrictions for telecommunications. Foreign satellite operators may obtain concessions. Local legal representation required for licensing.",
+    "data_sovereignty": "Law 29733 on Protection of Personal Data. National Authority for Personal Data Protection (ANPD) enforces. Cross-border data transfer allowed to countries with adequate protection. No satellite-specific data localization.",
+    "spectrum_licensing": "MTC manages spectrum allocation. Satellite operators need radio spectrum assignment. OSIPTEL regulates telecommunications market.",
+    "landing_rights": "MTC concession required for satellite services in Peru. Administrative concession for satellite landing rights.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "6-12 months",
+    "application_portal_url": "https://www.gob.pe/mtc",
+    "key_requirements": [
+      "MTC telecommunications concession",
+      "Radio spectrum assignment",
+      "Local legal representation",
+      "Law 29733 data protection compliance",
+      "Equipment type approval",
+      "CONIDA coordination for space activities"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Concession or authorization from MTC",
+      "non_terrestrial": "Satellite service concession and spectrum assignment",
+      "interconnection": "OSIPTEL-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "MTC Telecommunications", "url": "https://www.gob.pe/mtc"},
+      {"label": "OSIPTEL", "url": "https://www.osiptel.gob.pe"}
+    ]
+  },
+  {
+    "country": "Egypt",
+    "region": "MENA",
+    "regulator_name": "NTRA (National Telecom Regulatory Authority)",
+    "regulator_url": "https://www.tra.gov.eg",
+    "regulator_contact_url": "https://www.tra.gov.eg/en/contact-us/",
+    "foreign_ownership_restrictions": "Foreign ownership in telecommunications permitted but subject to licensing conditions. Satellite operators must obtain NTRA authorization. Local partnership or representation may be required for certain service categories.",
+    "data_sovereignty": "Data Protection Law No. 151 of 2020. Cross-border data transfer requires adequate protection or regulatory approval. Government and security-related data subject to localization requirements.",
+    "spectrum_licensing": "NTRA manages spectrum allocation under Egypt's National Frequency Plan. Satellite operators need frequency license. Coordination with Egyptian Space Agency (EgSA) for space activities.",
+    "landing_rights": "NTRA authorization required for satellite landing rights. Individual license for satellite service provision.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "6-12 months",
+    "application_portal_url": "https://www.tra.gov.eg/en/services/",
+    "key_requirements": [
+      "NTRA telecommunications license",
+      "Frequency license for satellite operations",
+      "Data Protection Law 151/2020 compliance",
+      "Egyptian Space Agency coordination",
+      "Equipment type approval",
+      "National security clearance for satellite services"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Individual license from NTRA",
+      "non_terrestrial": "Satellite service license and frequency authorization",
+      "interconnection": "NTRA-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "NTRA", "url": "https://www.tra.gov.eg"},
+      {"label": "Egyptian Space Agency", "url": "https://www.egsa.gov.eg"}
+    ]
+  },
+  {
+    "country": "Kenya",
+    "region": "Africa",
+    "regulator_name": "CA (Communications Authority of Kenya)",
+    "regulator_url": "https://www.ca.go.ke",
+    "regulator_contact_url": "https://www.ca.go.ke/contact-us",
+    "foreign_ownership_restrictions": "No explicit foreign ownership restrictions for satellite operators under the Kenya Information and Communications Act. Foreign companies must register in Kenya. Local content and employment guidelines may apply.",
+    "data_sovereignty": "Data Protection Act 2019. Office of the Data Protection Commissioner enforces. Cross-border data transfer subject to adequate protection requirements. No satellite-specific data localization currently.",
+    "spectrum_licensing": "CA manages spectrum. Satellite operators need frequency spectrum license. National Frequency Allocation Plan aligned with ITU.",
+    "landing_rights": "CA authorization required for satellite services. Network facilities provider license and frequency authorization needed.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "3-9 months",
+    "application_portal_url": "https://www.ca.go.ke/licensing",
+    "key_requirements": [
+      "CA telecommunications license (unified licensing framework)",
+      "Frequency spectrum license",
+      "Kenyan company registration",
+      "Data Protection Act 2019 compliance",
+      "Equipment type approval",
+      "Kenya Space Agency coordination"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Unified license from CA",
+      "non_terrestrial": "Satellite service authorization and spectrum license",
+      "interconnection": "CA-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "CA Licensing", "url": "https://www.ca.go.ke/licensing"},
+      {"label": "Kenya Space Agency", "url": "https://ksa.go.ke"}
+    ]
+  },
+  {
+    "country": "Ghana",
+    "region": "Africa",
+    "regulator_name": "NCA (National Communications Authority)",
+    "regulator_url": "https://www.nca.org.gh",
+    "regulator_contact_url": "https://www.nca.org.gh/contact-us/",
+    "foreign_ownership_restrictions": "Foreign ownership in telecommunications allowed. GIPC (Ghana Investment Promotion Centre) Act requires minimum equity participation thresholds for foreign investors. Satellite operators need NCA authorization.",
+    "data_sovereignty": "Data Protection Act 2012 (Act 843). Data Protection Commission enforces. Cross-border data transfer subject to adequate protection. No satellite-specific data localization requirements.",
+    "spectrum_licensing": "NCA manages spectrum allocation. Satellite operators need frequency authorization. National Frequency Allocation Table aligned with ITU.",
+    "landing_rights": "NCA authorization for satellite services in Ghana. Earth station license required.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "3-9 months",
+    "application_portal_url": "https://www.nca.org.gh/licensing/",
+    "key_requirements": [
+      "NCA telecommunications license",
+      "Frequency authorization for earth stations",
+      "GIPC registration for foreign investors",
+      "Data Protection Act 2012 compliance",
+      "Equipment type approval",
+      "Local representation"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "License from NCA",
+      "non_terrestrial": "Satellite service authorization and frequency license",
+      "interconnection": "NCA-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "NCA Licensing", "url": "https://www.nca.org.gh/licensing/"},
+      {"label": "Ghana Space Science & Technology Institute", "url": "https://gssti.org"}
+    ]
+  },
+  {
+    "country": "Ethiopia",
+    "region": "Africa",
+    "regulator_name": "ECA (Ethiopian Communications Authority)",
+    "regulator_url": "https://www.eca.et",
+    "regulator_contact_url": "https://www.eca.et/contact/",
+    "foreign_ownership_restrictions": "Telecommunications market recently liberalized (2021). Foreign ownership allowed through competitive licensing process. Safaricom consortium received first private operator license in 2021. Satellite services subject to ECA authorization.",
+    "data_sovereignty": "Draft data protection legislation under development. Current regulations require telecommunications data to be accessible to ECA. Government data subject to localization requirements.",
+    "spectrum_licensing": "ECA manages spectrum allocation. Satellite operators need frequency license. Market liberalization expanding spectrum access for new entrants.",
+    "landing_rights": "ECA authorization required for satellite services. Historically state-controlled market now opening to licensed operators.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "6-18 months — regulatory framework still developing",
+    "application_portal_url": "https://www.eca.et/licensing/",
+    "key_requirements": [
+      "ECA telecommunications service license",
+      "Frequency assignment authorization",
+      "Foreign investment approval",
+      "Compliance with emerging data protection framework",
+      "Equipment type approval",
+      "Ethiopian Space Science and Technology Institute coordination"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Unified telecommunications license from ECA",
+      "non_terrestrial": "Satellite service authorization and frequency license",
+      "interconnection": "ECA-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "ECA", "url": "https://www.eca.et"},
+      {"label": "ESSTI", "url": "https://www.essti.gov.et"}
+    ]
+  },
+  {
+    "country": "Tanzania",
+    "region": "Africa",
+    "regulator_name": "TCRA (Tanzania Communications Regulatory Authority)",
+    "regulator_url": "https://www.tcra.go.tz",
+    "regulator_contact_url": "https://www.tcra.go.tz/contact-us",
+    "foreign_ownership_restrictions": "Foreign ownership in telecommunications allowed. Electronic and Postal Communications Act (EPOCA) governs licensing. Local representation required. Tanzania Investment Centre (TIC) registration for foreign investors.",
+    "data_sovereignty": "Personal Data Protection Act (under development). Cybercrimes Act 2015 includes data-related provisions. Telecommunications data retention requirements per TCRA regulations.",
+    "spectrum_licensing": "TCRA manages spectrum allocation. Satellite operators need frequency spectrum license. National Frequency Allocation Table aligned with ITU.",
+    "landing_rights": "TCRA authorization required for satellite services. Network service license and frequency license needed.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "6-12 months",
+    "application_portal_url": "https://www.tcra.go.tz/licensing",
+    "key_requirements": [
+      "TCRA network service license",
+      "Frequency spectrum license",
+      "TIC registration for foreign investors",
+      "Cybercrimes Act compliance",
+      "Equipment type approval",
+      "Local representation requirement"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Network or application service license from TCRA",
+      "non_terrestrial": "Satellite service authorization and spectrum license",
+      "interconnection": "TCRA-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "TCRA Licensing", "url": "https://www.tcra.go.tz/licensing"},
+      {"label": "EPOCA", "url": "https://www.tcra.go.tz/legislation"}
+    ]
+  },
+  {
+    "country": "Philippines",
+    "region": "Asia-Pacific",
+    "regulator_name": "NTC (National Telecommunications Commission)",
+    "regulator_url": "https://ntc.gov.ph",
+    "regulator_contact_url": "https://ntc.gov.ph/contact-us/",
+    "foreign_ownership_restrictions": "Foreign ownership in telecommunications limited to 40% under the Philippine Constitution. Public Utilities Modernization Act (2022) relaxed restrictions for value-added services but maintained 40% cap for public telecommunications entities. Local partner required.",
+    "data_sovereignty": "Data Privacy Act of 2012 (Republic Act 10173). National Privacy Commission (NPC) enforces. Cross-border data transfer subject to adequate protection. No satellite-specific data localization currently.",
+    "spectrum_licensing": "NTC manages spectrum. Satellite operators need provisional authority or certificate of public convenience and necessity (CPCN). Frequency assignment from NTC.",
+    "landing_rights": "NTC authorization required for satellite services. CPCN or provisional authority needed for telecommunications operations.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "6-12 months",
+    "application_portal_url": "https://ntc.gov.ph/services/",
+    "key_requirements": [
+      "NTC CPCN or provisional authority",
+      "Frequency assignment",
+      "40% foreign ownership compliance",
+      "Data Privacy Act 2012 compliance",
+      "Equipment type approval",
+      "PhilSA coordination for space activities"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "CPCN or franchise from NTC/Congress",
+      "non_terrestrial": "Satellite service authorization and frequency assignment",
+      "interconnection": "NTC-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "NTC", "url": "https://ntc.gov.ph"},
+      {"label": "Philippine Space Agency (PhilSA)", "url": "https://philsa.gov.ph"}
+    ]
+  },
+  {
+    "country": "Vietnam",
+    "region": "Asia-Pacific",
+    "regulator_name": "MIC (Ministry of Information and Communications)",
+    "regulator_url": "https://english.mic.gov.vn",
+    "regulator_contact_url": "https://english.mic.gov.vn/Pages/ContactInfo.aspx",
+    "foreign_ownership_restrictions": "Foreign ownership in telecommunications restricted: up to 49% for network infrastructure services, 65% for non-infrastructure services (under WTO commitments). Satellite services classified as infrastructure services. Joint venture with Vietnamese partner required.",
+    "data_sovereignty": "Law on Cybersecurity (2018) and Decree 13/2023 on Personal Data Protection. Data localization requirements for certain categories of data. Satellite operators handling Vietnamese user data may need to store data locally.",
+    "spectrum_licensing": "MIC manages spectrum through the Authority of Radio Frequency Management (ARFM). Satellite operators need frequency license. Vietnam's National Frequency Allocation Table aligned with ITU.",
+    "landing_rights": "MIC authorization required for satellite services. Telecommunications license for satellite service provision in Vietnam.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "9-18 months — complex approval process",
+    "application_portal_url": "https://english.mic.gov.vn",
+    "key_requirements": [
+      "MIC telecommunications license",
+      "ARFM frequency license",
+      "Foreign ownership compliance (49% cap for infrastructure)",
+      "Vietnamese joint venture partner",
+      "Cybersecurity Law and Decree 13/2023 compliance",
+      "VNSC coordination for space activities"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Telecommunications license from MIC",
+      "non_terrestrial": "Satellite service license and frequency authorization",
+      "interconnection": "MIC-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "MIC", "url": "https://english.mic.gov.vn"},
+      {"label": "Vietnam National Space Center (VNSC)", "url": "https://vnsc.org.vn/en/"}
+    ]
+  },
+  {
+    "country": "Thailand",
+    "region": "Asia-Pacific",
+    "regulator_name": "NBTC (National Broadcasting and Telecommunications Commission)",
+    "regulator_url": "https://www.nbtc.go.th",
+    "regulator_contact_url": "https://www.nbtc.go.th/Contact.aspx",
+    "foreign_ownership_restrictions": "Foreign Business Act limits foreign ownership in telecommunications to 49%. Satellite operators classified as telecommunications must comply. BOI (Board of Investment) privileges may allow higher foreign ownership in certain promoted activities.",
+    "data_sovereignty": "Personal Data Protection Act B.E. 2562 (2019) (PDPA). Cross-border data transfer subject to adequate protection standards. No satellite-specific data localization, but government data may have restrictions.",
+    "spectrum_licensing": "NBTC manages spectrum allocation. Satellite operators need frequency assignment. National Frequency Allocation Table aligned with ITU. GISTDA coordinates space activities.",
+    "landing_rights": "NBTC authorization for satellite services in Thailand. Telecommunications business license required.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "6-12 months",
+    "application_portal_url": "https://www.nbtc.go.th",
+    "key_requirements": [
+      "NBTC telecommunications business license",
+      "Frequency assignment",
+      "Foreign Business Act compliance (49% cap)",
+      "PDPA data protection compliance",
+      "Equipment certification",
+      "GISTDA coordination for space activities"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Type 1, 2, or 3 telecommunications license from NBTC",
+      "non_terrestrial": "Satellite service license and frequency assignment",
+      "interconnection": "NBTC-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "NBTC", "url": "https://www.nbtc.go.th"},
+      {"label": "GISTDA", "url": "https://www.gistda.or.th/main/en/"}
+    ]
+  },
+  {
+    "country": "Malaysia",
+    "region": "Asia-Pacific",
+    "regulator_name": "MCMC (Malaysian Communications and Multimedia Commission)",
+    "regulator_url": "https://www.mcmc.gov.my",
+    "regulator_contact_url": "https://www.mcmc.gov.my/en/about-us/contact-us",
+    "foreign_ownership_restrictions": "Foreign ownership in telecommunications allowed up to 49% for network facilities provider (NFP) licensees. Higher foreign ownership possible with government approval on case-by-case basis. Bumiputera equity requirements apply.",
+    "data_sovereignty": "Personal Data Protection Act 2010 (PDPA). Cross-border data transfer subject to ministerial approval for prescribed countries. No satellite-specific data localization requirements.",
+    "spectrum_licensing": "MCMC manages spectrum under the Communications and Multimedia Act 1998. Satellite operators need spectrum assignment. Class or individual license depending on service type.",
+    "landing_rights": "MCMC authorization for satellite services. NFP or network service provider (NSP) license and spectrum assignment required.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "6-12 months",
+    "application_portal_url": "https://www.mcmc.gov.my/en/sectors/licensing",
+    "key_requirements": [
+      "MCMC NFP or NSP license",
+      "Spectrum assignment",
+      "Foreign ownership compliance (49% cap for NFP)",
+      "Bumiputera equity conditions",
+      "PDPA data protection compliance",
+      "MYSA coordination for space activities"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "NFP or NSP individual license from MCMC",
+      "non_terrestrial": "Satellite service license and spectrum assignment",
+      "interconnection": "MCMC-regulated interconnection under Access List"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "MCMC Licensing", "url": "https://www.mcmc.gov.my/en/sectors/licensing"},
+      {"label": "Malaysian Space Agency (MYSA)", "url": "https://www.mysa.gov.my"}
+    ]
+  },
+  {
+    "country": "Bangladesh",
+    "region": "Asia-Pacific",
+    "regulator_name": "BTRC (Bangladesh Telecommunication Regulatory Commission)",
+    "regulator_url": "http://www.btrc.gov.bd",
+    "regulator_contact_url": "http://www.btrc.gov.bd/contact",
+    "foreign_ownership_restrictions": "Foreign ownership in telecommunications allowed up to 60% for most services. Satellite operators need BTRC authorization. Local partner may be required depending on service category. BIDA (Bangladesh Investment Development Authority) approval needed.",
+    "data_sovereignty": "Digital Security Act 2018 governs cyber and data-related matters. Draft Data Protection Act under consideration. Government data subject to localization. Telecommunications operators must provide lawful interception capability.",
+    "spectrum_licensing": "BTRC manages spectrum. Satellite operators need frequency assignment. National Frequency Allocation Plan aligned with ITU.",
+    "landing_rights": "BTRC authorization for satellite services in Bangladesh. VSAT license or ISP license categories available.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "6-12 months",
+    "application_portal_url": "http://www.btrc.gov.bd/licensing",
+    "key_requirements": [
+      "BTRC telecommunications license",
+      "Frequency assignment authorization",
+      "Foreign ownership compliance (60% cap)",
+      "BIDA investment approval",
+      "Digital Security Act compliance",
+      "Equipment type approval"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Telecommunications license from BTRC",
+      "non_terrestrial": "VSAT or satellite service license and frequency assignment",
+      "interconnection": "BTRC-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "BTRC Licensing", "url": "http://www.btrc.gov.bd/licensing"},
+      {"label": "SPARRSO (Space Research)", "url": "http://www.sparrso.gov.bd"}
+    ]
+  },
+  {
+    "country": "Pakistan",
+    "region": "Asia-Pacific",
+    "regulator_name": "PTA (Pakistan Telecommunication Authority)",
+    "regulator_url": "https://www.pta.gov.pk",
+    "regulator_contact_url": "https://www.pta.gov.pk/en/contact-us",
+    "foreign_ownership_restrictions": "100% foreign ownership allowed in telecommunications under Pakistan's liberalized telecom policy. Satellite operators need PTA license. Security clearance required for foreign operators.",
+    "data_sovereignty": "Personal Data Protection Bill under consideration. Prevention of Electronic Crimes Act 2016 applies. Telecommunications data retention required per PTA regulations. Lawful interception capability mandatory.",
+    "spectrum_licensing": "PTA manages spectrum through the Frequency Allocation Board (FAB). Satellite operators need frequency license. Spectrum auctions for commercial bands.",
+    "landing_rights": "PTA authorization for satellite services. Landing rights for foreign satellite operators subject to government approval.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "6-12 months",
+    "application_portal_url": "https://www.pta.gov.pk/en/licensing",
+    "key_requirements": [
+      "PTA telecommunications license",
+      "FAB frequency authorization",
+      "Security clearance for foreign operators",
+      "Prevention of Electronic Crimes Act compliance",
+      "Equipment type approval",
+      "SUPARCO coordination for space activities"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Telecommunications license from PTA",
+      "non_terrestrial": "Satellite service license and frequency authorization",
+      "interconnection": "PTA-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "PTA Licensing", "url": "https://www.pta.gov.pk/en/licensing"},
+      {"label": "SUPARCO", "url": "https://www.suparco.gov.pk"}
+    ]
+  },
+  {
+    "country": "Poland",
+    "region": "Europe",
+    "regulator_name": "UKE (Urząd Komunikacji Elektronicznej / Office of Electronic Communications)",
+    "regulator_url": "https://www.uke.gov.pl",
+    "regulator_contact_url": "https://www.uke.gov.pl/en/contact/",
+    "foreign_ownership_restrictions": "No specific foreign ownership restrictions for satellite operators. EU framework applies. Foreign investment screening under Polish law for critical infrastructure and telecommunications.",
+    "data_sovereignty": "EU GDPR applies directly. UODO (Urząd Ochrony Danych Osobowych) enforces data protection. No satellite-specific data localization requirements beyond GDPR compliance.",
+    "spectrum_licensing": "UKE manages spectrum allocation. Satellite operators need frequency reservation. EU harmonized spectrum framework applies.",
+    "landing_rights": "UKE authorization for satellite services. Frequency reservation for earth stations. EU general authorization for electronic communications.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "3-6 months within EU framework",
+    "application_portal_url": "https://www.uke.gov.pl/en/",
+    "key_requirements": [
+      "UKE frequency reservation for earth stations",
+      "Notification for electronic communications services",
+      "GDPR compliance",
+      "Foreign investment screening for critical infrastructure",
+      "POLSA coordination for space activities"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Notification to UKE for electronic communications",
+      "non_terrestrial": "Frequency reservation and service notification",
+      "interconnection": "EU framework interconnection obligations"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "UKE", "url": "https://www.uke.gov.pl/en/"},
+      {"label": "Polish Space Agency (POLSA)", "url": "https://www.polsa.gov.pl/en/"}
+    ]
+  },
+  {
+    "country": "Romania",
+    "region": "Europe",
+    "regulator_name": "ANCOM (Autoritatea Națională pentru Administrare și Reglementare în Comunicații)",
+    "regulator_url": "https://www.ancom.ro",
+    "regulator_contact_url": "https://www.ancom.ro/en/contact",
+    "foreign_ownership_restrictions": "No specific foreign ownership restrictions for satellite operators. EU framework applies. Foreign investment screening under Romanian national security legislation for critical infrastructure.",
+    "data_sovereignty": "EU GDPR applies directly. ANSPDCP (Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal) enforces. No satellite-specific data localization beyond GDPR.",
+    "spectrum_licensing": "ANCOM manages spectrum allocation. Satellite operators need frequency license. EU harmonized decisions apply.",
+    "landing_rights": "ANCOM authorization for earth stations. General authorization for electronic communications services under EU framework.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "3-6 months within EU framework",
+    "application_portal_url": "https://www.ancom.ro/en/licensing",
+    "key_requirements": [
+      "ANCOM frequency license for earth stations",
+      "General authorization notification",
+      "GDPR compliance",
+      "Romanian Space Agency (ROSA) coordination"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "General authorization for electronic communications",
+      "non_terrestrial": "Frequency license and service notification",
+      "interconnection": "EU framework interconnection obligations"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "ANCOM", "url": "https://www.ancom.ro/en/"},
+      {"label": "Romanian Space Agency (ROSA)", "url": "https://www.rosa.ro/en/"}
+    ]
+  },
+  {
+    "country": "Czech Republic",
+    "region": "Europe",
+    "regulator_name": "CTU (Český telekomunikační úřad / Czech Telecommunication Office)",
+    "regulator_url": "https://www.ctu.cz",
+    "regulator_contact_url": "https://www.ctu.cz/en/contacts",
+    "foreign_ownership_restrictions": "No specific foreign ownership restrictions for satellite operators. EU framework applies. Foreign investment screening under Czech Act on Screening of Foreign Direct Investments for critical infrastructure.",
+    "data_sovereignty": "EU GDPR applies directly. UOOU (Úřad pro ochranu osobních údajů) enforces data protection. No satellite-specific data localization beyond GDPR.",
+    "spectrum_licensing": "CTU manages spectrum allocation. Satellite operators need individual radio license for earth stations. EU harmonized spectrum decisions apply.",
+    "landing_rights": "CTU radio license for earth stations. General authorization for electronic communications under EU framework.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "3-6 months within EU framework",
+    "application_portal_url": "https://www.ctu.cz/en/",
+    "key_requirements": [
+      "CTU individual radio license for earth stations",
+      "General authorization notification for services",
+      "GDPR compliance",
+      "Foreign investment screening for critical infrastructure"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "General authorization for electronic communications",
+      "non_terrestrial": "Individual radio license and service notification",
+      "interconnection": "EU framework interconnection obligations"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "CTU", "url": "https://www.ctu.cz/en/"},
+      {"label": "Czech Space Exploration", "url": "https://www.czechspace.cz/en"}
+    ]
+  },
+  {
+    "country": "Greece",
+    "region": "Europe",
+    "regulator_name": "EETT (Εθνική Επιτροπή Τηλεπικοινωνιών και Ταχυδρομείων / Hellenic Telecommunications and Post Commission)",
+    "regulator_url": "https://www.eett.gr",
+    "regulator_contact_url": "https://www.eett.gr/en/contact/",
+    "foreign_ownership_restrictions": "No specific foreign ownership restrictions for satellite operators. EU framework applies. Greek foreign investment screening under national security provisions for critical infrastructure.",
+    "data_sovereignty": "EU GDPR applies directly. HDPA (Hellenic Data Protection Authority) enforces. No satellite-specific data localization beyond GDPR.",
+    "spectrum_licensing": "EETT manages spectrum allocation. Satellite operators need individual radio frequency license for earth stations. EU harmonized spectrum framework applies.",
+    "landing_rights": "EETT authorization for earth stations. General authorization for electronic communications under EU framework.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "3-6 months within EU framework",
+    "application_portal_url": "https://www.eett.gr/en/",
+    "key_requirements": [
+      "EETT radio frequency license for earth stations",
+      "General authorization notification for services",
+      "GDPR compliance",
+      "Hellenic Space Agency coordination"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "General authorization for electronic communications",
+      "non_terrestrial": "Frequency license and service notification",
+      "interconnection": "EU framework interconnection obligations"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "EETT", "url": "https://www.eett.gr/en/"},
+      {"label": "Hellenic Space Agency (HSA)", "url": "https://hsa.gr/en/"}
+    ]
+  },
+  {
+    "country": "Portugal",
+    "region": "Europe",
+    "regulator_name": "ANACOM (Autoridade Nacional de Comunicações)",
+    "regulator_url": "https://www.anacom.pt",
+    "regulator_contact_url": "https://www.anacom.pt/render.jsp?categoryId=2869",
+    "foreign_ownership_restrictions": "No specific foreign ownership restrictions for satellite operators. EU framework applies. Portuguese foreign investment screening for critical infrastructure under national defense provisions.",
+    "data_sovereignty": "EU GDPR applies directly. CNPD (Comissão Nacional de Proteção de Dados) enforces data protection. No satellite-specific data localization requirements beyond GDPR.",
+    "spectrum_licensing": "ANACOM manages spectrum allocation. Satellite operators need radio frequency license for earth stations. EU harmonized spectrum decisions apply.",
+    "landing_rights": "ANACOM radio license for earth stations. General authorization for electronic communications under EU framework.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "3-6 months within EU framework",
+    "application_portal_url": "https://www.anacom.pt/render.jsp?categoryId=331297",
+    "key_requirements": [
+      "ANACOM radio frequency license for earth stations",
+      "General authorization for electronic communications",
+      "GDPR compliance",
+      "Portugal Space coordination for space activities"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "General authorization for electronic communications",
+      "non_terrestrial": "Frequency license and service notification",
+      "interconnection": "EU framework interconnection obligations"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "ANACOM", "url": "https://www.anacom.pt/render.jsp?categoryId=331297"},
+      {"label": "Portugal Space", "url": "https://www.portugalspace.pt/en/"}
+    ]
+  },
+  {
+    "country": "Ireland",
+    "region": "Europe",
+    "regulator_name": "ComReg (Commission for Communications Regulation)",
+    "regulator_url": "https://www.comreg.ie",
+    "regulator_contact_url": "https://www.comreg.ie/contact-us/",
+    "foreign_ownership_restrictions": "No specific foreign ownership restrictions for satellite operators. EU framework applies. Ireland's open-market policy welcomes foreign telecommunications investment. No foreign investment screening regime specific to telecoms.",
+    "data_sovereignty": "EU GDPR applies directly. DPC (Data Protection Commission) enforces — Ireland hosts many major tech companies and DPC is a key EU regulator. No satellite-specific data localization requirements.",
+    "spectrum_licensing": "ComReg manages spectrum allocation. Satellite operators need radio license for earth stations. EU harmonized spectrum decisions apply.",
+    "landing_rights": "ComReg radio license for earth stations. General authorization for electronic communications under EU framework.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "2-4 months within EU framework",
+    "application_portal_url": "https://www.comreg.ie/industry/licensing/",
+    "key_requirements": [
+      "ComReg radio license for earth stations",
+      "General authorization notification for services",
+      "GDPR compliance",
+      "Irish Aviation Authority coordination for certain installations"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "General authorization for electronic communications",
+      "non_terrestrial": "Radio license and service notification",
+      "interconnection": "EU framework interconnection obligations"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "ComReg Licensing", "url": "https://www.comreg.ie/industry/licensing/"},
+      {"label": "ComReg Spectrum", "url": "https://www.comreg.ie/industry/radio-spectrum/"}
+    ]
+  },
+  {
+    "country": "New Zealand",
+    "region": "Asia-Pacific",
+    "regulator_name": "RSM (Radio Spectrum Management, Ministry of Business, Innovation and Employment)",
+    "regulator_url": "https://www.rsm.govt.nz",
+    "regulator_contact_url": "https://www.rsm.govt.nz/about/contact-us/",
+    "foreign_ownership_restrictions": "No specific foreign ownership restrictions for satellite operators. Overseas Investment Act applies to significant business assets — OIO (Overseas Investment Office) screening for investments exceeding thresholds in significant business assets or sensitive land.",
+    "data_sovereignty": "Privacy Act 2020. No general data localization requirement. Cross-border data transfer allowed with adequate safeguards. No satellite-specific data localization requirements.",
+    "spectrum_licensing": "RSM manages spectrum under the Radiocommunications Act 1989. Satellite operators need radio license or management right. Spectrum management rights available through competitive allocation.",
+    "landing_rights": "RSM radio license for earth stations. Telecommunications service provider registration with Commerce Commission.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "2-4 months",
+    "application_portal_url": "https://www.rsm.govt.nz/licensing/",
+    "key_requirements": [
+      "RSM radio license for earth stations",
+      "Commerce Commission registration for telecom services",
+      "OIO approval for significant foreign investments",
+      "Privacy Act 2020 compliance",
+      "Equipment compliance (radio standards)"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Registration as telecommunications service provider",
+      "non_terrestrial": "Radio license and service provider registration",
+      "interconnection": "Commerce Commission regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "RSM", "url": "https://www.rsm.govt.nz"},
+      {"label": "NZ Space Agency", "url": "https://www.mbie.govt.nz/science-and-technology/space/"}
+    ]
+  },
+  {
+    "country": "Qatar",
+    "region": "MENA",
+    "regulator_name": "CRA (Communications Regulatory Authority)",
+    "regulator_url": "https://www.cra.gov.qa",
+    "regulator_contact_url": "https://www.cra.gov.qa/en/contact-us",
+    "foreign_ownership_restrictions": "Telecommunications services provided through licensed operators. Foreign ownership restrictions depend on license category — historically limited market with Ooredoo and Vodafone Qatar. New entrants subject to CRA licensing. Qatar Free Zones may offer different terms.",
+    "data_sovereignty": "Law No. 13 of 2016 on Personal Data Privacy. Cross-border data transfer subject to adequate protection. Government and critical data may have localization requirements.",
+    "spectrum_licensing": "CRA manages spectrum under Qatar's National Frequency Plan. Satellite operators need spectrum authorization. Ka-band and Ku-band coordination through CRA.",
+    "landing_rights": "CRA authorization required for satellite services. Telecommunications service license needed.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "3-9 months",
+    "application_portal_url": "https://www.cra.gov.qa/en/licensing",
+    "key_requirements": [
+      "CRA telecommunications service license",
+      "Spectrum authorization",
+      "Law 13/2016 data privacy compliance",
+      "Type approval for ground equipment",
+      "Qatar National Vision compliance alignment"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Individual license from CRA",
+      "non_terrestrial": "Satellite service license and spectrum authorization",
+      "interconnection": "CRA-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "CRA Licensing", "url": "https://www.cra.gov.qa/en/licensing"},
+      {"label": "CRA Spectrum", "url": "https://www.cra.gov.qa/en/spectrum-management"}
+    ]
+  },
+  {
+    "country": "Kuwait",
+    "region": "MENA",
+    "regulator_name": "CITRA (Communication and Information Technology Regulatory Authority)",
+    "regulator_url": "https://www.citra.gov.kw",
+    "regulator_contact_url": "https://www.citra.gov.kw/sites/en/Pages/Contact-Us.aspx",
+    "foreign_ownership_restrictions": "Foreign ownership in telecommunications subject to CITRA licensing conditions. Kuwait Direct Investment Promotion Authority (KDIPA) oversees foreign investment. Local partnership may be required depending on service category.",
+    "data_sovereignty": "No comprehensive data protection law enacted yet (draft under consideration). Telecommunications Law No. 37 of 2014 includes data-related provisions. Government data subject to localization requirements.",
+    "spectrum_licensing": "CITRA manages spectrum allocation. Satellite operators need frequency authorization. National Frequency Plan aligned with ITU.",
+    "landing_rights": "CITRA authorization required for satellite services. Telecommunications license for service provision.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "3-9 months",
+    "application_portal_url": "https://www.citra.gov.kw/sites/en/Pages/licensing.aspx",
+    "key_requirements": [
+      "CITRA telecommunications license",
+      "Frequency authorization",
+      "KDIPA investment approval for foreign entities",
+      "Telecommunications Law 37/2014 compliance",
+      "Equipment type approval"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Individual license from CITRA",
+      "non_terrestrial": "Satellite service license and frequency authorization",
+      "interconnection": "CITRA-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "CITRA", "url": "https://www.citra.gov.kw"},
+      {"label": "CITRA Licensing", "url": "https://www.citra.gov.kw/sites/en/Pages/licensing.aspx"}
+    ]
+  },
+  {
+    "country": "Bahrain",
+    "region": "MENA",
+    "regulator_name": "TRA (Telecommunications Regulatory Authority of Bahrain)",
+    "regulator_url": "https://www.tra.org.bh",
+    "regulator_contact_url": "https://www.tra.org.bh/en/contact-us",
+    "foreign_ownership_restrictions": "No general foreign ownership restrictions for telecommunications. Liberal investment environment. Satellite operators need TRA authorization. Bahrain Economic Development Board supports foreign investment in ICT sector.",
+    "data_sovereignty": "Personal Data Protection Law (Law No. 30 of 2018). Cross-border data transfer subject to adequate protection. No satellite-specific data localization requirements.",
+    "spectrum_licensing": "TRA manages spectrum under Bahrain's National Frequency Plan. Satellite operators need spectrum authorization. Open and competitive licensing framework.",
+    "landing_rights": "TRA authorization for satellite services. Individual or class license depending on service type.",
+    "itu_recognition": true,
+    "estimated_approval_timeline": "2-6 months",
+    "application_portal_url": "https://www.tra.org.bh/en/licensing",
+    "key_requirements": [
+      "TRA telecommunications license (individual or class)",
+      "Spectrum authorization",
+      "PDPL Law 30/2018 compliance",
+      "Equipment type approval",
+      "National Space Science Agency coordination"
+    ],
+    "telecom_services_requirements": {
+      "terrestrial": "Individual or class license from TRA",
+      "non_terrestrial": "Satellite service license and spectrum authorization",
+      "interconnection": "TRA-regulated interconnection"
+    },
+    "last_updated": "2026-03-01",
+    "sources": [
+      {"label": "TRA Licensing", "url": "https://www.tra.org.bh/en/licensing"},
+      {"label": "National Space Science Agency (NSSA)", "url": "https://www.nssa.gov.bh"}
+    ]
+  }
+]
