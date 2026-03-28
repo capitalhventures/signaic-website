@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useRef, useCallback } from "react";
 import { SignaicLogo } from "@/components/signaic-logo";
 import { SignaicBrand } from "@/components/signaic-brand";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Scale } from "lucide-react";
 
 interface DropdownItem {
   title: React.ReactNode;
@@ -34,6 +34,17 @@ const platformItems: DropdownItem[] = [
     description:
       "7+ authoritative government and industry data feeds including FCC, USPTO, USASpending, SEC EDGAR, Space-Track, and real-time news. All aggregated, searchable, and AI-queryable.",
     path: "/data-sources",
+  },
+  {
+    title: (
+      <>
+        <Scale className="inline w-3.5 h-3.5 mr-1 text-[#00D4FF]" />
+        Regulatory Guide
+      </>
+    ),
+    description:
+      "Licensing and compliance requirements for NTN and LEO operations across 50+ global markets",
+    path: "/dashboard/regulatory-guide",
   },
 ];
 
@@ -170,6 +181,14 @@ export function MarketingLayout({ children }: { children: React.ReactNode }) {
               </div>
             </div>
 
+            {/* Ask Raptor */}
+            <span
+              className="text-sm text-gray-300 hover:text-white cursor-pointer transition-colors"
+              onClick={() => navigateTo("/ask-raptor")}
+            >
+              Ask Raptor
+            </span>
+
             {/* The Orbital Brief */}
             <span
               className="text-sm text-gray-300 hover:text-white cursor-pointer transition-colors"
@@ -295,6 +314,12 @@ export function MarketingLayout({ children }: { children: React.ReactNode }) {
               ))}
             </div>
             <div className="space-y-2 pt-2 border-t border-white/5">
+              <div
+                className="py-2 cursor-pointer"
+                onClick={() => navigateTo("/ask-raptor")}
+              >
+                <span className="text-sm text-white">Ask Raptor</span>
+              </div>
               <div
                 className="py-2 cursor-pointer"
                 onClick={() => navigateTo("/orbital-brief")}

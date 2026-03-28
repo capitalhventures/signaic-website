@@ -150,7 +150,7 @@ export function LandingPage() {
               </div>
             </div>
             <h3 className="text-lg font-semibold font-[family-name:var(--font-chakra-petch)]">
-              13+ Authoritative Data Sources
+              30+ Authoritative Data Sources
             </h3>
             <p className="text-sm text-gray-400 leading-relaxed">
               FCC filings, USPTO patents, USAspending contracts, SEC filings,
@@ -226,7 +226,7 @@ export function LandingPage() {
                 className="w-full h-12 rounded-lg text-base font-bold transition-colors cursor-pointer border border-[#00D4FF] text-[#00D4FF] bg-transparent hover:bg-[#00D4FF]/10"
                 onClick={() => router.push("/ask-raptor")}
               >
-                Try Raptor →
+                See What Raptor Can Do →
               </button>
 
               <div className="space-y-3">
