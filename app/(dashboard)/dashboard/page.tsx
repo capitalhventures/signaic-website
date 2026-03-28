@@ -1,170 +1,283 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { Card, Badge, EntityTag, StatusIndicator, Citation } from "@/components/ui";
+import { Card, Badge } from "@/components/ui";
 import {
-  Zap,
-  Eye,
-  ArrowRight,
-  Send,
-  Database,
-  FileText,
-  Clock,
-  TrendingUp,
-  RefreshCw,
-  AlertTriangle,
-  BarChart3,
   Activity,
-  Globe,
-  Shield,
-  Satellite,
-  FileSearch,
-  Newspaper,
-  Scale,
+  AlertTriangle,
+  ArrowRight,
+  Bell,
+  BarChart3,
+  Bookmark,
+  Clock,
+  Eye,
+  EyeOff,
+  GripVertical,
+  RefreshCw,
+  Send,
+  Settings,
+  TrendingUp,
+  Zap,
 } from "lucide-react";
+import {
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from "recharts";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
-/* ─── Types ─── */
-interface BriefingEntity {
-  id?: string;
+/* ═══════════════════════════════════════════════════════════════
+   TYPES
+   ═══════════════════════════════════════════════════════════════ */
+
+interface DashboardStats {
+  sourcesActive: number;
+  totalSources: number;
+  lastRefreshMinutes: number | null;
+  lastRefreshAt: string | null;
+  newAlerts: number;
+  watchlistUpdates: number;
+}
+
+interface WeeklyActivity {
+  week: string;
+  fcc_filings: number;
+  patents: number;
+  contracts: number;
+  news: number;
+  sec_filings: number;
+  federal_register: number;
+}
+
+interface SectorCount {
+  sector: string;
+  count: number;
+}
+
+interface TopEntity {
   name: string;
   slug: string;
-  type: "company" | "agency" | "program";
-}
-
-interface BriefingSource {
-  id: string;
-  title: string;
   type: string;
-  url: string;
+  activity_count: number;
 }
 
-interface BriefingItem {
-  headline: string;
-  synthesis: string;
-  entities: BriefingEntity[];
-  impact: "high" | "medium" | "low";
-  sources: BriefingSource[];
+interface ChartData {
+  weeklyActivity: WeeklyActivity[];
+  sectorDistribution: SectorCount[];
+  topEntities: TopEntity[];
+  alertSeverity: Record<string, number>;
 }
 
-/* ─── Sample Briefing Data ─── */
-const sampleBriefingItems: BriefingItem[] = [
-  {
-    headline: "SpaceX Secures $1.8B NRO Launch Contract Extension",
-    synthesis:
-      "The National Reconnaissance Office has extended its launch services contract with SpaceX by $1.8 billion through 2028. This solidifies SpaceX's position as the primary launch provider for classified payloads and may impact ULA's competitive positioning for future NSSL Phase 3 awards.",
-    entities: [
-      { id: "1", name: "SpaceX", slug: "spacex", type: "company" },
-      { id: "2", name: "NRO", slug: "nro", type: "agency" },
-      { id: "3", name: "ULA", slug: "ula", type: "company" },
-    ],
-    impact: "high",
-    sources: [
-      { id: "s1", title: "NRO Contract Award Notice", type: "contract", url: "#" },
-      { id: "s2", title: "SAM.gov Opportunity FA8811-24-R-0001", type: "sam", url: "#" },
-    ],
-  },
-  {
-    headline: "FCC Approves Kuiper Gen2 Constellation Modification",
-    synthesis:
-      "Amazon's Project Kuiper received FCC approval for its Gen2 constellation modification, allowing deployment of 7,774 satellites across revised orbital shells. This directly competes with Starlink's V2 Mini constellation and signals accelerating commercial broadband competition in LEO.",
-    entities: [
-      { id: "4", name: "Amazon Kuiper", slug: "amazon-kuiper", type: "program" },
-      { id: "5", name: "FCC", slug: "fcc", type: "agency" },
-      { id: "6", name: "SpaceX Starlink", slug: "spacex-starlink", type: "program" },
-    ],
-    impact: "high",
-    sources: [
-      { id: "s3", title: "FCC Order DA-24-1847", type: "fcc", url: "#" },
-      { id: "s4", title: "Federal Register Notice Vol. 89", type: "federal_register", url: "#" },
-    ],
-  },
-  {
-    headline: "L3Harris Patents New Satellite Servicing Mechanism",
-    synthesis:
-      "L3Harris Technologies filed a patent for an autonomous satellite servicing mechanism designed for GEO orbit operations. This aligns with DARPA's RSGS program requirements and positions L3Harris ahead of Northrop Grumman's MEV technology in the on-orbit servicing market.",
-    entities: [
-      { id: "7", name: "L3Harris", slug: "l3harris", type: "company" },
-      { id: "8", name: "DARPA", slug: "darpa", type: "agency" },
-      { id: "9", name: "Northrop Grumman", slug: "northrop-grumman", type: "company" },
-    ],
-    impact: "medium",
-    sources: [
-      { id: "s5", title: "USPTO Patent Application 2024/0187432", type: "patent", url: "#" },
-      { id: "s6", title: "DARPA RSGS Program Update", type: "news", url: "#" },
-    ],
-  },
+interface ActivityItem {
+  id: string;
+  type: string;
+  title: string;
+  source: string;
+  created_at: string;
+  url?: string;
+}
+
+interface AlertItem {
+  id: string;
+  alert_type: string;
+  severity: string;
+  title: string;
+  description: string | null;
+  source_type: string | null;
+  source_url: string | null;
+  read: boolean;
+  created_at: string;
+  entity_id: string | null;
+  entities: { id: string; name: string; slug: string; type: string } | null;
+}
+
+interface SectionConfig {
+  key: string;
+  label: string;
+  visible: boolean;
+  position: number;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CONSTANTS
+   ═══════════════════════════════════════════════════════════════ */
+
+const CYAN_PALETTE = [
+  "#06b6d4", // cyan-500
+  "#0891b2", // cyan-600
+  "#22d3ee", // cyan-400
+  "#0e7490", // cyan-700
+  "#67e8f9", // cyan-300
+  "#155e75", // cyan-800
 ];
 
-/* ─── Watchlist Alerts ─── */
-const watchlistAlerts = [
-  { entity: "SpaceX", alertType: "New Contract", timestamp: "2 hours ago", source: "SAM.gov" },
-  { entity: "Rocket Lab", alertType: "SEC Filing", timestamp: "5 hours ago", source: "SEC EDGAR" },
-  { entity: "Amazon Kuiper", alertType: "FCC Filing", timestamp: "8 hours ago", source: "FCC ECFS" },
-];
-
-/* ─── Data Source Cards ─── */
-const dataSourceCards = [
-  { name: "Government Contracts", icon: Shield, status: "green" as const, records: "2,341", lastRefresh: "12 min ago", source: "SAM.gov" },
-  { name: "FCC Filings", icon: Globe, status: "green" as const, records: "8,847", lastRefresh: "28 min ago", source: "FCC ICFS / ECFS" },
-  { name: "SEC EDGAR", icon: FileSearch, status: "yellow" as const, records: "1,203", lastRefresh: "3 hrs ago", source: "SEC EDGAR" },
-  { name: "Patents", icon: FileText, status: "green" as const, records: "4,512", lastRefresh: "1 hr ago", source: "USPTO" },
-  { name: "News & RSS", icon: Newspaper, status: "green" as const, records: "12,891", lastRefresh: "5 min ago", source: "Industry RSS" },
-  { name: "Orbital Data", icon: Satellite, status: "green" as const, records: "45,230", lastRefresh: "18 min ago", source: "Space-Track / CelesTrak" },
-];
-
-/* ─── Recent Activity ─── */
-const recentActivity = [
-  { type: "contract", title: "USSF awards $340M SATCOM contract to L3Harris", time: "35 min ago", source: "SAM.gov" },
-  { type: "fcc", title: "Telesat files LEO constellation amendment for Lightspeed", time: "1 hr ago", source: "FCC ICFS" },
-  { type: "patent", title: "Blue Origin patents reusable upper stage heatshield", time: "2 hrs ago", source: "USPTO" },
-  { type: "sec", title: "Rocket Lab 10-Q filing reveals $42M backlog increase", time: "3 hrs ago", source: "SEC EDGAR" },
-  { type: "news", title: "ESA selects Arianespace for Galileo second-gen launches", time: "4 hrs ago", source: "SpaceNews" },
-  { type: "orbital", title: "34 new objects cataloged from Starlink Group 12-6 launch", time: "5 hrs ago", source: "Space-Track" },
-  { type: "contract", title: "DARPA RSGS Phase 3 sources sought notice published", time: "6 hrs ago", source: "SAM.gov" },
-  { type: "fcc", title: "OneWeb files spectrum coordination request with ITU", time: "8 hrs ago", source: "ITU" },
-];
-
-/* ─── Intelligence Activity (bar chart data — last 7 days) ─── */
-const activityByDay = [
-  { day: "Mon", contracts: 12, fcc: 8, patents: 5, sec: 3, news: 24, orbital: 18 },
-  { day: "Tue", contracts: 8, fcc: 14, patents: 7, sec: 6, news: 31, orbital: 12 },
-  { day: "Wed", contracts: 15, fcc: 6, patents: 3, sec: 4, news: 28, orbital: 22 },
-  { day: "Thu", contracts: 10, fcc: 11, patents: 9, sec: 2, news: 19, orbital: 15 },
-  { day: "Fri", contracts: 18, fcc: 9, patents: 4, sec: 8, news: 35, orbital: 20 },
-  { day: "Sat", contracts: 3, fcc: 2, patents: 1, sec: 0, news: 12, orbital: 8 },
-  { day: "Sun", contracts: 2, fcc: 1, patents: 0, sec: 0, news: 8, orbital: 5 },
-];
-
-const suggestedQueries = [
-  "What's the latest on NSSL Phase 3 competition?",
-  "Show me SpaceX's recent FCC filings",
-  "Summarize defense budget impacts on satellite programs",
-];
-
-const impactColors = {
-  high: "text-red-600 bg-red-50",
-  medium: "text-amber-600 bg-amber-50",
-  low: "text-slate-500 bg-slate-100",
+const SEVERITY_COLORS: Record<string, string> = {
+  critical: "#ef4444",
+  high: "#f97316",
+  medium: "#eab308",
+  low: "#06b6d4",
 };
 
-const activityTypeIcons: Record<string, string> = {
-  contract: "text-emerald-500",
-  fcc: "text-blue-500",
-  patent: "text-violet-500",
-  sec: "text-amber-500",
-  news: "text-slate-500",
-  orbital: "text-cyan-500",
+const ACTIVITY_TYPE_COLORS: Record<string, string> = {
+  fcc: "#3b82f6",
+  contract: "#10b981",
+  patent: "#8b5cf6",
+  sec: "#f59e0b",
+  news: "#64748b",
+  federal_register: "#ec4899",
 };
+
+const DEFAULT_SECTIONS: SectionConfig[] = [
+  { key: "stats", label: "Key Metrics", visible: true, position: 0 },
+  { key: "activity-feed", label: "Recent Activity", visible: true, position: 1 },
+  { key: "alerts", label: "Active Alerts", visible: true, position: 2 },
+  { key: "weekly-activity", label: "Filing & Activity Trend (90 Days)", visible: true, position: 3 },
+  { key: "sector-distribution", label: "Sector Distribution", visible: true, position: 4 },
+  { key: "top-entities", label: "Top Entities by Activity", visible: true, position: 5 },
+];
+
+/* ═══════════════════════════════════════════════════════════════
+   SORTABLE SECTION WRAPPER
+   ═══════════════════════════════════════════════════════════════ */
+
+function SortableSection({
+  id,
+  children,
+  isCustomizing,
+}: {
+  id: string;
+  children: React.ReactNode;
+  isCustomizing: boolean;
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id, disabled: !isCustomizing });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    position: "relative" as const,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      {isCustomizing && (
+        <button
+          className="absolute -left-2 top-1/2 -translate-y-1/2 z-10 p-1 rounded bg-slate-200 hover:bg-cyan-100 cursor-grab active:cursor-grabbing"
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical className="w-4 h-4 text-slate-400" />
+        </button>
+      )}
+      {children}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   CUSTOMIZE PANEL
+   ═══════════════════════════════════════════════════════════════ */
+
+function CustomizePanel({
+  sections,
+  onToggle,
+  onReset,
+  onClose,
+}: {
+  sections: SectionConfig[];
+  onToggle: (key: string) => void;
+  onReset: () => void;
+  onClose: () => void;
+}) {
+  return (
+    <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-xl shadow-lg border border-slate-200 z-50 p-4">
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="text-sm font-semibold text-slate-900">Dashboard Sections</h3>
+        <button
+          onClick={onClose}
+          className="text-xs text-slate-400 hover:text-slate-600"
+        >
+          Done
+        </button>
+      </div>
+      <div className="space-y-2">
+        {sections
+          .filter((s) => s.key !== "stats")
+          .map((section) => (
+            <button
+              key={section.key}
+              onClick={() => onToggle(section.key)}
+              className="flex items-center justify-between w-full px-3 py-2 rounded-lg hover:bg-slate-50 transition-colors"
+            >
+              <span className="text-sm text-slate-700">{section.label}</span>
+              {section.visible ? (
+                <Eye className="w-4 h-4 text-cyan-500" />
+              ) : (
+                <EyeOff className="w-4 h-4 text-slate-300" />
+              )}
+            </button>
+          ))}
+      </div>
+      <button
+        onClick={onReset}
+        className="mt-3 w-full text-xs text-slate-400 hover:text-slate-600 py-1.5"
+      >
+        Reset to Default
+      </button>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MAIN COMPONENT
+   ═══════════════════════════════════════════════════════════════ */
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [query, setQuery] = useState("");
-  const [briefingItems, setBriefingItems] = useState<BriefingItem[]>(sampleBriefingItems);
-  const [isSampleData, setIsSampleData] = useState(true);
-  const [generatedAt, setGeneratedAt] = useState<string | null>(null);
+
+  // Data state
+  const [stats, setStats] = useState<DashboardStats | null>(null);
+  const [chartData, setChartData] = useState<ChartData | null>(null);
+  const [activities, setActivities] = useState<ActivityItem[]>([]);
+  const [alerts, setAlerts] = useState<AlertItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Customize state
+  const [sections, setSections] = useState<SectionConfig[]>(DEFAULT_SECTIONS);
+  const [isCustomizing, setIsCustomizing] = useState(false);
+  const [showCustomizePanel, setShowCustomizePanel] = useState(false);
+
+  // Quick Ask
+  const [query, setQuery] = useState("");
 
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "long",
@@ -173,52 +286,76 @@ export default function DashboardPage() {
     day: "numeric",
   });
 
-  const fetchBriefing = useCallback(async () => {
+  // DnD sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+  );
+
+  /* ─── Data Fetching ─── */
+
+  const fetchAllData = useCallback(async () => {
     try {
-      const res = await fetch("/api/v1/briefing");
-      if (!res.ok) return;
-      const json = await res.json();
-      if (json.success && json.data?.items?.length > 0) {
-        const items = json.data.items.map((item: BriefingItem, idx: number) => ({
-          ...item,
-          entities: item.entities.map((e: BriefingEntity, eIdx: number) => ({
-            ...e,
-            id: e.id || `e-${idx}-${eIdx}`,
-          })),
-          sources: item.sources.map((s: BriefingSource, sIdx: number) => ({
-            ...s,
-            id: s.id || `s-${idx}-${sIdx}`,
-          })),
-        }));
-        setBriefingItems(items);
-        setIsSampleData(false);
-        setGeneratedAt(json.data.generated_at || null);
+      const [statsRes, chartsRes, activityRes, alertsRes, prefsRes] = await Promise.all([
+        fetch("/api/v1/dashboard/stats"),
+        fetch("/api/v1/dashboard/charts"),
+        fetch("/api/v1/dashboard/activity"),
+        fetch("/api/v1/dashboard/alerts"),
+        fetch("/api/v1/dashboard/preferences"),
+      ]);
+
+      if (statsRes.ok) {
+        const json = await statsRes.json();
+        if (json.success) setStats(json.data);
+      }
+
+      if (chartsRes.ok) {
+        const json = await chartsRes.json();
+        if (json.success) setChartData(json.data);
+      }
+
+      if (activityRes.ok) {
+        const json = await activityRes.json();
+        if (json.success) setActivities(json.data);
+      }
+
+      if (alertsRes.ok) {
+        const json = await alertsRes.json();
+        if (json.success) setAlerts(json.data);
+      }
+
+      if (prefsRes.ok) {
+        const json = await prefsRes.json();
+        if (json.success && json.data?.length > 0) {
+          const savedSections = DEFAULT_SECTIONS.map((def) => {
+            const saved = json.data.find(
+              (p: { section_key: string }) => p.section_key === def.key
+            );
+            return saved
+              ? { ...def, visible: saved.visible, position: saved.position }
+              : def;
+          });
+          savedSections.sort((a: SectionConfig, b: SectionConfig) => a.position - b.position);
+          setSections(savedSections);
+        }
       }
     } catch {
-      // Keep sample data on error
+      // Network error — leave defaults
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    fetchBriefing();
-  }, [fetchBriefing]);
+    fetchAllData();
+  }, [fetchAllData]);
+
+  /* ─── Handlers ─── */
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    try {
-      const res = await fetch("/api/v1/agents/meridian", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      });
-      if (res.ok) {
-        await new Promise((r) => setTimeout(r, 1000));
-        await fetchBriefing();
-      }
-    } catch {
-      // Silently fail
-    } finally {
-      setIsRefreshing(false);
-    }
+    await fetchAllData();
+    setIsRefreshing(false);
   };
 
   const handleAsk = () => {
@@ -227,8 +364,505 @@ export default function DashboardPage() {
     }
   };
 
-  // Calculate max value for chart scaling
-  const chartMax = Math.max(...activityByDay.map((d) => d.contracts + d.fcc + d.patents + d.sec + d.news + d.orbital));
+  const handleToggleSection = (key: string) => {
+    setSections((prev) => {
+      const updated = prev.map((s) =>
+        s.key === key ? { ...s, visible: !s.visible } : s
+      );
+      savePreferences(updated);
+      return updated;
+    });
+  };
+
+  const handleResetSections = () => {
+    setSections(DEFAULT_SECTIONS);
+    savePreferences(DEFAULT_SECTIONS);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    setSections((prev) => {
+      const oldIndex = prev.findIndex((s) => s.key === active.id);
+      const newIndex = prev.findIndex((s) => s.key === over.id);
+      const reordered = arrayMove(prev, oldIndex, newIndex).map((s, i) => ({
+        ...s,
+        position: i,
+      }));
+      savePreferences(reordered);
+      return reordered;
+    });
+  };
+
+  const savePreferences = async (secs: SectionConfig[]) => {
+    try {
+      await fetch("/api/v1/dashboard/preferences", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sections: secs.map((s) => ({
+            key: s.key,
+            visible: s.visible,
+            position: s.position,
+          })),
+        }),
+      });
+    } catch {
+      // Silently fail — preferences are not critical
+    }
+  };
+
+  /* ─── Derived Data ─── */
+
+  const lastRefreshLabel = useMemo(() => {
+    if (!stats?.lastRefreshMinutes && stats?.lastRefreshMinutes !== 0) return "N/A";
+    const mins = stats.lastRefreshMinutes;
+    if (mins < 60) return `${mins} min`;
+    if (mins < 1440) return `${Math.round(mins / 60)} hr`;
+    return `${Math.round(mins / 1440)} days`;
+  }, [stats]);
+
+  const formattedWeeklyData = useMemo(() => {
+    if (!chartData?.weeklyActivity) return [];
+    return chartData.weeklyActivity.map((w) => ({
+      ...w,
+      label: new Date(w.week).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
+    }));
+  }, [chartData]);
+
+  const isVisible = (key: string) => sections.find((s) => s.key === key)?.visible ?? true;
+
+  const formatRelativeTime = (dateStr: string) => {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24) return `${hrs}h ago`;
+    const days = Math.floor(hrs / 24);
+    return `${days}d ago`;
+  };
+
+  /* ─── Section Renderers ─── */
+
+  const renderStats = () => (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <button onClick={() => router.push("/dashboard/data-sources")} className="text-left">
+        <Card className="!p-4 hover:border-cyan-300 transition-colors">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
+              <Activity className="w-5 h-5 text-emerald-500" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-slate-900">
+                {stats ? stats.sourcesActive : <span className="animate-pulse text-slate-300">--</span>}
+              </p>
+              <p className="text-xs text-slate-500">Sources Active</p>
+            </div>
+          </div>
+        </Card>
+      </button>
+
+      <button onClick={() => router.push("/dashboard/data-sources")} className="text-left">
+        <Card className="!p-4 hover:border-cyan-300 transition-colors">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-cyan-50 flex items-center justify-center">
+              <Clock className="w-5 h-5 text-brand-cyan" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-slate-900">
+                {stats ? lastRefreshLabel : <span className="animate-pulse text-slate-300">--</span>}
+              </p>
+              <p className="text-xs text-slate-500">Last Refresh</p>
+            </div>
+          </div>
+        </Card>
+      </button>
+
+      <button onClick={() => router.push("/dashboard/entities")} className="text-left">
+        <Card className="!p-4 hover:border-cyan-300 transition-colors">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-red-50 flex items-center justify-center">
+              <Bell className="w-5 h-5 text-red-500" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-slate-900">
+                {stats ? stats.newAlerts : <span className="animate-pulse text-slate-300">--</span>}
+              </p>
+              <p className="text-xs text-slate-500">New Alerts</p>
+            </div>
+          </div>
+        </Card>
+      </button>
+
+      <button onClick={() => router.push("/dashboard/entities")} className="text-left">
+        <Card className="!p-4 hover:border-cyan-300 transition-colors">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-violet-50 flex items-center justify-center">
+              <Bookmark className="w-5 h-5 text-violet-500" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-slate-900">
+                {stats ? stats.watchlistUpdates : <span className="animate-pulse text-slate-300">--</span>}
+              </p>
+              <p className="text-xs text-slate-500">Watchlist Updates</p>
+            </div>
+          </div>
+        </Card>
+      </button>
+    </div>
+  );
+
+  const renderActivityFeed = () => (
+    <Card className="!p-5">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+          <Activity className="w-4 h-4 text-brand-cyan" />
+          Recent Activity
+        </h2>
+        <button
+          onClick={() => router.push("/dashboard/data-sources")}
+          className="text-xs text-brand-cyan hover:text-cyan-700 font-medium flex items-center gap-1"
+        >
+          See all <ArrowRight className="w-3 h-3" />
+        </button>
+      </div>
+      <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1">
+        {activities.length === 0 ? (
+          <p className="text-xs text-slate-400 py-4 text-center">No recent activity</p>
+        ) : (
+          activities.slice(0, 5).map((item) => (
+            <button
+              key={item.id}
+              onClick={() => {
+                if (item.url) {
+                  window.open(item.url, "_blank");
+                } else {
+                  router.push("/dashboard/data-sources");
+                }
+              }}
+              className="flex items-start gap-3 w-full text-left hover:bg-slate-50 rounded-lg p-1.5 -m-1.5 transition-colors"
+            >
+              <div
+                className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0"
+                style={{ backgroundColor: ACTIVITY_TYPE_COLORS[item.type] || "#94a3b8" }}
+              />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-slate-700 leading-snug truncate">{item.title}</p>
+                <p className="text-[10px] text-slate-400 mt-0.5">
+                  {item.source} &middot; {formatRelativeTime(item.created_at)}
+                </p>
+              </div>
+            </button>
+          ))
+        )}
+      </div>
+    </Card>
+  );
+
+  const renderAlerts = () => (
+    <Card className="!p-5">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
+          <AlertTriangle className="w-4 h-4 text-brand-cyan" />
+          Active Alerts
+        </h2>
+        <button
+          onClick={() => router.push("/dashboard/entities")}
+          className="text-xs text-brand-cyan hover:text-cyan-700 font-medium flex items-center gap-1"
+        >
+          See all <ArrowRight className="w-3 h-3" />
+        </button>
+      </div>
+      <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1">
+        {alerts.length === 0 ? (
+          <p className="text-xs text-slate-400 py-4 text-center">No active alerts</p>
+        ) : (
+          alerts.slice(0, 5).map((alert) => (
+            <button
+              key={alert.id}
+              onClick={() => {
+                if (alert.entities?.slug) {
+                  router.push(`/dashboard/entities/${alert.entities.slug}`);
+                } else {
+                  router.push("/dashboard/entities");
+                }
+              }}
+              className="flex items-start gap-3 w-full text-left hover:bg-slate-50 rounded-lg p-1.5 -m-1.5 transition-colors"
+            >
+              <div
+                className="w-2 h-2 rounded-full mt-1 flex-shrink-0"
+                style={{ backgroundColor: SEVERITY_COLORS[alert.severity] || "#94a3b8" }}
+              />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <p className="text-xs font-medium text-slate-900 truncate">{alert.title}</p>
+                  <Badge variant={alert.severity === "high" || alert.severity === "critical" ? "high" : alert.severity === "medium" ? "medium" : "low"}>
+                    {alert.severity}
+                  </Badge>
+                </div>
+                {alert.entities && (
+                  <p className="text-[10px] text-cyan-600 mt-0.5">{alert.entities.name}</p>
+                )}
+                <p className="text-[10px] text-slate-400 mt-0.5">
+                  {formatRelativeTime(alert.created_at)}
+                </p>
+              </div>
+            </button>
+          ))
+        )}
+      </div>
+    </Card>
+  );
+
+  const renderWeeklyActivity = () => (
+    <Card className="!p-5">
+      <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2 mb-4">
+        <BarChart3 className="w-4 h-4 text-brand-cyan" />
+        Filing & Activity Trend (90 Days)
+      </h2>
+      {formattedWeeklyData.length === 0 ? (
+        <p className="text-xs text-slate-400 py-8 text-center">No activity data available</p>
+      ) : (
+        <ResponsiveContainer width="100%" height={260}>
+          <AreaChart data={formattedWeeklyData} margin={{ top: 5, right: 10, left: -20, bottom: 0 }}>
+            <defs>
+              <linearGradient id="gradContracts" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#06b6d4" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="gradFCC" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#0891b2" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#0891b2" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="gradNews" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#22d3ee" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#22d3ee" stopOpacity={0} />
+              </linearGradient>
+              <linearGradient id="gradPatents" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#0e7490" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#0e7490" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+            <XAxis dataKey="label" tick={{ fontSize: 10, fill: "#94a3b8" }} tickLine={false} />
+            <YAxis tick={{ fontSize: 10, fill: "#94a3b8" }} tickLine={false} axisLine={false} />
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#fff",
+                border: "1px solid #e2e8f0",
+                borderRadius: "8px",
+                fontSize: "11px",
+              }}
+            />
+            <Legend wrapperStyle={{ fontSize: "10px" }} />
+            <Area
+              type="monotone"
+              dataKey="contracts"
+              name="Contracts"
+              stroke="#06b6d4"
+              fill="url(#gradContracts)"
+              strokeWidth={2}
+            />
+            <Area
+              type="monotone"
+              dataKey="fcc_filings"
+              name="FCC Filings"
+              stroke="#0891b2"
+              fill="url(#gradFCC)"
+              strokeWidth={2}
+            />
+            <Area
+              type="monotone"
+              dataKey="news"
+              name="News"
+              stroke="#22d3ee"
+              fill="url(#gradNews)"
+              strokeWidth={1.5}
+            />
+            <Area
+              type="monotone"
+              dataKey="patents"
+              name="Patents"
+              stroke="#0e7490"
+              fill="url(#gradPatents)"
+              strokeWidth={1.5}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      )}
+    </Card>
+  );
+
+  const renderSectorDistribution = () => {
+    const data = chartData?.sectorDistribution || [];
+    const total = data.reduce((sum, d) => sum + d.count, 0);
+
+    return (
+      <Card className="!p-5">
+        <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2 mb-4">
+          <TrendingUp className="w-4 h-4 text-brand-cyan" />
+          Sector Distribution
+        </h2>
+        {data.length === 0 ? (
+          <p className="text-xs text-slate-400 py-8 text-center">No sector data available</p>
+        ) : (
+          <div className="flex items-center gap-4">
+            <ResponsiveContainer width="50%" height={200}>
+              <PieChart>
+                <Pie
+                  data={data.slice(0, 8)}
+                  dataKey="count"
+                  nameKey="sector"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={80}
+                  innerRadius={45}
+                  paddingAngle={2}
+                >
+                  {data.slice(0, 8).map((_, i) => (
+                    <Cell key={i} fill={CYAN_PALETTE[i % CYAN_PALETTE.length]} />
+                  ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "#fff",
+                    border: "1px solid #e2e8f0",
+                    borderRadius: "8px",
+                    fontSize: "11px",
+                  }}
+                  formatter={(value) => [
+                    `${value} (${total > 0 ? Math.round((Number(value) / total) * 100) : 0}%)`,
+                    "Entities",
+                  ]}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="flex-1 space-y-1.5">
+              {data.slice(0, 8).map((item, i) => (
+                <button
+                  key={item.sector}
+                  onClick={() =>
+                    router.push(`/dashboard/entities?sector=${encodeURIComponent(item.sector)}`)
+                  }
+                  className="flex items-center gap-2 w-full text-left hover:bg-slate-50 rounded px-1 py-0.5 transition-colors"
+                >
+                  <div
+                    className="w-2.5 h-2.5 rounded-sm flex-shrink-0"
+                    style={{ backgroundColor: CYAN_PALETTE[i % CYAN_PALETTE.length] }}
+                  />
+                  <span className="text-[11px] text-slate-600 truncate flex-1">{item.sector}</span>
+                  <span className="text-[10px] text-slate-400 font-medium">{item.count}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+      </Card>
+    );
+  };
+
+  const renderTopEntities = () => {
+    const data = chartData?.topEntities || [];
+
+    return (
+      <Card className="!p-5">
+        <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2 mb-4">
+          <Zap className="w-4 h-4 text-brand-cyan" />
+          Top Entities by Activity
+        </h2>
+        {data.length === 0 ? (
+          <p className="text-xs text-slate-400 py-8 text-center">No entity data available</p>
+        ) : (
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart
+              data={data}
+              layout="vertical"
+              margin={{ top: 0, right: 10, left: 0, bottom: 0 }}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" horizontal={false} />
+              <XAxis type="number" tick={{ fontSize: 10, fill: "#94a3b8" }} tickLine={false} />
+              <YAxis
+                type="category"
+                dataKey="name"
+                tick={{ fontSize: 10, fill: "#475569" }}
+                tickLine={false}
+                axisLine={false}
+                width={120}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#fff",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: "8px",
+                  fontSize: "11px",
+                }}
+                formatter={(value) => [value, "Total Activity"]}
+              />
+              <Bar
+                dataKey="activity_count"
+                fill="#06b6d4"
+                radius={[0, 4, 4, 0]}
+                cursor="pointer"
+                onClick={(data) => {
+                  const payload = data as unknown as TopEntity;
+                  if (payload?.slug) router.push(`/dashboard/entities/${payload.slug}`);
+                }}
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
+      </Card>
+    );
+  };
+
+  /* ─── Section Registry ─── */
+
+  const sectionRenderers: Record<string, () => React.ReactNode> = {
+    stats: renderStats,
+    "activity-feed": renderActivityFeed,
+    alerts: renderAlerts,
+    "weekly-activity": renderWeeklyActivity,
+    "sector-distribution": renderSectorDistribution,
+    "top-entities": renderTopEntities,
+  };
+
+  /* ═══════════════════════════════════════════════════════════════
+     RENDER
+     ═══════════════════════════════════════════════════════════════ */
+
+  if (isLoading) {
+    return (
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Command Center</h1>
+            <p className="text-xs text-slate-400 mt-0.5">{today}</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <Card key={i} className="!p-4">
+              <div className="animate-pulse flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-slate-100" />
+                <div className="space-y-2">
+                  <div className="h-6 w-12 bg-slate-100 rounded" />
+                  <div className="h-3 w-20 bg-slate-100 rounded" />
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="!p-5 h-48 animate-pulse bg-slate-50"><span /></Card>
+          <Card className="!p-5 h-48 animate-pulse bg-slate-50"><span /></Card>
+        </div>
+      </div>
+    );
+  }
+
+  // Sort visible sections (stats always first)
+  const visibleSections = sections.filter((s) => s.visible);
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -245,265 +879,107 @@ export default function DashboardPage() {
             className="flex items-center gap-2 text-xs font-medium text-slate-500 hover:text-brand-cyan transition-colors disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
-            {isRefreshing ? "Generating..." : "Refresh"}
+            {isRefreshing ? "Refreshing..." : "Refresh"}
           </button>
+          <div className="relative">
+            <button
+              onClick={() => {
+                setShowCustomizePanel(!showCustomizePanel);
+                setIsCustomizing(!isCustomizing);
+              }}
+              className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+                isCustomizing
+                  ? "bg-cyan-500 text-white"
+                  : "bg-cyan-50 text-cyan-700 hover:bg-cyan-100"
+              }`}
+            >
+              <Settings className="w-3.5 h-3.5" />
+              Customize
+            </button>
+            {showCustomizePanel && (
+              <CustomizePanel
+                sections={sections}
+                onToggle={handleToggleSection}
+                onReset={handleResetSections}
+                onClose={() => {
+                  setShowCustomizePanel(false);
+                  setIsCustomizing(false);
+                }}
+              />
+            )}
+          </div>
         </div>
       </div>
 
-      {/* ═══ QUICK STATS ROW ═══ */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="!p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-cyan-50 flex items-center justify-center">
-              <Database className="w-5 h-5 text-brand-cyan" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-900">74,024</p>
-              <p className="text-xs text-slate-500">Total Records</p>
-            </div>
-          </div>
-        </Card>
-        <Card className="!p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
-              <Activity className="w-5 h-5 text-emerald-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-900">12</p>
-              <p className="text-xs text-slate-500">Sources Active</p>
-            </div>
-          </div>
-        </Card>
-        <Card className="!p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-violet-50 flex items-center justify-center">
-              <BarChart3 className="w-5 h-5 text-violet-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-900">2,847</p>
-              <p className="text-xs text-slate-500">Entities Tracked</p>
-            </div>
-          </div>
-        </Card>
-        <Card className="!p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center">
-              <Clock className="w-5 h-5 text-amber-500" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-slate-900">5 min</p>
-              <p className="text-xs text-slate-500">Last Refresh</p>
-            </div>
-          </div>
-        </Card>
-      </div>
+      {/* ═══ DASHBOARD SECTIONS (Drag-sortable) ═══ */}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={visibleSections.map((s) => s.key)}
+          strategy={verticalListSortingStrategy}
+        >
+          {visibleSections.map((section) => {
+            const renderer = sectionRenderers[section.key];
+            if (!renderer) return null;
 
-      {/* ═══ INTELLIGENCE ACTIVITY + RECENT ACTIVITY ═══ */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        {/* Activity Chart (3 cols) */}
-        <Card className="lg:col-span-3 !p-5">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-              <BarChart3 className="w-4 h-4 text-brand-cyan" />
-              Intelligence Activity — Last 7 Days
-            </h2>
-            <div className="flex items-center gap-3 text-[10px] text-slate-400">
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-emerald-400" />Contracts</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-blue-400" />FCC</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-violet-400" />Patents</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-amber-400" />SEC</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-slate-400" />News</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-sm bg-cyan-400" />Orbital</span>
-            </div>
-          </div>
-          <div className="flex items-end gap-3 h-40">
-            {activityByDay.map((day) => {
-              const total = day.contracts + day.fcc + day.patents + day.sec + day.news + day.orbital;
-              const scale = (val: number) => (val / chartMax) * 100;
+            // Stats row and the two-column row get special layout
+            if (section.key === "stats") {
               return (
-                <div key={day.day} className="flex-1 flex flex-col items-center gap-1">
-                  <div className="w-full flex flex-col-reverse" style={{ height: `${scale(total)}%`, minHeight: 4 }}>
-                    <div className="bg-emerald-400 rounded-t-sm" style={{ height: `${(day.contracts / total) * 100}%` }} />
-                    <div className="bg-blue-400" style={{ height: `${(day.fcc / total) * 100}%` }} />
-                    <div className="bg-violet-400" style={{ height: `${(day.patents / total) * 100}%` }} />
-                    <div className="bg-amber-400" style={{ height: `${(day.sec / total) * 100}%` }} />
-                    <div className="bg-slate-300" style={{ height: `${(day.news / total) * 100}%` }} />
-                    <div className="bg-cyan-400 rounded-b-sm" style={{ height: `${(day.orbital / total) * 100}%` }} />
-                  </div>
-                  <span className="text-[10px] text-slate-400 font-medium">{day.day}</span>
-                </div>
+                <SortableSection key={section.key} id={section.key} isCustomizing={isCustomizing}>
+                  {renderer()}
+                </SortableSection>
               );
-            })}
-          </div>
-        </Card>
+            }
 
-        {/* Recent Activity Feed (2 cols) */}
-        <Card className="lg:col-span-2 !p-5">
-          <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2 mb-4">
-            <Activity className="w-4 h-4 text-brand-cyan" />
-            Recent Activity
-          </h2>
-          <div className="space-y-3 max-h-[280px] overflow-y-auto pr-1">
-            {recentActivity.map((item, idx) => (
-              <div key={idx} className="flex items-start gap-3">
-                <div className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${activityTypeIcons[item.type]?.replace("text-", "bg-")}`} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs text-slate-700 leading-snug">{item.title}</p>
-                  <p className="text-[10px] text-slate-400 mt-0.5">{item.source} &middot; {item.time}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-      </div>
-
-      {/* ═══ DATA SOURCE CARDS ═══ */}
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-            <Database className="w-4 h-4 text-brand-cyan" />
-            Data Sources
-          </h2>
-          <Link href="/dashboard/data-sources" className="text-xs text-brand-cyan hover:text-brand-cyan-dark font-medium flex items-center gap-1">
-            View All <ArrowRight className="w-3 h-3" />
-          </Link>
-        </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-          {dataSourceCards.map((ds) => (
-            <Card key={ds.name} className="!p-3">
-              <div className="flex items-center gap-2 mb-2">
-                <StatusIndicator status={ds.status} pulse={ds.status === "yellow"} />
-                <ds.icon className="w-3.5 h-3.5 text-slate-400" />
-              </div>
-              <p className="text-xs font-semibold text-slate-900 mb-0.5">{ds.name}</p>
-              <p className="text-lg font-bold text-slate-900">{ds.records}</p>
-              <p className="text-[10px] text-slate-400 mt-1 flex items-center gap-1">
-                <Clock className="w-2.5 h-2.5" />
-                {ds.lastRefresh}
-              </p>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      {/* ═══ DAILY INTELLIGENCE BRIEFING ═══ */}
-      <section>
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
-          <div>
-            <div className="flex items-center gap-3 flex-wrap">
-              <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-                <Zap className="w-4 h-4 text-brand-cyan" />
-                Daily Intelligence Briefing
-              </h2>
-              {isSampleData && (
-                <Badge variant="default" className="text-[10px] uppercase tracking-wider">
-                  <AlertTriangle className="w-3 h-3 mr-1" />
-                  Sample Data
-                </Badge>
-              )}
-            </div>
-            <p className="text-[10px] text-slate-400 mt-0.5">
-              Last updated: 6:00 AM CT
-              {generatedAt && !isSampleData && (
-                <span className="ml-1">
-                  &middot; {new Date(generatedAt).toLocaleString()}
-                </span>
-              )}
-            </p>
-          </div>
-          <Link
-            href="/dashboard/orbital-brief"
-            className="flex items-center gap-2 text-xs font-medium text-brand-cyan hover:text-brand-cyan-dark transition-colors"
-          >
-            View Full Brief <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
-
-        <div className="space-y-3">
-          {briefingItems.map((item, idx) => (
-            <Card key={idx} variant={item.impact === "high" ? "highlighted" : "default"}>
-              <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 mt-0.5">
-                  <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${impactColors[item.impact]}`}>
-                    {item.impact === "high" ? <Zap className="w-3.5 h-3.5" /> : <TrendingUp className="w-3.5 h-3.5" />}
+            // Activity feed and alerts sit side-by-side
+            if (section.key === "activity-feed") {
+              const alertsVisible = isVisible("alerts");
+              return (
+                <SortableSection key={section.key} id={section.key} isCustomizing={isCustomizing}>
+                  <div className={`grid grid-cols-1 ${alertsVisible ? "lg:grid-cols-2" : ""} gap-6`}>
+                    {renderer()}
+                    {alertsVisible && renderAlerts()}
                   </div>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <h3 className="text-sm font-semibold text-slate-900">{item.headline}</h3>
-                    <Badge variant={item.impact}>{item.impact.toUpperCase()}</Badge>
-                  </div>
-                  <p className="text-xs text-slate-600 leading-relaxed mb-2">{item.synthesis}</p>
-                  <div className="flex items-center gap-3 flex-wrap">
-                    <div className="flex items-center gap-1 flex-wrap">
-                      {item.entities.map((entity) => (
-                        <EntityTag key={entity.id || entity.slug} name={entity.name} slug={entity.slug} type={entity.type} />
-                      ))}
+                </SortableSection>
+              );
+            }
+
+            // Skip standalone alerts render since it's paired with activity-feed
+            if (section.key === "alerts") return null;
+
+            // Visualizations in a responsive grid
+            if (section.key === "weekly-activity") {
+              const sectorVisible = isVisible("sector-distribution");
+              const entitiesVisible = isVisible("top-entities");
+              return (
+                <SortableSection key={section.key} id={section.key} isCustomizing={isCustomizing}>
+                  {renderer()}
+                  {(sectorVisible || entitiesVisible) && (
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+                      {sectorVisible && renderSectorDistribution()}
+                      {entitiesVisible && renderTopEntities()}
                     </div>
-                    <div className="flex items-center gap-1">
-                      {item.sources.map((source, sIdx) => (
-                        <Citation key={source.id} number={sIdx + 1} title={source.title} source={source.type} url={source.url} />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </section>
+                  )}
+                </SortableSection>
+              );
+            }
 
-      {/* ═══ WATCHLIST ALERTS ═══ */}
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-            <Eye className="w-4 h-4 text-brand-cyan" />
-            Watchlist Alerts
-          </h2>
-          <Link href="/dashboard/entities" className="text-xs text-brand-cyan hover:text-brand-cyan-dark font-medium flex items-center gap-1">
-            Manage Watchlist <ArrowRight className="w-3 h-3" />
-          </Link>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {watchlistAlerts.map((alert, idx) => (
-            <Card key={idx} className="!p-3">
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="font-semibold text-slate-900 text-sm">{alert.entity}</p>
-                  <p className="text-xs text-brand-cyan font-medium mt-0.5">{alert.alertType}</p>
-                </div>
-                <Badge variant="default">{alert.source}</Badge>
-              </div>
-              <p className="text-[10px] text-slate-400 mt-2 flex items-center gap-1">
-                <Clock className="w-2.5 h-2.5" />
-                {alert.timestamp}
-              </p>
-            </Card>
-          ))}
-        </div>
-      </section>
+            // Skip standalone chart sections since they're grouped above
+            if (section.key === "sector-distribution" || section.key === "top-entities") {
+              return null;
+            }
 
-      {/* ═══ SYSTEM STATUS BAR ═══ */}
-      <Card className="!p-3">
-        <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex items-center gap-2">
-            <Scale className="w-3.5 h-3.5 text-slate-400" />
-            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">System</span>
-          </div>
-          <div className="flex items-center gap-4 flex-wrap">
-            {dataSourceCards.map((source) => (
-              <div key={source.name} className="flex items-center gap-1.5">
-                <StatusIndicator status={source.status} pulse={false} />
-                <span className="text-[10px] text-slate-600">{source.name}</span>
-              </div>
-            ))}
-          </div>
-          <div className="ml-auto flex items-center gap-3 text-[10px] text-slate-400">
-            <span>74,024 docs</span>
-            <span>2,847 entities</span>
-          </div>
-        </div>
-      </Card>
+            return (
+              <SortableSection key={section.key} id={section.key} isCustomizing={isCustomizing}>
+                {renderer()}
+              </SortableSection>
+            );
+          })}
+        </SortableContext>
+      </DndContext>
 
       {/* ═══ QUICK ASK BAR ═══ */}
       <section className="sticky bottom-4 z-30">
@@ -525,21 +1001,6 @@ export default function DashboardPage() {
             >
               <Send className="w-4 h-4" />
             </button>
-          </div>
-          <div className="flex items-center gap-2 mt-2 flex-wrap">
-            <span className="text-[10px] text-slate-400 uppercase tracking-wider font-medium">Try:</span>
-            {suggestedQueries.map((q, idx) => (
-              <button
-                key={idx}
-                onClick={() => {
-                  setQuery(q);
-                  router.push(`/dashboard/ask-raptor?q=${encodeURIComponent(q)}`);
-                }}
-                className="text-[11px] text-slate-500 bg-slate-50 px-2 py-0.5 rounded hover:bg-slate-100 hover:text-brand-cyan transition-colors"
-              >
-                {q}
-              </button>
-            ))}
           </div>
         </Card>
       </section>
