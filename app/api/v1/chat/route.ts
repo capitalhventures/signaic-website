@@ -58,8 +58,8 @@ export async function POST(request: NextRequest) {
     let ragContext: RAGContext;
     try {
       ragContext = await retrieveContext(message, {
-        limit: 15,
-        threshold: 0.3,
+        limit: 8,
+        threshold: 0.5,
       });
     } catch (ragError) {
       console.error("[Chat] RAG retrieval failed, proceeding without context:", ragError);
