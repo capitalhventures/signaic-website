@@ -9,6 +9,8 @@ interface CardProps {
   variant?: CardVariant;
   className?: string;
   padding?: boolean;
+  style?: React.CSSProperties;
+  onClick?: () => void;
 }
 
 const variantStyles: Record<CardVariant, string> = {
@@ -22,6 +24,8 @@ export function Card({
   variant = "default",
   className,
   padding = true,
+  style,
+  onClick,
 }: CardProps) {
   return (
     <div
@@ -31,6 +35,8 @@ export function Card({
         padding && "p-6",
         className
       )}
+      style={style}
+      onClick={onClick}
     >
       {children}
     </div>
@@ -62,6 +68,20 @@ export function CardTitle({
     <h3 className={cn("text-lg font-semibold text-slate-900", className)}>
       {children}
     </h3>
+  );
+}
+
+export function CardContent({
+  children,
+  className,
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={cn("p-6", className)}>
+      {children}
+    </div>
   );
 }
 

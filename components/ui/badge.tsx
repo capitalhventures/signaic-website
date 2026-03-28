@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 
 type BadgeVariant =
   | "default"
+  | "outline"
   | "cyan"
   | "company"
   | "agency"
@@ -24,6 +25,7 @@ interface BadgeProps {
 
 const variantStyles: Record<BadgeVariant, string> = {
   default: "bg-slate-100 text-slate-600 border-slate-200",
+  outline: "bg-transparent text-slate-600 border-slate-300",
   cyan: "bg-cyan-50 text-cyan-700 border-cyan-200",
   company: "bg-blue-50 text-blue-700 border-blue-200",
   agency: "bg-purple-50 text-purple-700 border-purple-200",

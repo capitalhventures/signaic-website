@@ -18,6 +18,15 @@ import {
   Menu,
   X,
   Shield,
+  Newspaper,
+  FileCheck,
+  Scale,
+  Lightbulb,
+  ScrollText,
+  Satellite,
+  FileSearch,
+  Award,
+  BookMarked,
 } from "lucide-react";
 
 const intelligenceLinks = [
@@ -41,6 +50,18 @@ const intelligenceLinks = [
     href: "/dashboard/entities",
     icon: Building2,
   },
+];
+
+const dataExplorerLinks = [
+  { label: "News", href: "/dashboard/news", icon: Newspaper },
+  { label: "Contracts", href: "/dashboard/contracts", icon: FileCheck },
+  { label: "FCC Filings", href: "/dashboard/fcc", icon: Scale },
+  { label: "Patents", href: "/dashboard/patents", icon: Lightbulb },
+  { label: "SEC Filings", href: "/dashboard/sec-filings", icon: ScrollText },
+  { label: "Orbital Data", href: "/dashboard/orbital", icon: Satellite },
+  { label: "SAM Opportunities", href: "/dashboard/sam-opportunities", icon: FileSearch },
+  { label: "SBIR Awards", href: "/dashboard/sbir", icon: Award },
+  { label: "Federal Register", href: "/dashboard/federal-register", icon: BookMarked },
 ];
 
 const dataLinks = [
@@ -198,6 +219,43 @@ export function Sidebar() {
                         )}
                         fill={active ? "currentColor" : "none"}
                         strokeWidth={active ? 0 : 1.5}
+                      />
+                      {link.label}
+                    </Link>
+                    {active && (
+                      <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-6 bg-brand-cyan rounded-r-full" />
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+
+          {/* Data Explorer Section */}
+          <div className="mb-6">
+            <p className="px-3 mb-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-500">
+              Data Explorer
+            </p>
+            <ul className="space-y-0.5">
+              {dataExplorerLinks.map((link) => {
+                const active = isActive(link.href);
+                return (
+                  <li key={link.href} className="relative">
+                    <Link
+                      href={link.href}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
+                        active
+                          ? "bg-brand-cyan/10 text-brand-cyan"
+                          : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
+                      )}
+                    >
+                      <link.icon
+                        className={cn(
+                          "w-5 h-5",
+                          active ? "text-brand-cyan" : "text-slate-500"
+                        )}
+                        strokeWidth={1.5}
                       />
                       {link.label}
                     </Link>
