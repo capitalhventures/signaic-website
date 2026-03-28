@@ -20,7 +20,7 @@ const platformItems: DropdownItem[] = [
       </>
     ),
     description:
-      "Unified command center for space and defense competitive intelligence. Real-time dashboard, automated alerts, entity tracking, and integrated data feeds from 7+ government sources.",
+      "Unified command center for space and defense competitive intelligence. Real-time dashboard, automated alerts, entity tracking, and integrated data feeds from 30+ government sources.",
     path: "/platform",
   },
   {
@@ -32,7 +32,7 @@ const platformItems: DropdownItem[] = [
   {
     title: "Data Sources",
     description:
-      "7+ authoritative government and industry data feeds including FCC, USPTO, USASpending, SEC EDGAR, Space-Track, and real-time news. All aggregated, searchable, and AI-queryable.",
+      "30+ authoritative government and industry data feeds including FCC, USPTO, USASpending, SEC EDGAR, Space-Track, and real-time news. All aggregated, searchable, and AI-queryable.",
     path: "/data-sources",
   },
   {
@@ -44,7 +44,7 @@ const platformItems: DropdownItem[] = [
     ),
     description:
       "Licensing and compliance requirements for NTN and LEO operations across 50+ global markets",
-    path: "/dashboard/regulatory-guide",
+    path: "/regulatory-guide",
   },
 ];
 

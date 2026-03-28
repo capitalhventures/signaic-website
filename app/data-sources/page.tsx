@@ -23,7 +23,7 @@ export default function DataSourcesPage() {
               Data <span className="text-[#00D4FF]">Sources</span>
             </h1>
             <p className="text-gray-400 text-lg max-w-3xl mx-auto leading-relaxed">
-              SIG/NAIC aggregates 7+ authoritative data feeds into a
+              SIG/NAIC aggregates 30+ authoritative data feeds into a
               single searchable, AI-queryable platform. All data is real, sourced
               directly from government and industry APIs, and refreshed
               continuously.
