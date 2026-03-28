@@ -247,7 +247,7 @@ export function SecFilingsClient({ filings }: { filings: SecFiling[] }) {
                     {filing.description || "N/A"}
                   </TableCell>
                   <TableCell>
-                    {filing.document_url ? (
+                    {filing.document_url && (
                       <a
                         href={filing.document_url}
                         target="_blank"
@@ -257,17 +257,7 @@ export function SecFilingsClient({ filings }: { filings: SecFiling[] }) {
                       >
                         <ExternalLink className="w-3.5 h-3.5" />
                       </a>
-                    ) : filing.accession_number ? (
-                      <a
-                        href={`https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${filing.accession_number.split("-")[0]}&type=${filing.filing_type || ""}&dateb=&owner=include&count=40`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="text-[#00D4FF] hover:text-[#00D4FF]/80"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
-                    ) : null}
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
