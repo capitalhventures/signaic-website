@@ -33,12 +33,8 @@ export interface RAGContext {
 // ---------------------------------------------------------------------------
 
 const EMBEDDING_MODEL = "text-embedding-3-small";
-const DEFAULT_LIMIT = 10;
-const DEFAULT_THRESHOLD = 0.7;
-
-const NO_CONTEXT_INSTRUCTION =
-  "I don't have enough data in the intelligence database to answer this question. " +
-  "Try refining your query or check back after the next data refresh.";
+const DEFAULT_LIMIT = 15;
+const DEFAULT_THRESHOLD = 0.3;
 
 // ---------------------------------------------------------------------------
 // OpenAI client (lazy singleton)
@@ -149,26 +145,30 @@ export async function retrieveContext(
 // ---------------------------------------------------------------------------
 
 export function buildSystemPrompt(ragContext: RAGContext): string {
-  const basePrompt = `You are Raptor, the AI intelligence analyst powering Signaic's competitive intelligence platform for the space and defense sector. You are confident, precise, and analytical.`;
+  const basePrompt = `You are Raptor, the AI intelligence analyst powering Signaic's competitive intelligence platform for the space and defense sector. You are confident, precise, and analytical. You ALWAYS provide substantive, multi-paragraph answers to intelligence queries.`;
 
   if (ragContext.documents.length === 0) {
     return (
       basePrompt +
-      `\n\nIMPORTANT: You have no relevant intelligence documents for this query. ` +
-      `You MUST respond with exactly: "${NO_CONTEXT_INSTRUCTION}"\n` +
-      `Do NOT fabricate, speculate, or use general knowledge. Only cite documents provided to you.`
+      `\n\nINSTRUCTIONS:
+- No relevant documents were found in the Signaic intelligence database for this query.
+- Answer the question using your general knowledge of the space and defense sector.
+- Provide a thorough, multi-paragraph response with clear headers and sections.
+- Note at the end that this response is based on general knowledge rather than the Signaic intelligence database.
+- When mentioning companies, agencies, or programs, highlight them clearly.
+- Focus on actionable intelligence and strategic implications.`
     );
   }
 
   return (
     basePrompt +
     `\n\nINSTRUCTIONS:
-- Answer ONLY based on the intelligence documents provided below.
+- Answer the question using the intelligence documents provided below as your primary source.
 - Cite sources using numbered references [1], [2], etc. that correspond to the documents below.
+- You may supplement with your general knowledge of the space and defense sector to provide a more complete answer. Clearly distinguish between information from the provided documents and general knowledge.
 - Structure your responses with clear headers and sections.
 - When mentioning companies, agencies, or programs, highlight them clearly.
 - Focus on actionable intelligence and strategic implications.
-- If the provided documents do not contain enough information to fully answer the query, say so explicitly. Do NOT fabricate information.
 - NEVER cite sources that are not in the provided documents.
 
 INTELLIGENCE DOCUMENTS:
