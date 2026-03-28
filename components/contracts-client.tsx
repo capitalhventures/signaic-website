@@ -49,11 +49,11 @@ function getContractStatus(contract: ContractItem): { label: string; color: stri
   if (!contract.period_end) return { label: "Unknown", color: "bg-[#fce8e8] text-[#991f1f] border-[#f5bcbc]" };
   const endDate = new Date(contract.period_end);
   const now = new Date();
-  const sixMonths = new Date();
-  sixMonths.setMonth(sixMonths.getMonth() + 6);
+  const ninetyDays = new Date();
+  ninetyDays.setDate(ninetyDays.getDate() + 90);
 
   if (endDate < now) return { label: "Expired", color: "bg-[#fce8e8] text-[#991f1f] border-[#f5bcbc]" };
-  if (endDate < sixMonths) return { label: "Expiring Soon", color: "bg-[#fef5e1] text-[#854f0b] border-[#fcd97e]" };
+  if (endDate < ninetyDays) return { label: "Expiring Soon", color: "bg-[#fef5e1] text-[#854f0b] border-[#fcd97e]" };
   return { label: "Active", color: "bg-[#e6f9f0] text-[#0f6e56] border-[#b0e8d0]" };
 }
 
@@ -212,7 +212,7 @@ export function ContractsClient({ contracts }: { contracts: ContractItem[] }) {
       rows: data.map((c) => [
         cleanContractTitle(c.contract_title, c.description) || "N/A",
         c.awarding_agency || "N/A",
-        (c.companies as { name: string } | null)?.name || "Classified / Withheld",
+        (c.companies as { name: string } | null)?.name || (c.awarding_agency ? `${c.awarding_agency} [Agency Direct]` : "Unknown"),
         formatUSD(c.contract_value),
         c.period_start || "N/A",
         c.period_end || "N/A",
@@ -403,8 +403,13 @@ export function ContractsClient({ contracts }: { contracts: ContractItem[] }) {
                           >
                             {(contract.companies as { name: string }).name}
                           </span>
+                        ) : contract.awarding_agency ? (
+                          <span className="text-[#666]">
+                            {contract.awarding_agency}{" "}
+                            <span className="text-[#999] text-xs">[Agency Direct]</span>
+                          </span>
                         ) : (
-                          <span className="text-[#999] italic">Classified / Withheld</span>
+                          <span className="text-[#999] italic">Unknown</span>
                         )}
                       </TableCell>
                       <TableCell className="text-sm text-[#0f6e56] font-mono">
