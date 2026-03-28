@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Card, Badge, StatusIndicator } from "@/components/ui";
+import { createClient } from "@/lib/supabase/client";
 import {
   Bot,
   Brain,
@@ -14,7 +16,10 @@ import {
   AlertTriangle,
   XCircle,
   RefreshCw,
+  ShieldAlert,
 } from "lucide-react";
+
+const ADMIN_EMAILS = ["ryan@capitalh.io", "ryan@signaic.com", "ryanjhasty@gmail.com"];
 
 interface AgentLog {
   id: string;
@@ -54,9 +59,19 @@ export default function AgentsPage() {
   const [meridianLastRun, setMeridianLastRun] = useState<AgentLog | null>(null);
   const [sentinelLastRun, setSentinelLastRun] = useState<AgentLog | null>(null);
   const [runningAgent, setRunningAgent] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    fetchAgentData();
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user?.email && ADMIN_EMAILS.includes(user.email.toLowerCase())) {
+        setIsAdmin(true);
+        fetchAgentData();
+      } else {
+        setIsAdmin(false);
+      }
+    });
   }, []);
 
   async function fetchAgentData() {
@@ -172,6 +187,32 @@ export default function AgentsPage() {
       endpoint: null,
     },
   ];
+
+  if (isAdmin === null) {
+    return (
+      <div className="flex items-center justify-center py-32">
+        <RefreshCw className="w-6 h-6 text-brand-cyan animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="max-w-lg mx-auto py-32 text-center space-y-4">
+        <ShieldAlert className="w-12 h-12 text-slate-300 mx-auto" />
+        <h1 className="text-xl font-bold text-slate-900">Access Restricted</h1>
+        <p className="text-sm text-slate-500">
+          This page is restricted to administrators.
+        </p>
+        <button
+          onClick={() => router.push("/dashboard")}
+          className="px-4 py-2 text-sm font-medium text-white bg-brand-cyan rounded-lg hover:bg-brand-cyan/90 transition-colors"
+        >
+          Return to Command Center
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-5xl mx-auto space-y-6">

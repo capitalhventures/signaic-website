@@ -219,7 +219,7 @@ export function OrbitalDataClient({
       <Tabs value={filter} onValueChange={(val) => { setFilter(val); setPage(0); }}>
         <TabsList className="bg-white border border-[#f0f0f2]">
           {orbitTypes.map((t) => (
-            <TabsTrigger key={t} value={t} className="data-[state=active]:bg-transparent data-[state=active]:text-[#00D4FF] data-[state=active]:border-b-2 data-[state=active]:border-[#00D4FF] data-[state=active]:shadow-none">
+            <TabsTrigger key={t} value={t} className="data-active:bg-transparent data-active:text-[#00D4FF] data-active:border-b-2 data-active:border-[#00D4FF] data-active:shadow-none">
               {t}
             </TabsTrigger>
           ))}

@@ -3,88 +3,56 @@
 import { useState } from "react";
 import { Badge, SearchInput } from "@/components/ui";
 import { CollapsibleCard } from "@/components/ui/collapsible-card";
-import { Globe2, BookOpen } from "lucide-react";
+import { Globe2, BookOpen, ExternalLink, Clock, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import regulatoryJson from "@/lib/data/regulatory-data.json";
+
+interface RegulatorySource {
+  label: string;
+  url: string;
+}
 
 interface RegulatoryEntry {
   country: string;
-  code: string;
   region: string;
-  regulator: string;
-  regBody: string;
-  spectrum: string;
-  licensing: string;
-  foreignOwnership: string;
-  launchRegulation: string;
-  keyNotes: string;
+  regulator_name: string;
+  regulator_url: string;
+  regulator_contact_url: string;
+  foreign_ownership_restrictions: string;
+  data_sovereignty: string;
+  spectrum_licensing: string;
+  landing_rights: string;
+  itu_recognition: boolean;
+  estimated_approval_timeline: string;
+  application_portal_url: string;
+  key_requirements: string[];
+  telecom_services_requirements: {
+    terrestrial: string;
+    non_terrestrial: string;
+    interconnection: string;
+  };
+  last_updated: string;
+  sources: RegulatorySource[];
 }
 
-const regulatoryData: RegulatoryEntry[] = [
-  { country: "United States", code: "US", region: "North America", regulator: "FCC / FAA / NOAA / FTC", regBody: "Federal Communications Commission, Federal Aviation Administration", spectrum: "Coordinated through FCC with NTIA for federal spectrum. ITU filings managed by FCC.", licensing: "FCC Part 25 for satellite operations. FAA launch/reentry licenses. NOAA for remote sensing.", foreignOwnership: "Section 310 restricts foreign ownership of broadcast licenses. Satellite services have more flexibility through Team Telesat ruling.", launchRegulation: "FAA AST manages commercial launch licenses. Environmental reviews under NEPA required.", keyNotes: "Most developed regulatory framework for commercial space. ITAR/EAR export controls significantly impact international partnerships." },
-  { country: "United Kingdom", code: "GB", region: "Europe", regulator: "Ofcom / UK Space Agency / CAA", regBody: "Office of Communications, UK Space Agency, Civil Aviation Authority", spectrum: "Managed by Ofcom. UK ITU filings through Ofcom.", licensing: "Space Industry Act 2018 provides framework for launch and satellite operations from UK.", foreignOwnership: "No specific foreign ownership restrictions for satellite operators.", launchRegulation: "CAA regulates spaceports and launch activities under Space Industry Act 2018.", keyNotes: "Post-Brexit, UK developing independent space regulatory framework. SaxaVord Spaceport in Shetland targeting vertical launch capability." },
-  { country: "France", code: "FR", region: "Europe", regulator: "ARCEP / CNES / Arcom", regBody: "Autorité de régulation des communications électroniques, CNES", spectrum: "ARCEP manages spectrum allocation. French ITU filings coordinated through ARCEP/CNES.", licensing: "French Space Operations Act (FSOA) 2008 governs all space activities.", foreignOwnership: "EU framework allows intra-EU ownership. Extra-EU restrictions may apply.", launchRegulation: "CNES manages launch activities from French Guiana (CSG). Insurance requirements mandatory.", keyNotes: "Home to Arianespace and CSG launch facility. Strong regulatory framework with mandatory insurance and debris mitigation requirements." },
-  { country: "Germany", code: "DE", region: "Europe", regulator: "BNetzA / DLR / BSI", regBody: "Federal Network Agency, German Aerospace Center", spectrum: "BNetzA manages spectrum. German ITU filings through BNetzA.", licensing: "Satellite Data Security Act (SatDSiG) governs Earth observation satellites.", foreignOwnership: "EU framework applies. Additional security screening for critical infrastructure.", launchRegulation: "No domestic launch capability. German operators use third-party launch services.", keyNotes: "Strong in Earth observation regulation. Increasing focus on space security and cyber resilience for space assets." },
-  { country: "Japan", code: "JP", region: "Asia-Pacific", regulator: "MIC / JAXA / Cabinet Office", regBody: "Ministry of Internal Affairs and Communications, JAXA", spectrum: "MIC manages spectrum allocation and ITU coordination.", licensing: "Space Activities Act 2016 governs launch and satellite operations.", foreignOwnership: "Foreign Investment in Telecommunications limited. Security review for space assets.", launchRegulation: "Space Activities Act requires launch permits. JAXA provides technical oversight.", keyNotes: "Growing commercial space sector with Ispace, Astroscale, and others. Government actively promoting space industry growth." },
-  { country: "India", code: "IN", region: "Asia-Pacific", regulator: "DoT / IN-SPACe / ISRO", regBody: "Department of Telecommunications, Indian National Space Promotion and Authorization Center", spectrum: "DoT manages spectrum. WPC wing handles satellite coordination.", licensing: "IN-SPACe established 2020 to authorize private space activities. New Space Policy 2023.", foreignOwnership: "100% FDI allowed in satellite manufacturing. Service provision has sector-specific caps.", launchRegulation: "IN-SPACe authorizes private launch activities. ISRO maintains technical oversight.", keyNotes: "Rapidly liberalizing space sector. New Space Policy 2023 opens market to private players. Strong cost advantage in manufacturing." },
-  { country: "Australia", code: "AU", region: "Asia-Pacific", regulator: "ACMA / ASA", regBody: "Australian Communications and Media Authority, Australian Space Agency", spectrum: "ACMA manages spectrum and ITU coordination.", licensing: "Space (Launches and Returns) Act 2018 governs launch operations.", foreignOwnership: "Foreign Investment Review Board screening for critical infrastructure.", launchRegulation: "Australian Space Agency regulates launches. Multiple spaceport developments underway.", keyNotes: "Growing launch sector with Equatorial Launch Australia and Gilmour Space. Strategic location for equatorial and polar orbits." },
-  { country: "South Korea", code: "KR", region: "Asia-Pacific", regulator: "MSIT / KARI / KASA", regBody: "Ministry of Science and ICT, Korea Aerospace Research Institute, Korea AeroSpace Administration", spectrum: "MSIT manages spectrum allocation.", licensing: "Space Development Promotion Act governs space activities.", foreignOwnership: "Restrictions on foreign ownership in key telecommunications sectors.", launchRegulation: "KASA (established 2024) oversees space launches. Nuri rocket provides domestic capability.", keyNotes: "KASA establishment signals growing commitment to space. Nuri rocket gives indigenous launch capability. Active in Earth observation." },
-  { country: "Canada", code: "CA", region: "North America", regulator: "ISED / CSA", regBody: "Innovation, Science and Economic Development Canada, Canadian Space Agency", spectrum: "ISED manages spectrum through Spectrum Management. ITU filings through ISED.", licensing: "Remote Sensing Space Systems Act governs Earth observation. Telecom Act for satellite communications.", foreignOwnership: "Telecommunications Act limits foreign ownership to 20% direct, 33.3% indirect.", launchRegulation: "No domestic commercial launch capability. Canadian operators use third-party launch.", keyNotes: "Strong in satellite communications (Telesat, MDA). Telesat Lightspeed LEO constellation under development. Restrictive foreign ownership rules for telecom." },
-  { country: "Luxembourg", code: "LU", region: "Europe", regulator: "ILR / LSA", regBody: "Institut Luxembourgeois de Régulation, Luxembourg Space Agency", spectrum: "ILR manages spectrum and satellite coordination.", licensing: "Law of July 15, 2020 on space activities.", foreignOwnership: "Open framework. Luxembourg actively courts international space companies.", launchRegulation: "No domestic launch capability.", keyNotes: "SpaceResources.lu initiative positions Luxembourg as hub for space resources. SES headquarters. Very favorable regulatory and tax environment for space companies." },
-  { country: "Israel", code: "IL", region: "Middle East", regulator: "MOC / ISA", regBody: "Ministry of Communications, Israel Space Agency", spectrum: "MOC manages spectrum. Coordination with military for dual-use spectrum.", licensing: "Space Law pending. Current activities governed through various ministry regulations.", foreignOwnership: "Security restrictions on defense-related space activities.", launchRegulation: "ISA coordinates launches. Shavit launch vehicle for domestic needs.", keyNotes: "Strong in ISR and defense-focused space capabilities. Active smallsat industry. Geographic constraints on launch azimuth (over Mediterranean only)." },
-  { country: "United Arab Emirates", code: "AE", region: "Middle East", regulator: "TDRA / UAE Space Agency", regBody: "Telecommunications and Digital Government Regulatory Authority, UAE Space Agency", spectrum: "TDRA manages spectrum allocation.", licensing: "National Space Policy and Federal Law No. 12 of 2019 on space sector.", foreignOwnership: "Free zone structures allow 100% foreign ownership in designated areas.", launchRegulation: "UAE Space Agency oversees space activities. No domestic launch capability yet.", keyNotes: "Ambitious space program including Mars Hope probe. Dubai and Abu Dhabi space free zones attract international companies. Growing investment in space infrastructure." },
-  { country: "Saudi Arabia", code: "SA", region: "Middle East", regulator: "CST / SSA", regBody: "Communications, Space & Technology Commission, Saudi Space Agency (formerly Saudi Space Commission)", spectrum: "CST manages spectrum allocation and ITU coordination for the Kingdom.", licensing: "Saudi Space Agency established 2022 oversees national space policy. Telecommunications licensing through CST framework.", foreignOwnership: "NEOM and other special economic zones allow 100% foreign ownership. Broader economy undergoing Vision 2030 liberalization.", launchRegulation: "No domestic orbital launch capability. Plans for launch infrastructure under Vision 2030 space strategy.", keyNotes: "Saudi Space Agency established 2022 signals major commitment. Vision 2030 includes significant space investment. Saudi astronaut mission to ISS in 2023. Growing defense procurement market with satellite communications and Earth observation priorities." },
-  { country: "Russia", code: "RU", region: "Europe", regulator: "Minkomsvyaz / Roscosmos", regBody: "Ministry of Digital Development, Communications and Mass Media, Roscosmos State Corporation for Space Activities", spectrum: "Minkomsvyaz manages civilian spectrum. Military spectrum managed separately.", licensing: "Federal Space Program governs all space activities. Roscosmos authorizes commercial space operations.", foreignOwnership: "Effectively closed to foreign ownership in space and telecommunications sectors. International sanctions have further restricted cooperation since 2022.", launchRegulation: "Roscosmos manages all launch operations from Baikonur (Kazakhstan lease), Plesetsk, Vostochny, and Kapustin Yar.", keyNotes: "Historically major space power with extensive launch infrastructure. International sanctions since 2022 have severely limited commercial cooperation with Western companies. OneWeb and other partnerships disrupted. Retains significant legacy orbital slot filings and technical capabilities." },
-  { country: "Singapore", code: "SG", region: "Asia-Pacific", regulator: "IMDA / OSTx", regBody: "Infocomm Media Development Authority, Office for Space Technology & Industry", spectrum: "IMDA manages spectrum and satellite coordination.", licensing: "Space sector regulated under telecommunications framework.", foreignOwnership: "Generally open to foreign investment.", launchRegulation: "No domestic launch capability. OSTx coordinates space industry development.", keyNotes: "Positioning as Asia-Pacific space hub. Growing satellite manufacturing and ground segment industry. Strategic equatorial location." },
-  { country: "Brazil", code: "BR", region: "South America", regulator: "Anatel / AEB / FAB", regBody: "National Telecommunications Agency, Brazilian Space Agency, Brazilian Air Force", spectrum: "Anatel manages spectrum and ITU coordination.", licensing: "Space activities governed through multiple agencies. Reform ongoing.", foreignOwnership: "Limited foreign ownership in telecommunications. Eased for satellite operators.", launchRegulation: "Alcântara launch site near equator. Safeguards agreement with US enables commercial use.", keyNotes: "Alcântara is the world's closest major spaceport to the equator, offering significant performance advantages. Regulatory modernization ongoing." },
-  { country: "New Zealand", code: "NZ", region: "Asia-Pacific", regulator: "RSM / NZSA", regBody: "Radio Spectrum Management, New Zealand Space Agency", spectrum: "RSM manages spectrum under Radio Communications Act.", licensing: "Outer Space and High-altitude Activities Act 2017.", foreignOwnership: "Overseas Investment Act review for significant assets.", launchRegulation: "NZSA licenses launches. Rocket Lab's Launch Complex 1 at Mahia Peninsula.", keyNotes: "Home to Rocket Lab's primary launch site. Progressive regulatory framework. Favorable geography for sun-synchronous orbits." },
+const regulatoryData: RegulatoryEntry[] = regulatoryJson as RegulatoryEntry[];
 
-  // ── Europe (additional) ──────────────────────────────────────────────
-  { country: "Italy", code: "IT", region: "Europe", regulator: "AGCOM / ASI", regBody: "Autorità per le Garanzie nelle Comunicazioni, Agenzia Spaziale Italiana", spectrum: "AGCOM manages spectrum allocation and ITU coordination for Italy.", licensing: "Law 7/2018 on space activities and ASI authorization framework govern satellite and launch operations.", foreignOwnership: "EU framework applies. Golden power rules allow government screening of foreign acquisitions in strategic sectors including space.", launchRegulation: "No domestic orbital launch capability. ASI coordinates Italian participation in ESA launch programs.", keyNotes: "Major ESA contributor. Strong in Earth observation (COSMO-SkyMed constellation), satellite manufacturing (Thales Alenia Space Italy), and small satellite platforms (Avio's Vega launcher built in Italy)." },
-  { country: "Spain", code: "ES", region: "Europe", regulator: "CNMC / INTA / AEE", regBody: "Comisión Nacional de los Mercados y la Competencia, Instituto Nacional de Técnica Aeroespacial, Agencia Espacial Española", spectrum: "CNMC manages spectrum. Spanish ITU filings coordinated through the Ministry of Economic Affairs.", licensing: "Royal Decree framework governs satellite operations. AEE established 2023 to consolidate space governance.", foreignOwnership: "EU framework applies. No specific additional restrictions on satellite operators.", launchRegulation: "No domestic launch capability. INTA operates test facilities and sounding rocket ranges.", keyNotes: "Agencia Espacial Española (AEE) established in 2023 to unify space policy. Active in ESA programs and growing NewSpace ecosystem around Madrid and Barcelona." },
-  { country: "Netherlands", code: "NL", region: "Europe", regulator: "AT / NSO", regBody: "Autoriteit Telecom, Netherlands Space Office", spectrum: "AT (Agentschap Telecom) manages spectrum allocation and enforcement.", licensing: "Space Activities Act (Wet Ruimtevaartactiviteiten) enacted 2007 governs authorization of space objects.", foreignOwnership: "Open EU framework. Netherlands actively attracts international space companies.", launchRegulation: "No domestic launch capability. NSO coordinates Dutch participation in ESA.", keyNotes: "Home to ESA's ESTEC technology center in Noordwijk. Strong in satellite instrumentation and Earth observation. Hosts Airbus Defence and Space Netherlands." },
-  { country: "Norway", code: "NO", region: "Europe", regulator: "Nkom / NSA", regBody: "Norwegian Communications Authority, Norwegian Space Agency", spectrum: "Nkom manages spectrum allocation, including satellite frequencies.", licensing: "Act on Launching Objects from Norwegian Territory into Outer Space (1969) governs space activities.", foreignOwnership: "EEA framework applies. Security screening for critical infrastructure.", launchRegulation: "Andøya Space Center operates sounding rocket launches. Orbital launch capability under development.", keyNotes: "Strategic Arctic location for polar orbit access. Andøya spaceport development for small satellite launches. Strong in maritime satellite services (Kongsberg, Telenor Satellite)." },
-  { country: "Sweden", code: "SE", region: "Europe", regulator: "PTS / SNSA", regBody: "Post- och telestyrelsen, Swedish National Space Agency", spectrum: "PTS manages spectrum. Swedish ITU filings coordinated through PTS.", licensing: "Act on Space Activities (1982:963) governs launching and operation of space objects.", foreignOwnership: "EU/EEA framework applies. Foreign direct investment screening for critical technology.", launchRegulation: "Esrange Space Center near Kiruna operates sounding rocket launches with orbital launch aspirations.", keyNotes: "Esrange is Europe's only mainland orbital launch candidate site. Home to SSC (Swedish Space Corporation) providing global ground station services. Strong heritage in scientific satellites." },
-  { country: "Switzerland", code: "CH", region: "Europe", regulator: "OFCOM / SSO", regBody: "Federal Office of Communications, Swiss Space Office (within SERI)", spectrum: "OFCOM manages spectrum and ITU coordination. Switzerland hosts ITU headquarters in Geneva.", licensing: "Swiss Ordinance on Space Activities. Federal framework under development for comprehensive space law.", foreignOwnership: "Generally open to foreign investment. No specific restrictions on space sector.", launchRegulation: "No domestic launch capability. Swiss operators use third-party launch services.", keyNotes: "Hosts ITU headquarters in Geneva. Growing clean-space industry (ClearSpace). Strong academic space research (EPFL, ETH Zürich). Home to several NewSpace startups." },
-  { country: "Belgium", code: "BE", region: "Europe", regulator: "BIPT / BISA", regBody: "Belgian Institute for Postal Services and Telecommunications, Belgian Institute for Space Aeronomy", spectrum: "BIPT manages spectrum allocation and satellite coordination.", licensing: "Law of 17 September 2005 on Space Activities governs launch and operation of space objects.", foreignOwnership: "EU framework applies. No specific additional restrictions on space operators.", launchRegulation: "No domestic launch capability. Belgian Federal Science Policy Office coordinates ESA participation.", keyNotes: "Hosts ESA headquarters in Brussels. Strong in satellite payload development and space science instrumentation. Home to QinetiQ Space and other aerospace manufacturers." },
-  { country: "Poland", code: "PL", region: "Europe", regulator: "UKE / POLSA", regBody: "Office of Electronic Communications, Polish Space Agency", spectrum: "UKE manages spectrum allocation and ITU coordination.", licensing: "POLSA (established 2014) oversees national space activities. Comprehensive space law under development.", foreignOwnership: "EU framework applies. Foreign investment screening for strategic sectors.", launchRegulation: "No domestic launch capability. POLSA coordinates Polish participation in ESA programs.", keyNotes: "Joined ESA as full member in 2012. Growing space sector with strengths in satellite subsystems, ground segment software, and Earth observation data analytics." },
-  { country: "Czech Republic", code: "CZ", region: "Europe", regulator: "CTU / CSO", regBody: "Czech Telecommunication Office, Czech Space Office", spectrum: "CTU manages spectrum and ITU filings.", licensing: "National Space Plan governs space policy. No comprehensive national space law yet.", foreignOwnership: "EU framework applies. Standard investment screening for critical infrastructure.", launchRegulation: "No domestic launch capability. Czech Space Office coordinates ESA participation.", keyNotes: "ESA member since 2008. Growing smallsat manufacturing capability. Strengths in space instrumentation, robotics, and software. Active participation in ESA science missions." },
-  { country: "Romania", code: "RO", region: "Europe", regulator: "ANCOM / ROSA", regBody: "National Authority for Management and Regulation in Communications, Romanian Space Agency", spectrum: "ANCOM manages spectrum allocation.", licensing: "ROSA coordinates national space activities under Government Decision framework.", foreignOwnership: "EU framework applies. No specific restrictions on space operators.", launchRegulation: "No domestic launch capability. ROSA coordinates ESA cooperation.", keyNotes: "ESA cooperating state. Growing space capabilities in Earth observation data processing and satellite subsystems. Competitive cost base for engineering talent." },
-  { country: "Greece", code: "GR", region: "Europe", regulator: "EETT / HSA", regBody: "Hellenic Telecommunications and Post Commission, Hellenic Space Agency", spectrum: "EETT manages spectrum allocation.", licensing: "Hellenic Space Agency (established 2019) oversees national space activities.", foreignOwnership: "EU framework applies. No additional space-specific restrictions.", launchRegulation: "No domestic launch capability. HSA coordinates with ESA.", keyNotes: "Hellas Sat operates GEO communications satellites. HSA established 2019 to consolidate space governance. Growing interest in maritime satellite applications given shipping industry." },
-  { country: "Portugal", code: "PT", region: "Europe", regulator: "ANACOM / PT Space", regBody: "Autoridade Nacional de Comunicações, Portugal Space Agency", spectrum: "ANACOM manages spectrum and satellite coordination.", licensing: "Portugal Space Agency (established 2019) coordinates national space policy and licensing.", foreignOwnership: "EU framework applies. Open to foreign investment in space sector.", launchRegulation: "Azores being explored as potential European launch site due to Atlantic location.", keyNotes: "Portugal Space agency established 2019. Azores location attractive for Atlantic-trajectory launches. AIR Centre (Atlantic International Research Centre) in Azores focuses on space and ocean observation." },
-  { country: "Finland", code: "FI", region: "Europe", regulator: "Traficom / MINEDU", regBody: "Finnish Transport and Communications Agency, Ministry of Education and Culture (Space Affairs)", spectrum: "Traficom manages spectrum allocation and ITU coordination.", licensing: "Act on Space Activities (63/2018) governs Finnish space operations.", foreignOwnership: "EU/EEA framework applies. Foreign investment screening for critical sectors.", launchRegulation: "No domestic launch capability. Arctic location offers potential for polar orbit access.", keyNotes: "Strong in satellite-based Arctic monitoring and communications. ICEYE operates SAR microsatellite constellation from Finland. Act on Space Activities enacted 2018 provides modern framework." },
-  { country: "Denmark", code: "DK", region: "Europe", regulator: "DEA / DTU Space", regBody: "Danish Energy Agency, Technical University of Denmark National Space Institute", spectrum: "DEA manages spectrum through Danish frequency plan.", licensing: "Outer Space Act (2016) governs Danish space activities.", foreignOwnership: "EU/EEA framework applies. Greenland and Faroe Islands provide strategic Arctic locations.", launchRegulation: "No domestic orbital launch capability. DTU Space coordinates technical space activities.", keyNotes: "Greenland provides strategically important ground station locations. GomSpace is a leading European nanosatellite manufacturer headquartered in Aalborg. Strong in Arctic observation." },
-  { country: "Austria", code: "AT", region: "Europe", regulator: "RTR / ALR / FFG", regBody: "Rundfunk und Telekom Regulierungs-GmbH, Austrian Research Promotion Agency (Space Affairs)", spectrum: "RTR manages spectrum and frequency coordination.", licensing: "Austrian Outer Space Act (2011) governs space activities including liability and registration.", foreignOwnership: "EU framework applies. Standard foreign investment screening.", launchRegulation: "No domestic launch capability. FFG coordinates Austrian ESA participation.", keyNotes: "Austrian Outer Space Act 2011 was among the first comprehensive national space laws in Europe. Strong in satellite navigation applications and space debris research." },
-  { country: "Ireland", code: "IE", region: "Europe", regulator: "ComReg / EI", regBody: "Commission for Communications Regulation, Enterprise Ireland (Space)", spectrum: "ComReg manages spectrum allocation and satellite coordination.", licensing: "No dedicated national space legislation. Activities governed under telecommunications and general commercial law.", foreignOwnership: "Very open to foreign investment. Low corporate tax attracts space companies.", launchRegulation: "No domestic launch capability. Enterprise Ireland coordinates ESA participation.", keyNotes: "Favorable corporate tax environment attracts space sector investment. Growing satellite services sector. ESA member with increasing contributions. Strengths in software and analytics for space applications." },
-  { country: "Ukraine", code: "UA", region: "Europe", regulator: "NCRSM / SSAU", regBody: "National Commission for the State Regulation of Communications and Informatization, State Space Agency of Ukraine", spectrum: "NCRSM manages spectrum. Ukraine has significant legacy ITU orbital slot filings.", licensing: "Law on Space Activities of Ukraine (1996) governs space operations.", foreignOwnership: "Restrictions on foreign ownership in strategic sectors. Conflict has impacted regulatory operations.", launchRegulation: "SSAU coordinates space activities. Historically involved in Zenit and Dnipro launch vehicles.", keyNotes: "Significant legacy space industrial base from Soviet era (Yuzhnoye, Yuzhmash). Ongoing conflict has severely disrupted space industry operations. Retains valuable orbital slot filings." },
-  { country: "Turkey", code: "TR", region: "Europe", regulator: "BTK / TUA", regBody: "Information and Communication Technologies Authority, Turkish Space Agency", spectrum: "BTK manages spectrum allocation and satellite coordination.", licensing: "Turkish Space Agency (TUA) established 2018 to coordinate national space program.", foreignOwnership: "Foreign investment restrictions in telecommunications. Security screening for space assets.", launchRegulation: "No domestic orbital launch capability. Plans for national launch vehicle under development.", keyNotes: "TUA established 2018 with ambitious national space program. Turksat operates GEO communications satellites. Plans for indigenous satellite manufacturing and launch capability." },
+const countryCodeMap: Record<string, string> = {
+  "United States": "US", "United Kingdom": "GB", "Canada": "CA", "Germany": "DE",
+  "France": "FR", "Italy": "IT", "Spain": "ES", "Netherlands": "NL", "Sweden": "SE",
+  "Norway": "NO", "UAE": "AE", "Saudi Arabia": "SA", "India": "IN", "Japan": "JP",
+  "South Korea": "KR", "Australia": "AU", "Brazil": "BR", "Morocco": "MA",
+  "Nigeria": "NG", "South Africa": "ZA", "Singapore": "SG", "Indonesia": "ID",
+  "Mexico": "MX", "Israel": "IL", "Turkey": "TR", "Colombia": "CO", "Chile": "CL",
+  "Argentina": "AR", "Peru": "PE", "Egypt": "EG", "Kenya": "KE", "Ghana": "GH",
+  "Ethiopia": "ET", "Tanzania": "TZ", "Philippines": "PH", "Vietnam": "VN",
+  "Thailand": "TH", "Malaysia": "MY", "Bangladesh": "BD", "Pakistan": "PK",
+  "Poland": "PL", "Romania": "RO", "Czech Republic": "CZ", "Greece": "GR",
+  "Portugal": "PT", "Ireland": "IE", "New Zealand": "NZ", "Qatar": "QA",
+  "Kuwait": "KW", "Bahrain": "BH",
+};
 
-  // ── Asia-Pacific (additional) ────────────────────────────────────────
-  { country: "China", code: "CN", region: "Asia-Pacific", regulator: "MIIT / CNSA / SASTIND", regBody: "Ministry of Industry and Information Technology, China National Space Administration, State Administration for Science, Technology and Industry for National Defence", spectrum: "MIIT manages spectrum. China aggressively pursues ITU orbital slot filings for large constellations.", licensing: "Space activities governed by State Council regulations and CNSA authorization. All launches require state approval.", foreignOwnership: "Foreign ownership in satellite operations and telecommunications effectively prohibited. Joint ventures with state entities required.", launchRegulation: "All launches conducted by state entities (CASC, CASIC) or licensed private companies. Launch sites at Jiuquan, Xichang, Taiyuan, and Wenchang.", keyNotes: "Second-largest space program globally. Rapidly growing commercial space sector with private launch companies (Galactic Energy, LandSpace). BeiDou navigation system fully operational. Tiangong space station operational." },
-  { country: "Indonesia", code: "ID", region: "Asia-Pacific", regulator: "Kominfo / LAPAN / BRIN", regBody: "Ministry of Communication and Informatics, National Research and Innovation Agency (BRIN, absorbed LAPAN)", spectrum: "Kominfo manages spectrum. Indonesia holds significant GEO orbital slot filings due to equatorial location.", licensing: "Government Regulation on Space Activities. BRIN coordinates national space activities after LAPAN merger.", foreignOwnership: "Foreign ownership restrictions in telecommunications. Satellite operators must partner with local entities.", launchRegulation: "No operational orbital launch capability. Equatorial location offers significant launch advantages.", keyNotes: "Equatorial archipelago location makes Indonesia strategically valuable for GEO orbital slots and potential equatorial launches. Growing demand for satellite connectivity across 17,000+ islands." },
-  { country: "Thailand", code: "TH", region: "Asia-Pacific", regulator: "NBTC / GISTDA", regBody: "National Broadcasting and Telecommunications Commission, Geo-Informatics and Space Technology Development Agency", spectrum: "NBTC manages spectrum allocation and satellite coordination.", licensing: "Space Affairs Act under development. Currently governed through telecommunications regulations and GISTDA oversight.", foreignOwnership: "Foreign Business Act restricts foreign ownership in telecommunications to 49%.", launchRegulation: "No domestic launch capability. GISTDA coordinates space technology development.", keyNotes: "Thaicom operates GEO communications satellites. GISTDA manages Earth observation activities. Growing demand for satellite broadband. Space Affairs Act under development." },
-  { country: "Vietnam", code: "VN", region: "Asia-Pacific", regulator: "MIC / VNSC", regBody: "Ministry of Information and Communications, Vietnam National Space Center (under VAST)", spectrum: "MIC manages spectrum allocation.", licensing: "Space activities governed through government decrees. Comprehensive space law under development.", foreignOwnership: "Significant restrictions on foreign ownership in telecommunications. Joint ventures typically required.", launchRegulation: "No domestic launch capability. VNSC coordinates space technology development.", keyNotes: "Vietnam has launched several Earth observation satellites (VNREDSat, LOTUSat program with Japan). Growing demand for satellite connectivity in rural areas. Strategy to develop indigenous satellite manufacturing." },
-  { country: "Philippines", code: "PH", region: "Asia-Pacific", regulator: "NTC / PhilSA", regBody: "National Telecommunications Commission, Philippine Space Agency", spectrum: "NTC manages spectrum allocation and satellite coordination.", licensing: "Philippine Space Act (Republic Act 11363, 2019) established PhilSA and governance framework.", foreignOwnership: "60/40 rule requires 60% Filipino ownership in telecommunications. Constitutional restrictions.", launchRegulation: "No domestic launch capability. PhilSA coordinates national space development.", keyNotes: "Philippine Space Agency established 2019. Archipelagic geography creates strong demand for satellite communications. Diwata microsatellite program demonstrated indigenous capability." },
-  { country: "Malaysia", code: "MY", region: "Asia-Pacific", regulator: "MCMC / MYSA", regBody: "Malaysian Communications and Multimedia Commission, Malaysian Space Agency", spectrum: "MCMC manages spectrum under Communications and Multimedia Act 1998.", licensing: "MYSA coordinates space activities. Telecommunications licensing through MCMC.", foreignOwnership: "Foreign ownership in telecommunications subject to approval. Bumiputera participation requirements.", launchRegulation: "No domestic launch capability. MYSA coordinates national space program.", keyNotes: "MEASAT operates GEO communications satellites. Equatorial location advantageous for GEO operations. Growing Earth observation capabilities. RazakSAT demonstrated near-equatorial orbit imaging." },
-  { country: "Taiwan", code: "TW", region: "Asia-Pacific", regulator: "NCC / TASA", regBody: "National Communications Commission, Taiwan Space Agency (formerly NSPO)", spectrum: "NCC manages spectrum allocation. Taiwan coordinates ITU filings through its own administration.", licensing: "Space Development Act (2021) provides legal framework for space activities.", foreignOwnership: "Foreign ownership restrictions in telecommunications. Security review for strategic technology.", launchRegulation: "No operational orbital launch capability. TASA coordinates satellite and sounding rocket programs.", keyNotes: "Space Development Act enacted 2021. TASA (renamed from NSPO in 2023) coordinates national space program. Strong semiconductor industry relevant to satellite component manufacturing. FORMOSAT series of Earth observation satellites." },
-  { country: "Pakistan", code: "PK", region: "Asia-Pacific", regulator: "PTA / SUPARCO", regBody: "Pakistan Telecommunication Authority, Pakistan Space and Upper Atmosphere Research Commission", spectrum: "PTA manages spectrum. FAB (Frequency Allocation Board) coordinates satellite frequency assignments.", licensing: "SUPARCO governs space activities under federal government authority.", foreignOwnership: "Telecommunications sector open to foreign investment with licensing. Security restrictions on space assets.", launchRegulation: "No operational orbital launch capability. SUPARCO coordinates national space program.", keyNotes: "PakSat operates GEO communications satellites. SUPARCO has operated since 1961. Growing interest in remote sensing and satellite communications for development. Plans for indigenous satellite manufacturing." },
-  { country: "Bangladesh", code: "BD", region: "Asia-Pacific", regulator: "BTRC / MoPT", regBody: "Bangladesh Telecommunication Regulatory Commission, Ministry of Posts and Telecommunications", spectrum: "BTRC manages spectrum allocation.", licensing: "Satellite operations governed through telecommunications licensing framework.", foreignOwnership: "Foreign investment permitted in telecommunications with BTRC licensing.", launchRegulation: "No domestic launch capability.", keyNotes: "Bangabandhu-1 GEO communications satellite launched 2018. Growing demand for satellite broadband to connect rural populations. Space sector governance framework under development." },
-
-  // ── South America (additional) ──────────────────────────────────────
-  { country: "Argentina", code: "AR", region: "South America", regulator: "ENACOM / CONAE", regBody: "Ente Nacional de Comunicaciones, Comisión Nacional de Actividades Espaciales", spectrum: "ENACOM manages spectrum allocation and ITU coordination.", licensing: "National Space Law (Decree 995/91 and amendments) governs space activities. CONAE authorizes space operations.", foreignOwnership: "Telecommunications open to foreign investment. ARSAT is state-owned satellite operator.", launchRegulation: "No operational orbital launch capability. Tronador project aims to develop national launch vehicle.", keyNotes: "CONAE operates SAOCOM SAR satellite constellation. ARSAT operates GEO communications satellites. INVAP manufactures satellites domestically. Active Tronador launch vehicle development program." },
-  { country: "Chile", code: "CL", region: "South America", regulator: "SUBTEL / SAE", regBody: "Subsecretaría de Telecomunicaciones, Chilean Space Agency (Agencia Chilena del Espacio)", spectrum: "SUBTEL manages spectrum allocation and satellite coordination.", licensing: "General Telecommunications Law governs satellite operations. Space activities coordinated through multi-agency framework.", foreignOwnership: "Open to foreign investment in telecommunications with SUBTEL licensing.", launchRegulation: "No domestic launch capability. Chile hosts major astronomical observatories.", keyNotes: "Atacama Desert hosts world-class astronomical observatories. Growing satellite Earth observation use for mining and agricultural monitoring. Strategic Pacific location for ground stations." },
-  { country: "Colombia", code: "CO", region: "South America", regulator: "CRC / ANE / CCE", regBody: "Comisión de Regulación de Comunicaciones, Agencia Nacional del Espectro, Colombian Space Commission", spectrum: "ANE manages spectrum. CRC regulates telecommunications services.", licensing: "Colombian Space Commission (CCE) coordinates national space policy. Satellite licensing through CRC/ANE.", foreignOwnership: "Open to foreign investment in telecommunications with appropriate licensing.", launchRegulation: "No domestic launch capability. Equatorial location offers potential advantages.", keyNotes: "Equatorial location near zero latitude offers launch advantages. FAC (Colombian Air Force) satellite program demonstrated indigenous capability. Growing demand for satellite connectivity in remote regions." },
-  { country: "Mexico", code: "MX", region: "North America", regulator: "IFT / AEM", regBody: "Instituto Federal de Telecomunicaciones, Agencia Espacial Mexicana", spectrum: "IFT manages spectrum allocation and satellite coordination. Mexico holds several GEO orbital slot filings.", licensing: "Federal Telecommunications and Broadcasting Law governs satellite operations. AEM coordinates space policy.", foreignOwnership: "Foreign investment in telecommunications limited to 49% for broadcasting, 100% for other telecom services.", launchRegulation: "No domestic orbital launch capability. AEM coordinates national space activities.", keyNotes: "Morelos and MEXSAT satellite systems provide national communications coverage. IFT manages valuable GEO orbital slot filings. Growing NewSpace ecosystem. Strategic geographic position in North America." },
-
-  // ── Africa ───────────────────────────────────────────────────────────
-  { country: "South Africa", code: "ZA", region: "Africa", regulator: "ICASA / SANSA", regBody: "Independent Communications Authority of South Africa, South African National Space Agency", spectrum: "ICASA manages spectrum allocation under Electronic Communications Act.", licensing: "Space Affairs Act (No. 84 of 1993) governs space activities. SANSA coordinates national space program.", foreignOwnership: "ICT sector equity ownership requirements under B-BBEE framework. Foreign operators must partner with local entities.", launchRegulation: "Overberg Test Range previously used for missile testing. No current orbital launch capability.", keyNotes: "SANSA operates ground stations supporting international space missions. South Africa hosts SKA (Square Kilometre Array) radio telescope. Strategic Southern Hemisphere location for ground station services." },
-  { country: "Nigeria", code: "NG", region: "Africa", regulator: "NCC / NASRDA", regBody: "Nigerian Communications Commission, National Space Research and Development Agency", spectrum: "NCC manages spectrum allocation.", licensing: "NASRDA Act (2010) governs space activities. NCC licenses satellite service providers.", foreignOwnership: "Telecommunications open to foreign investment. Nigerian content requirements apply.", launchRegulation: "No domestic launch capability. NASRDA coordinates satellite procurement and development.", keyNotes: "NigeriaSat and NigComSat satellite programs demonstrate national space capability. Largest economy in Africa with growing demand for satellite broadband. NASRDA pursuing indigenous satellite manufacturing." },
-  { country: "Kenya", code: "KE", region: "Africa", regulator: "CA / KSA", regBody: "Communications Authority of Kenya, Kenya Space Agency", spectrum: "CA manages spectrum under Kenya Information and Communications Act.", licensing: "Kenya Space Agency established under Science, Technology and Innovation Act. Satellite licensing through CA.", foreignOwnership: "Open to foreign investment in telecommunications. Some sector-specific restrictions.", launchRegulation: "No domestic launch capability. Near-equatorial location offers launch advantages. San Marco platform historically used by Italian space program.", keyNotes: "Kenya Space Agency established 2017. Near-equatorial location at Malindi historically hosted Italian San Marco launch platform. 1KunitaSat demonstrated university-level space capability. Growing tech ecosystem in Nairobi." },
-  { country: "Egypt", code: "EG", region: "Africa", regulator: "NTRA / EgSA", regBody: "National Telecom Regulatory Authority, Egyptian Space Agency", spectrum: "NTRA manages spectrum allocation and satellite coordination.", licensing: "Egyptian Space Agency law (2018) governs national space activities. Telecommunications regulated under NTRA.", foreignOwnership: "Foreign ownership restrictions in telecommunications. Government approval required for satellite operations.", launchRegulation: "No domestic launch capability. EgSA coordinates national space program.", keyNotes: "Egyptian Space Agency established 2019. EgyptSat Earth observation satellites launched with external partners. Nilesat operates GEO communications satellites serving the Middle East and North Africa." },
-  { country: "Morocco", code: "MA", region: "Africa", regulator: "ANRT / CRTS", regBody: "Agence Nationale de Réglementation des Télécommunications, Centre Royal de Télédétection Spatiale", spectrum: "ANRT manages spectrum and satellite coordination.", licensing: "Telecommunications law governs satellite services. CRTS coordinates Earth observation activities.", foreignOwnership: "Telecommunications open to foreign investment with ANRT licensing.", launchRegulation: "No domestic launch capability.", keyNotes: "Mohammed VI-A and VI-B Earth observation satellites provide high-resolution imaging. CRTS has decades of experience in satellite remote sensing. Strategic location at northwest tip of Africa." },
-  { country: "Rwanda", code: "RW", region: "Africa", regulator: "RURA / RSA", regBody: "Rwanda Utilities Regulatory Authority, Rwanda Space Agency", spectrum: "RURA manages spectrum allocation.", licensing: "Rwanda Space Agency (established 2020) coordinates national space activities.", foreignOwnership: "Open to foreign investment. Rwanda actively courts international technology companies.", launchRegulation: "No domestic launch capability. RSA coordinates space technology development.", keyNotes: "Rwanda Space Agency established 2020 as part of ambitious digital transformation agenda. RwaSat-1 CubeSat launched 2019. AfricanStar satellite constellation proposed. Positioning as East African technology hub." },
-];
-
-const regions = ["All", "North America", "Europe", "Asia-Pacific", "Middle East", "South America", "Africa"];
+const regions = ["All", "Americas", "Europe", "Asia-Pacific", "Middle East", "Africa"];
 
 export default function RegulatoryGuidePage() {
   const [search, setSearch] = useState("");
@@ -94,7 +62,7 @@ export default function RegulatoryGuidePage() {
     const matchesSearch =
       !search ||
       entry.country.toLowerCase().includes(search.toLowerCase()) ||
-      entry.regulator.toLowerCase().includes(search.toLowerCase());
+      entry.regulator_name.toLowerCase().includes(search.toLowerCase());
     const matchesRegion =
       regionFilter === "All" || entry.region === regionFilter;
     return matchesSearch && matchesRegion;
@@ -149,44 +117,121 @@ export default function RegulatoryGuidePage() {
       <div className="space-y-3">
         {filtered.map((entry) => (
           <CollapsibleCard
-            key={entry.code}
+            key={entry.country}
             title={
               <div className="flex items-center gap-3">
-                <span className="text-2xl">{getFlagEmoji(entry.code)}</span>
+                <span className="text-2xl">{getFlagEmoji(countryCodeMap[entry.country] || "")}</span>
                 <div>
                   <h3 className="text-base font-semibold text-slate-900">
                     {entry.country}
                   </h3>
                   <p className="text-xs text-slate-500 mt-0.5">
-                    {entry.regulator}
+                    {entry.regulator_name}
                   </p>
                 </div>
-                <Badge variant="default" className="ml-auto">
-                  {entry.region}
-                </Badge>
+                <div className="ml-auto flex items-center gap-2">
+                  {entry.itu_recognition && (
+                    <Badge variant="cyan" className="text-[10px]">
+                      ITU Recognized
+                    </Badge>
+                  )}
+                  <Badge variant="default">
+                    {entry.region}
+                  </Badge>
+                </div>
               </div>
             }
           >
             <div className="space-y-4">
-              <RegSection title="Regulatory Body" content={entry.regBody} />
-              <RegSection title="Spectrum Management" content={entry.spectrum} />
-              <RegSection title="Licensing Framework" content={entry.licensing} />
-              <RegSection
-                title="Foreign Ownership Rules"
-                content={entry.foreignOwnership}
-              />
-              <RegSection title="Launch Regulation" content={entry.launchRegulation} />
+              {/* Approval Timeline */}
+              <div className="flex items-center gap-2 text-sm">
+                <Clock className="w-4 h-4 text-brand-cyan" />
+                <span className="text-slate-500 font-medium">Estimated Approval:</span>
+                <span className="text-slate-700">{entry.estimated_approval_timeline}</span>
+              </div>
+
+              <RegSection title="Spectrum Licensing" content={entry.spectrum_licensing} />
+              <RegSection title="Landing Rights" content={entry.landing_rights} />
+              <RegSection title="Foreign Ownership Restrictions" content={entry.foreign_ownership_restrictions} />
+              <RegSection title="Data Sovereignty" content={entry.data_sovereignty} />
+
+              {/* Telecom Services Requirements */}
+              <div>
+                <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                  Telecom Services Requirements
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="bg-slate-50 rounded-lg p-3">
+                    <p className="text-[10px] font-semibold text-brand-cyan uppercase tracking-wider mb-1">Terrestrial</p>
+                    <p className="text-xs text-slate-600">{entry.telecom_services_requirements.terrestrial}</p>
+                  </div>
+                  <div className="bg-slate-50 rounded-lg p-3">
+                    <p className="text-[10px] font-semibold text-brand-cyan uppercase tracking-wider mb-1">Non-Terrestrial</p>
+                    <p className="text-xs text-slate-600">{entry.telecom_services_requirements.non_terrestrial}</p>
+                  </div>
+                  <div className="bg-slate-50 rounded-lg p-3">
+                    <p className="text-[10px] font-semibold text-brand-cyan uppercase tracking-wider mb-1">Interconnection</p>
+                    <p className="text-xs text-slate-600">{entry.telecom_services_requirements.interconnection}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Key Requirements */}
               <div className="bg-brand-cyan/5 rounded-lg p-4 border border-brand-cyan/10">
                 <div className="flex items-start gap-2">
                   <BookOpen className="w-4 h-4 text-brand-cyan flex-shrink-0 mt-0.5" />
                   <div>
-                    <p className="text-xs font-semibold text-brand-cyan uppercase tracking-wider mb-1">
-                      Key Notes
+                    <p className="text-xs font-semibold text-brand-cyan uppercase tracking-wider mb-2">
+                      Key Requirements
                     </p>
-                    <p className="text-sm text-slate-700">{entry.keyNotes}</p>
+                    <ul className="space-y-1.5">
+                      {entry.key_requirements.map((req, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-slate-700">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-brand-cyan flex-shrink-0 mt-0.5" />
+                          {req}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
               </div>
+
+              {/* Sources */}
+              {entry.sources && entry.sources.length > 0 && (
+                <div className="border-t border-slate-100 pt-4">
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">
+                    Regulatory Sources
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {entry.sources.map((source, i) => (
+                      <button
+                        key={i}
+                        onClick={() => window.open(source.url, "_blank", "noopener,noreferrer")}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-brand-cyan border border-brand-cyan/20 bg-brand-cyan/5 hover:bg-brand-cyan/10 transition-colors cursor-pointer"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        {source.label}
+                      </button>
+                    ))}
+                    {entry.application_portal_url && (
+                      <button
+                        onClick={() => window.open(entry.application_portal_url, "_blank", "noopener,noreferrer")}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-emerald-600 border border-emerald-200 bg-emerald-50 hover:bg-emerald-100 transition-colors cursor-pointer"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        Application Portal
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-[10px] text-slate-400 mt-2">
+                    Last updated: {new Date(entry.last_updated).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}
+                  </p>
+                </div>
+              )}
             </div>
           </CollapsibleCard>
         ))}
@@ -207,6 +252,7 @@ function RegSection({ title, content }: { title: string; content: string }) {
 }
 
 function getFlagEmoji(countryCode: string): string {
+  if (!countryCode) return "\uD83C\uDF10";
   const codePoints = countryCode
     .toUpperCase()
     .split("")

@@ -225,13 +225,13 @@ export function EntityDetailClient({
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="bg-white border border-[#e2e4e8] w-full overflow-x-auto flex-wrap">
-          <TabsTrigger value="overview" className="text-[#555555] data-[state=active]:bg-transparent data-[state=active]:text-[#00D4FF] data-[state=active]:border-b-2 data-[state=active]:border-[#00D4FF] data-[state=active]:font-semibold data-[state=active]:shadow-none">Overview</TabsTrigger>
-          <TabsTrigger value="fcc" className="text-[#555555] data-[state=active]:bg-transparent data-[state=active]:text-[#00D4FF] data-[state=active]:border-b-2 data-[state=active]:border-[#00D4FF] data-[state=active]:font-semibold data-[state=active]:shadow-none">FCC ({filings.length})</TabsTrigger>
-          <TabsTrigger value="orbital" className="text-[#555555] data-[state=active]:bg-transparent data-[state=active]:text-[#00D4FF] data-[state=active]:border-b-2 data-[state=active]:border-[#00D4FF] data-[state=active]:font-semibold data-[state=active]:shadow-none">Orbital ({orbital.length})</TabsTrigger>
-          <TabsTrigger value="patents" className="text-[#555555] data-[state=active]:bg-transparent data-[state=active]:text-[#00D4FF] data-[state=active]:border-b-2 data-[state=active]:border-[#00D4FF] data-[state=active]:font-semibold data-[state=active]:shadow-none">Patents ({patents.length})</TabsTrigger>
-          <TabsTrigger value="contracts" className="text-[#555555] data-[state=active]:bg-transparent data-[state=active]:text-[#00D4FF] data-[state=active]:border-b-2 data-[state=active]:border-[#00D4FF] data-[state=active]:font-semibold data-[state=active]:shadow-none">Contracts ({contracts.length})</TabsTrigger>
-          <TabsTrigger value="sec" className="text-[#555555] data-[state=active]:bg-transparent data-[state=active]:text-[#00D4FF] data-[state=active]:border-b-2 data-[state=active]:border-[#00D4FF] data-[state=active]:font-semibold data-[state=active]:shadow-none">SEC ({secFilings.length})</TabsTrigger>
-          <TabsTrigger value="news" className="text-[#555555] data-[state=active]:bg-transparent data-[state=active]:text-[#00D4FF] data-[state=active]:border-b-2 data-[state=active]:border-[#00D4FF] data-[state=active]:font-semibold data-[state=active]:shadow-none">News ({news.length})</TabsTrigger>
+          <TabsTrigger value="overview" className="text-[#555555] data-active:bg-transparent data-active:text-[#00D4FF] data-active:border-b-2 data-active:border-[#00D4FF] data-active:font-semibold data-active:shadow-none">Overview</TabsTrigger>
+          <TabsTrigger value="fcc" className="text-[#555555] data-active:bg-transparent data-active:text-[#00D4FF] data-active:border-b-2 data-active:border-[#00D4FF] data-active:font-semibold data-active:shadow-none">FCC ({filings.length})</TabsTrigger>
+          <TabsTrigger value="orbital" className="text-[#555555] data-active:bg-transparent data-active:text-[#00D4FF] data-active:border-b-2 data-active:border-[#00D4FF] data-active:font-semibold data-active:shadow-none">Orbital ({orbital.length})</TabsTrigger>
+          <TabsTrigger value="patents" className="text-[#555555] data-active:bg-transparent data-active:text-[#00D4FF] data-active:border-b-2 data-active:border-[#00D4FF] data-active:font-semibold data-active:shadow-none">Patents ({patents.length})</TabsTrigger>
+          <TabsTrigger value="contracts" className="text-[#555555] data-active:bg-transparent data-active:text-[#00D4FF] data-active:border-b-2 data-active:border-[#00D4FF] data-active:font-semibold data-active:shadow-none">Contracts ({contracts.length})</TabsTrigger>
+          <TabsTrigger value="sec" className="text-[#555555] data-active:bg-transparent data-active:text-[#00D4FF] data-active:border-b-2 data-active:border-[#00D4FF] data-active:font-semibold data-active:shadow-none">SEC ({secFilings.length})</TabsTrigger>
+          <TabsTrigger value="news" className="text-[#555555] data-active:bg-transparent data-active:text-[#00D4FF] data-active:border-b-2 data-active:border-[#00D4FF] data-active:font-semibold data-active:shadow-none">News ({news.length})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="mt-4 space-y-4">
@@ -273,15 +273,12 @@ export function EntityDetailClient({
                       <TableCell className="text-sm text-[#333333]">{f.status || "N/A"}</TableCell>
                       <TableCell>
                         {f.file_number && (
-                          <a
-                            href={`https://www.google.com/search?q=site%3Afcc.gov+%22${encodeURIComponent(f.file_number || "")}%22`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[#00D4FF] hover:underline"
-                            onClick={(e) => e.stopPropagation()}
+                          <span
+                            onClick={() => window.open(`https://www.google.com/search?q=site%3Afcc.gov+%22${encodeURIComponent(f.file_number || "")}%22`, "_blank", "noopener,noreferrer")}
+                            className="text-[#00D4FF] hover:underline cursor-pointer"
                           >
                             <ExternalLink className="w-3.5 h-3.5" />
-                          </a>
+                          </span>
                         )}
                       </TableCell>
                     </TableRow>
@@ -322,9 +319,12 @@ export function EntityDetailClient({
                       <TableCell className="text-sm text-[#333333]">{o.orbit_type || "N/A"}</TableCell>
                       <TableCell className="text-sm text-[#333333]">{o.inclination != null ? `${o.inclination.toFixed(1)}°` : "N/A"}</TableCell>
                       <TableCell>
-                        <a href={`https://www.n2yo.com/satellite/?s=${o.norad_cat_id}`} target="_blank" rel="noopener noreferrer" className="text-[#00D4FF] hover:underline">
+                        <span
+                          onClick={() => window.open(`https://www.n2yo.com/satellite/?s=${o.norad_cat_id}`, "_blank", "noopener,noreferrer")}
+                          className="text-[#00D4FF] hover:underline cursor-pointer"
+                        >
                           <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
+                        </span>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -361,14 +361,12 @@ export function EntityDetailClient({
                       <TableCell className="text-sm text-[#333333]">{p.technology_area || "N/A"}</TableCell>
                       <TableCell>
                         {p.patent_number && (
-                          <a
-                            href={`https://patents.google.com/?q=${encodeURIComponent(p.patent_number || "")}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[#00D4FF] hover:underline"
+                          <span
+                            onClick={() => window.open(`https://patents.google.com/?q=${encodeURIComponent(p.patent_number || "")}`, "_blank", "noopener,noreferrer")}
+                            className="text-[#00D4FF] hover:underline cursor-pointer"
                           >
                             <ExternalLink className="w-3.5 h-3.5" />
-                          </a>
+                          </span>
                         )}
                       </TableCell>
                     </TableRow>
@@ -515,13 +513,19 @@ export function EntityDetailClient({
                         <TableCell className="text-sm text-[#333333] max-w-xs truncate">{s.description || "N/A"}</TableCell>
                         <TableCell>
                           {s.document_url ? (
-                            <a href={s.document_url} target="_blank" rel="noopener noreferrer" className="text-[#00D4FF] hover:underline">
+                            <span
+                              onClick={() => window.open(s.document_url!, "_blank", "noopener,noreferrer")}
+                              className="text-[#00D4FF] hover:underline cursor-pointer"
+                            >
                               <ExternalLink className="w-3.5 h-3.5" />
-                            </a>
+                            </span>
                           ) : s.accession_number ? (
-                            <a href={`https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${company.ticker || ""}&type=${s.filing_type || ""}&dateb=&owner=include&count=40&search_text=&action=getcompany`} target="_blank" rel="noopener noreferrer" className="text-[#00D4FF] hover:underline">
+                            <span
+                              onClick={() => window.open(`https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${company.ticker || ""}&type=${s.filing_type || ""}&dateb=&owner=include&count=40&search_text=&action=getcompany`, "_blank", "noopener,noreferrer")}
+                              className="text-[#00D4FF] hover:underline cursor-pointer"
+                            >
                               <ExternalLink className="w-3.5 h-3.5" />
-                            </a>
+                            </span>
                           ) : null}
                         </TableCell>
                       </TableRow>
@@ -548,9 +552,12 @@ export function EntityDetailClient({
                       {n.title || "Untitled"}
                     </span>
                     {n.url && (
-                      <a href={n.url} target="_blank" rel="noopener noreferrer" className="text-[#00D4FF] shrink-0">
+                      <span
+                        onClick={() => window.open(n.url!, "_blank", "noopener,noreferrer")}
+                        className="text-[#00D4FF] shrink-0 cursor-pointer"
+                      >
                         <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
+                      </span>
                     )}
                   </div>
                   <p className="text-xs text-[#666666] mt-1">{n.summary || ""}</p>
