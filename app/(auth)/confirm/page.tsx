@@ -38,7 +38,7 @@ function ConfirmContent() {
 
           <p className="text-sm text-slate-500 leading-relaxed mb-8">
             Click the link in the email to verify your account and gain access
-            to the Signaic intelligence platform. The link expires in 24 hours.
+            to the SIG/NAIC intelligence platform. The link expires in 24 hours.
           </p>
 
           <div className="space-y-3">

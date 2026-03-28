@@ -166,7 +166,7 @@ export default function AgentsPage() {
       role: "Lead Engineer",
       icon: Wrench,
       description:
-        "Claude Code agent responsible for engineering, deployment, and maintaining the Signaic platform. Operates via CLAUDE.md standing orders.",
+        "Claude Code agent responsible for engineering, deployment, and maintaining the SIG/NAIC platform. Operates via CLAUDE.md standing orders.",
       schedule: "On-demand",
       lastRun: null,
       endpoint: null,
@@ -182,7 +182,7 @@ export default function AgentsPage() {
           Agent Operations
         </h1>
         <p className="text-sm text-slate-500 mt-1">
-          Signaic&apos;s autonomous agent roster. Each agent runs independently on a schedule.
+          SIG/NAIC&apos;s autonomous agent roster. Each agent runs independently on a schedule.
         </p>
       </div>
 

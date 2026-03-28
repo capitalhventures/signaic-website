@@ -127,7 +127,7 @@ export default function RegulatoryGuidePage() {
               Access Full Regulatory Guide
             </button>
             <p className="text-sm text-gray-500 mt-3">
-              Full regulatory intelligence is available inside the Signaic platform.
+              Full regulatory intelligence is available inside the SIG/NAIC platform.
             </p>
           </div>
         </div>

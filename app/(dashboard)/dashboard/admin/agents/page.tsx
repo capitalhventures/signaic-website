@@ -161,7 +161,7 @@ export default async function AgentsDashboardPage() {
           Agent Operations
         </h1>
         <p className="text-sm text-slate-500 mt-1">
-          All 5 Signaic agents — status, schedules, and activity logs.
+          All 5 SIG/NAIC agents — status, schedules, and activity logs.
         </p>
       </div>
 

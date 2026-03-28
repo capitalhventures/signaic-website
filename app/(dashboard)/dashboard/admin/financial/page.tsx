@@ -60,7 +60,7 @@ export default function FinancialPage() {
           LEDGER — Financial Overview
         </h1>
         <p className="text-sm text-slate-500 mt-1">
-          Revenue projections, cost model, and unit economics for Signaic.
+          Revenue projections, cost model, and unit economics for SIG/NAIC.
         </p>
       </div>
 
