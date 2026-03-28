@@ -309,7 +309,7 @@ export function EntityDetailClient({
                     <TableRow><TableCell colSpan={5} className="text-center text-[#666666] py-8">
                       No orbital objects found.
                       <br />
-                      <span className="text-[10px] text-[#999]">Note: Some recently launched objects may not yet appear in public Space-Track data.</span>
+                      <span className="text-[10px] text-[#999]">Note: Some recently launched objects may not yet appear in public catalog data.</span>
                     </TableCell></TableRow>
                   )}
                   {orbital.map((o) => (

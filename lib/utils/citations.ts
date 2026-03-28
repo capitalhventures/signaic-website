@@ -48,7 +48,9 @@ export function getExternalUrl(
       return null;
     }
     case "orbital": {
-      return "https://www.space-track.org/";
+      const norad = str(record.norad_cat_id);
+      if (norad) return `https://celestrak.org/NORAD/elements/gp.php?CATNR=${norad}`;
+      return "https://celestrak.org";
     }
     case "sec": {
       const docUrl = str(record.document_url);

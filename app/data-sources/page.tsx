@@ -87,14 +87,14 @@ export default function DataSourcesPage() {
 
             <div className="rounded-xl border border-[#1a1a2e] bg-[#0A0A1A] p-6">
               <h3 className="text-lg font-semibold text-white mb-3 font-[family-name:var(--font-chakra-petch)]">
-                Space-Track.org
+                CelesTrak / Space-Track
               </h3>
               <p className="text-sm text-gray-400 leading-relaxed">
                 NORAD catalog objects, two-line element sets, orbital parameters,
-                and constellation tracking from the 18th Space Defense Squadron.
-                Monitor physical assets in orbit, track new launches, analyze
-                conjunction risks, and compare constellation build-out progress
-                across operators.
+                and constellation tracking sourced from CelesTrak and the 18th
+                Space Defense Squadron. Monitor physical assets in orbit, track
+                new launches, analyze conjunction risks, and compare constellation
+                build-out progress across operators.
               </p>
             </div>
 

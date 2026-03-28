@@ -174,7 +174,7 @@ export function OrbitalDataClient({
             Orbital Data
           </h1>
           <p className="text-[#666666] text-sm mt-1">
-            Tracked objects from Space-Track.org
+            Tracked objects via CelesTrak public catalog
           </p>
           {(lastRefreshed || refreshResult) && (
             <div className="flex items-center gap-3 mt-2 text-xs text-[#888888]">
@@ -310,8 +310,8 @@ export function OrbitalDataClient({
                           e.stopPropagation();
                           window.open(
                             obj.norad_cat_id
-                              ? `https://www.space-track.org/basicspacedata/query/class/gp/NORAD_CAT_ID/${obj.norad_cat_id}/format/html`
-                              : "https://www.space-track.org",
+                              ? `https://celestrak.org/NORAD/elements/gp.php?CATNR=${obj.norad_cat_id}`
+                              : "https://celestrak.org",
                             "_blank"
                           );
                         }}

@@ -90,7 +90,7 @@ const tables: TableConfig[] = [
       `${r.object_name || "Unknown Object"} (NORAD ${r.norad_cat_id || "?"})`,
     contentFn: (r) =>
       `${r.object_name || ""} NORAD ${r.norad_cat_id || ""} ${r.orbit_type || ""} orbit, inclination ${r.inclination || ""}°, period ${r.period || ""} min, ${r.country_code || ""}`,
-    urlFn: () => "https://www.space-track.org/",
+    urlFn: (r) => r.norad_cat_id ? `https://celestrak.org/NORAD/elements/gp.php?CATNR=${r.norad_cat_id}` : "https://celestrak.org",
     metadataFn: (r) => ({
       norad_cat_id: r.norad_cat_id,
       object_type: r.object_type,

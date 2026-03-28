@@ -43,7 +43,7 @@ const descriptionMap: Record<string, string> = {
   sec_filings: "Securities and Exchange Commission EDGAR filings",
   patents: "United States Patent and Trademark Office applications and grants",
   contracts: "Federal contract awards and modifications from FPDS",
-  orbital_data: "Satellite catalog, TLEs, and orbital parameters",
+  orbital_data: "Satellite catalog and orbital parameters via CelesTrak",
   news: "Aggregated space and defense industry news sources",
   federal_register: "Federal Register notices and proposed rules",
   sbir_awards: "Small Business Innovation Research awards and solicitations",
