@@ -11,7 +11,7 @@ export function CommandCenterPreview() {
   const activities = [
     { time: "2m ago", text: "SpaceX filed FCC modification for Starlink Gen2", color: "#00D4FF" },
     { time: "18m ago", text: "L3Harris awarded $142M Space Force contract", color: "#6366F1" },
-    { time: "1h ago", text: "Kuiper patent granted: phased array antenna design", color: "#00D4FF" },
+    { time: "1h ago", text: "Leo patent granted: phased array antenna design", color: "#00D4FF" },
     { time: "3h ago", text: "Northrop Grumman 10-Q filed with SEC EDGAR", color: "#6366F1" },
   ];
 

@@ -25,17 +25,17 @@ interface DataSource {
 }
 
 const fallbackSources: DataSource[] = [
-  { name: "FCC Filings", description: "Federal Communications Commission electronic filings and orders", lastRefresh: "2 hours ago", recordCount: "8,847", status: "green", refreshFrequency: "Every 6 hours" },
-  { name: "SEC Filings", description: "Securities and Exchange Commission EDGAR filings", lastRefresh: "36 hours ago", recordCount: "1,203", status: "yellow", refreshFrequency: "Every 12 hours" },
-  { name: "Patents (USPTO)", description: "United States Patent and Trademark Office applications and grants", lastRefresh: "4 hours ago", recordCount: "4,512", status: "green", refreshFrequency: "Daily" },
-  { name: "Government Contracts", description: "Federal contract awards and modifications from FPDS", lastRefresh: "1 hour ago", recordCount: "2,341", status: "green", refreshFrequency: "Every 6 hours" },
-  { name: "Orbital Data", description: "Satellite catalog, TLEs, and orbital parameters", lastRefresh: "30 minutes ago", recordCount: "45,230", status: "green", refreshFrequency: "Every 2 hours" },
-  { name: "News", description: "Aggregated space and defense industry news sources", lastRefresh: "15 minutes ago", recordCount: "12,891", status: "green", refreshFrequency: "Every hour" },
-  { name: "Entities", description: "Tracked companies, agencies, and programs", lastRefresh: "6 hours ago", recordCount: "2,847", status: "green", refreshFrequency: "On-demand" },
-  { name: "Federal Register", description: "Federal Register notices and proposed rules", lastRefresh: "8 hours ago", recordCount: "432", status: "green", refreshFrequency: "Daily" },
-  { name: "SAM.gov Opportunities", description: "System for Award Management contract opportunities", lastRefresh: "3 hours ago", recordCount: "1,567", status: "green", refreshFrequency: "Every 6 hours" },
-  { name: "SBIR/STTR Awards", description: "Small Business Innovation Research awards and solicitations", lastRefresh: "12 hours ago", recordCount: "3,201", status: "green", refreshFrequency: "Daily" },
-  { name: "Embeddings Index", description: "Vector embeddings for semantic search (pgvector)", lastRefresh: "1 hour ago", recordCount: "156,432", status: "green", refreshFrequency: "Continuous" },
+  { name: "FCC Filings", description: "Federal Communications Commission electronic filings and orders", lastRefresh: "Checking...", recordCount: "--", status: "green", refreshFrequency: "Every 6 hours" },
+  { name: "SEC Filings", description: "Securities and Exchange Commission EDGAR filings", lastRefresh: "Checking...", recordCount: "--", status: "green", refreshFrequency: "Every 12 hours" },
+  { name: "Patents (USPTO)", description: "United States Patent and Trademark Office applications and grants", lastRefresh: "Checking...", recordCount: "--", status: "green", refreshFrequency: "Daily" },
+  { name: "Government Contracts", description: "Federal contract awards and modifications from FPDS", lastRefresh: "Checking...", recordCount: "--", status: "green", refreshFrequency: "Every 6 hours" },
+  { name: "Orbital Data", description: "Satellite catalog, TLEs, and orbital parameters", lastRefresh: "Checking...", recordCount: "--", status: "green", refreshFrequency: "Every 2 hours" },
+  { name: "News", description: "Aggregated space and defense industry news sources", lastRefresh: "Checking...", recordCount: "--", status: "green", refreshFrequency: "Every hour" },
+  { name: "Entities", description: "Tracked companies, agencies, and programs", lastRefresh: "Checking...", recordCount: "--", status: "green", refreshFrequency: "On-demand" },
+  { name: "Federal Register", description: "Federal Register notices and proposed rules", lastRefresh: "Checking...", recordCount: "--", status: "green", refreshFrequency: "Daily" },
+  { name: "SAM.gov Opportunities", description: "System for Award Management contract opportunities", lastRefresh: "Checking...", recordCount: "--", status: "green", refreshFrequency: "Every 6 hours" },
+  { name: "SBIR/STTR Awards", description: "Small Business Innovation Research awards and solicitations", lastRefresh: "Checking...", recordCount: "--", status: "green", refreshFrequency: "Daily" },
+  { name: "Embeddings Index", description: "Vector embeddings for semantic search (pgvector)", lastRefresh: "Checking...", recordCount: "--", status: "green", refreshFrequency: "Continuous" },
 ];
 
 const refreshFrequencyMap: Record<string, string> = {
@@ -111,7 +111,7 @@ export default function DataSourcesPage() {
   const degradedCount = displaySources.filter((s) => s.status === "yellow").length;
   const downCount = displaySources.filter((s) => s.status === "red").length;
   const totalRecords = useFallback
-    ? "239,503"
+    ? "--"
     : (liveData || []).reduce((sum, s) => sum + s.totalRows, 0).toLocaleString();
 
   return (

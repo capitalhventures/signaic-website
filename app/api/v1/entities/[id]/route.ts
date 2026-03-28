@@ -15,40 +15,18 @@ export async function GET(
 
   try {
     const supabase = createClient();
-    const { data: entity, error } = await supabase
-      .from("entities")
-      .select("*")
-      .eq("id", params.id)
-      .single();
+
+    // Support lookup by UUID or slug
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(params.id);
+    const query = isUuid
+      ? supabase.from("entities").select("*").eq("id", params.id).single()
+      : supabase.from("entities").select("*").eq("slug", params.id).single();
+
+    const { data: entity, error } = await query;
 
     if (error || !entity) return apiError("Entity not found", 404);
 
-    // Get source counts from related tables
-    const sourceTables = [
-      { table: "fcc_filings", label: "FCC Filings" },
-      { table: "sec_filings", label: "SEC Filings" },
-      { table: "patents", label: "Patents" },
-      { table: "contracts", label: "Government Contracts" },
-      { table: "orbital_data", label: "Orbital Assets" },
-      { table: "news", label: "News" },
-      { table: "federal_register", label: "Federal Register" },
-      { table: "sbir_awards", label: "SBIR/STTR" },
-      { table: "sam_opportunities", label: "SAM.gov" },
-    ];
-
-    const sourceCounts: Record<string, number> = {};
-    for (const source of sourceTables) {
-      const { count } = await supabase
-        .from(source.table)
-        .select("*", { count: "exact", head: true })
-        .eq("entity_id", entity.id);
-      sourceCounts[source.label] = count || 0;
-    }
-
-    return apiResponse({
-      ...entity,
-      source_counts: sourceCounts,
-    });
+    return apiResponse(entity);
   } catch {
     return apiError("Internal server error", 500);
   }

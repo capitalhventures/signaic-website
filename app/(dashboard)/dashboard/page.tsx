@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Card, Badge } from "@/components/ui";
 import {
@@ -49,7 +49,7 @@ import {
   SortableContext,
   sortableKeyboardCoordinates,
   useSortable,
-  verticalListSortingStrategy,
+  rectSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
@@ -171,10 +171,12 @@ function SortableSection({
   id,
   children,
   isCustomizing,
+  className,
 }: {
   id: string;
   children: React.ReactNode;
   isCustomizing: boolean;
+  className?: string;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({ id, disabled: !isCustomizing });
@@ -182,19 +184,22 @@ function SortableSection({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
     position: "relative" as const,
   };
 
   return (
-    <div ref={setNodeRef} style={style}>
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`${className || ""} ${isDragging ? "z-20 ring-2 ring-cyan-400 rounded-xl scale-[1.02] shadow-lg" : ""} transition-all duration-200`}
+    >
       {isCustomizing && (
         <button
-          className="absolute -left-2 top-1/2 -translate-y-1/2 z-10 p-1 rounded bg-slate-200 hover:bg-cyan-100 cursor-grab active:cursor-grabbing"
+          className="absolute -left-2 top-4 z-10 p-1.5 rounded-lg bg-white border border-slate-200 shadow-sm hover:bg-cyan-50 hover:border-cyan-300 cursor-grab active:cursor-grabbing transition-colors"
           {...attributes}
           {...listeners}
         >
-          <GripVertical className="w-4 h-4 text-slate-400" />
+          <GripVertical className="w-4 h-4 text-slate-500" />
         </button>
       )}
       {children}
@@ -217,6 +222,8 @@ function CustomizePanel({
   onReset: () => void;
   onClose: () => void;
 }) {
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+
   return (
     <div className="absolute right-0 top-full mt-2 w-72 bg-white rounded-xl shadow-lg border border-slate-200 z-50 p-4">
       <div className="flex items-center justify-between mb-3">
@@ -246,12 +253,37 @@ function CustomizePanel({
             </button>
           ))}
       </div>
-      <button
-        onClick={onReset}
-        className="mt-3 w-full text-xs text-slate-400 hover:text-slate-600 py-1.5"
-      >
-        Reset to Default
-      </button>
+      <div className="mt-3 pt-3 border-t border-slate-100">
+        {showResetConfirm ? (
+          <div className="bg-slate-50 rounded-lg p-3">
+            <p className="text-xs text-slate-600 mb-2">Reset dashboard to default layout?</p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  onReset();
+                  setShowResetConfirm(false);
+                }}
+                className="flex-1 text-xs font-medium text-white bg-red-500 hover:bg-red-600 px-3 py-1.5 rounded-lg transition-colors"
+              >
+                Reset
+              </button>
+              <button
+                onClick={() => setShowResetConfirm(false)}
+                className="flex-1 text-xs font-medium text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 px-3 py-1.5 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={() => setShowResetConfirm(true)}
+            className="w-full text-xs text-slate-400 hover:text-red-500 py-1.5 transition-colors"
+          >
+            Revert to Default Layout
+          </button>
+        )}
+      </div>
     </div>
   );
 }
@@ -278,6 +310,7 @@ export default function DashboardPage() {
 
   // Quick Ask
   const [query, setQuery] = useState("");
+  const customizePanelRef = useRef<HTMLDivElement>(null);
 
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "long",
@@ -350,6 +383,19 @@ export default function DashboardPage() {
     fetchAllData();
   }, [fetchAllData]);
 
+  // Click outside to close customize panel
+  useEffect(() => {
+    if (!showCustomizePanel) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (customizePanelRef.current && !customizePanelRef.current.contains(e.target as Node)) {
+        setShowCustomizePanel(false);
+        setIsCustomizing(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showCustomizePanel]);
+
   /* ─── Handlers ─── */
 
   const handleRefresh = async () => {
@@ -374,9 +420,13 @@ export default function DashboardPage() {
     });
   };
 
-  const handleResetSections = () => {
+  const handleResetSections = async () => {
     setSections(DEFAULT_SECTIONS);
-    savePreferences(DEFAULT_SECTIONS);
+    try {
+      await fetch("/api/v1/dashboard/preferences", { method: "DELETE" });
+    } catch {
+      // Silently fail
+    }
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -430,8 +480,6 @@ export default function DashboardPage() {
       label: new Date(w.week).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
     }));
   }, [chartData]);
-
-  const isVisible = (key: string) => sections.find((s) => s.key === key)?.visible ?? true;
 
   const formatRelativeTime = (dateStr: string) => {
     const diff = Date.now() - new Date(dateStr).getTime();
@@ -881,7 +929,7 @@ export default function DashboardPage() {
             <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? "animate-spin" : ""}`} />
             {isRefreshing ? "Refreshing..." : "Refresh"}
           </button>
-          <div className="relative">
+          <div className="relative" ref={customizePanelRef}>
             <button
               onClick={() => {
                 setShowCustomizePanel(!showCustomizePanel);
@@ -919,65 +967,28 @@ export default function DashboardPage() {
       >
         <SortableContext
           items={visibleSections.map((s) => s.key)}
-          strategy={verticalListSortingStrategy}
+          strategy={rectSortingStrategy}
         >
-          {visibleSections.map((section) => {
-            const renderer = sectionRenderers[section.key];
-            if (!renderer) return null;
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {visibleSections.map((section) => {
+              const renderer = sectionRenderers[section.key];
+              if (!renderer) return null;
 
-            // Stats row and the two-column row get special layout
-            if (section.key === "stats") {
+              // Stats row and weekly activity chart span full width
+              const isFullWidth = section.key === "stats" || section.key === "weekly-activity";
+
               return (
-                <SortableSection key={section.key} id={section.key} isCustomizing={isCustomizing}>
+                <SortableSection
+                  key={section.key}
+                  id={section.key}
+                  isCustomizing={isCustomizing}
+                  className={isFullWidth ? "lg:col-span-2" : ""}
+                >
                   {renderer()}
                 </SortableSection>
               );
-            }
-
-            // Activity feed and alerts sit side-by-side
-            if (section.key === "activity-feed") {
-              const alertsVisible = isVisible("alerts");
-              return (
-                <SortableSection key={section.key} id={section.key} isCustomizing={isCustomizing}>
-                  <div className={`grid grid-cols-1 ${alertsVisible ? "lg:grid-cols-2" : ""} gap-6`}>
-                    {renderer()}
-                    {alertsVisible && renderAlerts()}
-                  </div>
-                </SortableSection>
-              );
-            }
-
-            // Skip standalone alerts render since it's paired with activity-feed
-            if (section.key === "alerts") return null;
-
-            // Visualizations in a responsive grid
-            if (section.key === "weekly-activity") {
-              const sectorVisible = isVisible("sector-distribution");
-              const entitiesVisible = isVisible("top-entities");
-              return (
-                <SortableSection key={section.key} id={section.key} isCustomizing={isCustomizing}>
-                  {renderer()}
-                  {(sectorVisible || entitiesVisible) && (
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-                      {sectorVisible && renderSectorDistribution()}
-                      {entitiesVisible && renderTopEntities()}
-                    </div>
-                  )}
-                </SortableSection>
-              );
-            }
-
-            // Skip standalone chart sections since they're grouped above
-            if (section.key === "sector-distribution" || section.key === "top-entities") {
-              return null;
-            }
-
-            return (
-              <SortableSection key={section.key} id={section.key} isCustomizing={isCustomizing}>
-                {renderer()}
-              </SortableSection>
-            );
-          })}
+            })}
+          </div>
         </SortableContext>
       </DndContext>
 

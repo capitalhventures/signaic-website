@@ -40,10 +40,10 @@ export async function GET() {
             ],
           },
           {
-            headline: "FCC Approves Kuiper Gen2 Constellation Modification",
-            synthesis: "Amazon's Project Kuiper received FCC approval for its Gen2 constellation modification, allowing deployment of 7,774 satellites across revised orbital shells. This directly competes with Starlink's V2 Mini constellation and signals accelerating commercial broadband competition in LEO.",
+            headline: "FCC Approves Leo Gen2 Constellation Modification",
+            synthesis: "Amazon's Project Leo received FCC approval for its Gen2 constellation modification, allowing deployment of 7,774 satellites across revised orbital shells. This directly competes with Starlink's V2 Mini constellation and signals accelerating commercial broadband competition in LEO.",
             entities: [
-              { id: "4", name: "Amazon Kuiper", slug: "amazon-kuiper", type: "program" },
+              { id: "4", name: "Amazon Leo", slug: "amazon-leo", type: "program" },
               { id: "5", name: "FCC", slug: "fcc", type: "agency" },
               { id: "6", name: "SpaceX Starlink", slug: "spacex-starlink", type: "program" },
             ],

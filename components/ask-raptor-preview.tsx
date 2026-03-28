@@ -50,7 +50,7 @@ export function AskRaptorPreview() {
                 past 6 months and cross-reference it with their recent USPTO
                 filings. Are there any patterns suggesting a new constellation
                 deployment or spectrum strategy shift that could impact
-                Kuiper&apos;s Ka-band coordination efforts?
+                Leo&apos;s Ka-band coordination efforts?
               </p>
             </div>
           </div>

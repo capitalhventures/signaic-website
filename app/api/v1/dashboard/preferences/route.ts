@@ -64,3 +64,20 @@ export async function PUT(request: NextRequest) {
     return apiError("Internal server error", 500);
   }
 }
+
+export async function DELETE() {
+  const user = await getAuthUser();
+  if (!user) return apiError("Unauthorized", 401);
+
+  try {
+    const supabase = createClient();
+    await supabase
+      .from("user_dashboard_preferences")
+      .delete()
+      .eq("user_id", user.id);
+
+    return apiResponse({ deleted: true });
+  } catch {
+    return apiError("Internal server error", 500);
+  }
+}

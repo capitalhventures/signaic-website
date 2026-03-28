@@ -47,7 +47,7 @@ export default function AskRaptorPage() {
                 this year?&rdquo;
               </p>
               <p className="text-sm text-gray-500 italic mb-1">
-                &ldquo;Compare SpaceX and Kuiper FCC filing activity over the
+                &ldquo;Compare SpaceX and Leo FCC filing activity over the
                 last 12 months.&rdquo;
               </p>
               <p className="text-sm text-gray-500 italic mb-3">

@@ -202,7 +202,7 @@ function SignupContent() {
             Track Specific Companies
           </h2>
           <textarea
-            placeholder="e.g., SpaceX, Northrop Grumman, Amazon Kuiper"
+            placeholder="e.g., SpaceX, Northrop Grumman, Amazon Leo"
             value={formData.companies}
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, companies: e.target.value }))

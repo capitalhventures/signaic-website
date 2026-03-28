@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, Badge, Button, Select } from "@/components/ui";
 import {
   FileText,
@@ -30,15 +30,20 @@ const depthOptions = [
 interface RecentBrief {
   id: string;
   title: string;
-  depth: string;
-  createdAt: string;
+  config: { depth?: string } | null;
+  created_at: string;
 }
 
-const sampleRecentBriefs: RecentBrief[] = [
-  { id: "1", title: "Standard Brief - Mar 25, 2026", depth: "standard", createdAt: "Yesterday" },
-  { id: "2", title: "Deep Dive - Mar 22, 2026", depth: "deep", createdAt: "4 days ago" },
-  { id: "3", title: "Quick Summary - Mar 20, 2026", depth: "quick", createdAt: "6 days ago" },
-];
+function formatRelativeTime(dateStr: string) {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days === 1) return "Yesterday";
+  return `${days}d ago`;
+}
 
 export default function OrbitalBriefPage() {
   const [selectedSectors, setSelectedSectors] = useState<string[]>([]);
@@ -46,6 +51,24 @@ export default function OrbitalBriefPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedContent, setGeneratedContent] = useState<string | null>(null);
   const [progress, setProgress] = useState("");
+  const [recentBriefs, setRecentBriefs] = useState<RecentBrief[]>([]);
+
+  // Fetch recent briefs from database
+  useEffect(() => {
+    async function fetchBriefs() {
+      try {
+        const res = await fetch("/api/v1/briefs");
+        if (!res.ok) return;
+        const json = await res.json();
+        if (json.success && json.data) {
+          setRecentBriefs(json.data);
+        }
+      } catch {
+        // No briefs available
+      }
+    }
+    fetchBriefs();
+  }, []);
 
   const toggleSector = (sector: string) => {
     setSelectedSectors((prev) =>
@@ -68,7 +91,9 @@ export default function OrbitalBriefPage() {
           sectors: selectedSectors,
           depth,
           dateRange: {
-            start: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+            start: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+              .toISOString()
+              .split("T")[0],
             end: new Date().toISOString().split("T")[0],
           },
         }),
@@ -77,9 +102,27 @@ export default function OrbitalBriefPage() {
       if (!response.ok) throw new Error("Failed to generate brief");
 
       const result = await response.json();
-      setGeneratedContent(result.data?.content || "Brief generation complete. Please authenticate to view results.");
+      setGeneratedContent(
+        result.data?.content ||
+          "Brief generation complete. Please authenticate to view results."
+      );
+
+      // Refresh recent briefs list
+      try {
+        const res = await fetch("/api/v1/briefs");
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && json.data) {
+            setRecentBriefs(json.data);
+          }
+        }
+      } catch {
+        // Ignore
+      }
     } catch {
-      setGeneratedContent("Unable to generate brief. Please ensure you're authenticated and try again.");
+      setGeneratedContent(
+        "Unable to generate brief. Please ensure you're authenticated and try again."
+      );
     } finally {
       setIsGenerating(false);
       setProgress("");
@@ -117,7 +160,11 @@ export default function OrbitalBriefPage() {
                 </label>
                 <input
                   type="date"
-                  defaultValue={new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]}
+                  defaultValue={
+                    new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+                      .toISOString()
+                      .split("T")[0]
+                  }
                   className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-cyan/50 focus:border-brand-cyan"
                 />
               </div>
@@ -227,28 +274,38 @@ export default function OrbitalBriefPage() {
             Recent Briefs
           </h3>
           <div className="space-y-2">
-            {sampleRecentBriefs.map((brief) => (
-              <button
-                key={brief.id}
-                className="w-full text-left p-3 rounded-lg border border-slate-200 bg-white hover:border-brand-cyan/30 hover:shadow-card transition-all group"
-              >
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-slate-700 truncate pr-2">
-                    {brief.title}
-                  </p>
-                  <ChevronRight className="w-4 h-4 text-slate-400 flex-shrink-0 group-hover:text-brand-cyan transition-colors" />
-                </div>
-                <div className="flex items-center gap-2 mt-1.5">
-                  <Badge variant={brief.depth === "deep" ? "cyan" : "default"}>
-                    {brief.depth}
-                  </Badge>
-                  <span className="text-xs text-slate-400 flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    {brief.createdAt}
-                  </span>
-                </div>
-              </button>
-            ))}
+            {recentBriefs.length === 0 ? (
+              <p className="text-xs text-slate-400 text-center py-6">
+                No briefs generated yet.
+              </p>
+            ) : (
+              recentBriefs.map((brief) => (
+                <button
+                  key={brief.id}
+                  className="w-full text-left p-3 rounded-lg border border-slate-200 bg-white hover:border-brand-cyan/30 hover:shadow-card transition-all group"
+                >
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium text-slate-700 truncate pr-2">
+                      {brief.title}
+                    </p>
+                    <ChevronRight className="w-4 h-4 text-slate-400 flex-shrink-0 group-hover:text-brand-cyan transition-colors" />
+                  </div>
+                  <div className="flex items-center gap-2 mt-1.5">
+                    <Badge
+                      variant={
+                        brief.config?.depth === "deep" ? "cyan" : "default"
+                      }
+                    >
+                      {brief.config?.depth || "standard"}
+                    </Badge>
+                    <span className="text-xs text-slate-400 flex items-center gap-1">
+                      <Clock className="w-3 h-3" />
+                      {formatRelativeTime(brief.created_at)}
+                    </span>
+                  </div>
+                </button>
+              ))
+            )}
           </div>
         </div>
       </div>

@@ -39,8 +39,8 @@ const entities = [
     source_counts: {},
   },
   {
-    name: "Amazon Kuiper",
-    slug: "amazon-kuiper",
+    name: "Amazon Leo",
+    slug: "amazon-leo",
     type: "program",
     sectors: ["LEO broadband", "satellite manufacturing"],
     description:

@@ -61,7 +61,7 @@ export default function PlatformPage() {
                 SQL. No complex dashboard filtering. Just ask.
               </p>
               <p className="text-sm text-gray-500 italic mb-3">
-                For example: &ldquo;Compare Kuiper and OneWeb constellation
+                For example: &ldquo;Compare Leo and OneWeb constellation
                 parameters and their latest FCC filings.&rdquo;
               </p>
               <p className="text-sm text-gray-400 leading-relaxed">

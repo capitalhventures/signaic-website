@@ -22,8 +22,8 @@ VALUES
     '{}'::jsonb
   ),
   (
-    'Amazon Kuiper',
-    'amazon-kuiper',
+    'Amazon Leo',
+    'amazon-leo',
     'program',
     ARRAY['LEO broadband', 'satellite manufacturing'],
     'Amazon''s 3,236-satellite broadband constellation competing with Starlink',
