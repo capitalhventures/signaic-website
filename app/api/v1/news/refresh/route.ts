@@ -46,13 +46,17 @@ export async function POST() {
           urlToImage?: string;
           publishedAt?: string;
         }) => ({
-          title: a.title || "Untitled",
-          description: a.description || null,
+          title: a.title || null,
+          summary: a.description || null,
           url: a.url || "",
+          source: a.source?.name || "Unknown",
           source_name: a.source?.name || "Unknown",
           author: a.author || null,
           image_url: a.urlToImage || null,
+          published_date: a.publishedAt ? a.publishedAt.split("T")[0] : null,
           published_at: a.publishedAt || new Date().toISOString(),
+          sentiment: "neutral",
+          category: "Space & Defense",
         })
       );
 
@@ -67,7 +71,8 @@ export async function POST() {
       const existingUrls = new Set((existing ?? []).map((r) => r.url));
 
       const newArticles = articles.filter(
-        (a: { url: string }) => a.url && !existingUrls.has(a.url)
+        (a: { url: string; title: string | null }) =>
+          a.url && a.title && !existingUrls.has(a.url)
       );
 
       if (newArticles.length > 0) {

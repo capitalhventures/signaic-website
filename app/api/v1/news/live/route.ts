@@ -110,15 +110,19 @@ export async function GET() {
       const existingUrls = new Set((existing ?? []).map((r) => r.url));
 
       const newArticles = articles
-        .filter((a) => !existingUrls.has(a.url))
+        .filter((a) => a.title && a.title !== "Untitled" && !existingUrls.has(a.url))
         .map((a) => ({
           title: a.title,
-          description: a.description,
+          summary: a.description,
           url: a.url,
+          source: a.source_name,
           source_name: a.source_name,
           author: a.author,
           image_url: a.image_url,
+          published_date: a.published_at ? a.published_at.split("T")[0] : null,
           published_at: a.published_at,
+          sentiment: "neutral",
+          category: "Space & Defense",
         }));
 
       if (newArticles.length > 0) {
