@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import React from "react";
 import {
   Send,
   Copy,
@@ -20,11 +21,22 @@ import {
   Newspaper,
   Search,
   Check,
+  Trash2,
 } from "lucide-react";
+
+interface ChatSource {
+  id: string;
+  title: string;
+  type: string;
+  url?: string;
+  snippet?: string;
+  date?: string;
+}
 
 interface ChatMessage {
   role: "user" | "assistant";
   content: string;
+  sources?: ChatSource[];
 }
 
 interface Conversation {
@@ -84,6 +96,34 @@ function formatRelativeTime(dateStr: string) {
   return `${days}d ago`;
 }
 
+/* ─── Citation badge rendering inside markdown text nodes ─── */
+function processCitations(children: React.ReactNode): React.ReactNode {
+  return React.Children.map(children, (child) => {
+    if (typeof child === "string") {
+      const parts = child.split(/(\[\d+\])/g);
+      if (parts.length === 1) return child;
+      return parts.map((part, i) => {
+        const m = part.match(/^\[(\d+)\]$/);
+        if (m) {
+          return (
+            <span
+              key={i}
+              className="inline-flex items-center justify-center w-4 h-4 text-[9px] font-bold text-cyan-700 bg-cyan-100 rounded-full align-super mx-0.5"
+            >
+              {m[1]}
+            </span>
+          );
+        }
+        return <React.Fragment key={i}>{part}</React.Fragment>;
+      });
+    }
+    if (React.isValidElement<{ children?: React.ReactNode }>(child) && child.props.children) {
+      return React.cloneElement(child, {}, processCitations(child.props.children));
+    }
+    return child;
+  });
+}
+
 /* ─── Markdown components for assistant responses ─── */
 const markdownComponents = {
   h1: ({ children, ...props }: React.ComponentPropsWithoutRef<"h1">) => (
@@ -103,7 +143,7 @@ const markdownComponents = {
   ),
   p: ({ children, ...props }: React.ComponentPropsWithoutRef<"p">) => (
     <p className="text-sm text-slate-700 leading-relaxed mb-3" {...props}>
-      {children}
+      {processCitations(children)}
     </p>
   ),
   ul: ({ children, ...props }: React.ComponentPropsWithoutRef<"ul">) => (
@@ -118,7 +158,7 @@ const markdownComponents = {
   ),
   li: ({ children, ...props }: React.ComponentPropsWithoutRef<"li">) => (
     <li className="text-sm text-slate-700 leading-relaxed" {...props}>
-      {children}
+      {processCitations(children)}
     </li>
   ),
   strong: ({ children, ...props }: React.ComponentPropsWithoutRef<"strong">) => (
@@ -297,6 +337,19 @@ function AskRaptorContent() {
           if (line.startsWith("data: ")) {
             try {
               const data = JSON.parse(line.slice(6));
+
+              // Handle sources metadata (sent before text streaming)
+              if (data.sources) {
+                setMessages((prev) => {
+                  const updated = [...prev];
+                  const lastMsg = updated[updated.length - 1];
+                  if (lastMsg.role === "assistant") {
+                    lastMsg.sources = data.sources;
+                  }
+                  return updated;
+                });
+              }
+
               if (data.text) {
                 setMessages((prev) => {
                   const updated = [...prev];
@@ -376,14 +429,21 @@ function AskRaptorContent() {
     inputRef.current?.focus();
   };
 
-  // Render citation badges like [1], [2]
-  const renderContent = (content: string) => {
-    // Replace citation patterns [1], [2] etc. with styled badges
-    const processed = content.replace(
-      /\[(\d+)\]/g,
-      '<span class="inline-flex items-center justify-center w-4 h-4 text-[9px] font-bold text-cyan-700 bg-cyan-100 rounded-full align-super mx-0.5">$1</span>'
-    );
-    return processed;
+  const deleteConversation = async (convId: string) => {
+    if (!confirm("Delete this conversation?")) return;
+    try {
+      const res = await fetch(`/api/v1/conversations/${convId}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) return;
+      setConversations((prev) => prev.filter((c) => c.id !== convId));
+      if (conversationId === convId) {
+        setMessages([]);
+        setConversationId(null);
+      }
+    } catch {
+      // Failed to delete
+    }
   };
 
   return (
@@ -409,26 +469,33 @@ function AskRaptorContent() {
               </p>
             ) : (
               conversations.map((conv) => (
-                <button
+                <div
                   key={conv.id}
-                  onClick={() => loadConversation(conv.id)}
                   className={cn(
-                    "w-full text-left p-3 rounded-lg hover:bg-slate-50 transition-colors mb-1",
+                    "group relative flex items-start gap-2 p-3 rounded-lg hover:bg-slate-50 transition-colors mb-1 cursor-pointer",
                     conversationId === conv.id && "bg-cyan-50 border border-cyan-200"
                   )}
+                  onClick={() => loadConversation(conv.id)}
                 >
-                  <div className="flex items-start gap-2">
-                    <MessageSquare className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" />
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-slate-700 truncate">
-                        {conv.title}
-                      </p>
-                      <p className="text-xs text-slate-400 mt-0.5">
-                        {formatRelativeTime(conv.updated_at)}
-                      </p>
-                    </div>
+                  <MessageSquare className="w-4 h-4 text-slate-400 mt-0.5 flex-shrink-0" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-slate-700 truncate">
+                      {conv.title}
+                    </p>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      {formatRelativeTime(conv.updated_at)}
+                    </p>
                   </div>
-                </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteConversation(conv.id);
+                    }}
+                    className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-50 text-slate-400 hover:text-red-500 transition-all flex-shrink-0"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               ))
             )}
           </div>
@@ -520,7 +587,7 @@ function AskRaptorContent() {
                           remarkPlugins={[remarkGfm]}
                           components={markdownComponents}
                         >
-                          {renderContent(msg.content)}
+                          {msg.content}
                         </ReactMarkdown>
                       </div>
                     ) : (
@@ -534,22 +601,66 @@ function AskRaptorContent() {
                       </span>
                     )}
                     {msg.role === "assistant" && msg.content && (
-                      <div className="flex items-center gap-2 mt-3 pt-2 border-t border-slate-100">
-                        <button
-                          onClick={() => copyMessage(idx, msg.content)}
-                          className="text-xs text-slate-400 hover:text-slate-600 flex items-center gap-1 transition-colors"
-                        >
-                          {copied === idx ? (
-                            <>
-                              <Check className="w-3 h-3" /> Copied
-                            </>
-                          ) : (
-                            <>
-                              <Copy className="w-3 h-3" /> Copy
-                            </>
-                          )}
-                        </button>
-                      </div>
+                      <>
+                        {/* Source Citations */}
+                        {msg.sources && msg.sources.length > 0 && (
+                          <div className="mt-3 pt-3 border-t border-slate-100">
+                            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
+                              Sources
+                            </p>
+                            <div className="space-y-1.5">
+                              {msg.sources.map((src, srcIdx) => (
+                                <div
+                                  key={src.id}
+                                  className="flex items-start gap-2 text-xs"
+                                >
+                                  <span className="inline-flex items-center justify-center w-4 h-4 text-[9px] font-bold text-cyan-700 bg-cyan-100 rounded-full flex-shrink-0 mt-0.5">
+                                    {srcIdx + 1}
+                                  </span>
+                                  <div className="min-w-0">
+                                    {src.url ? (
+                                      <a
+                                        href={src.url}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-cyan-600 hover:underline font-medium truncate block"
+                                      >
+                                        {src.title}
+                                      </a>
+                                    ) : (
+                                      <span className="text-slate-700 font-medium truncate block">
+                                        {src.title}
+                                      </span>
+                                    )}
+                                    <span className="text-slate-400">
+                                      {src.type}
+                                      {src.date ? ` · ${src.date}` : ""}
+                                    </span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Copy Button */}
+                        <div className="flex items-center gap-2 mt-3 pt-2 border-t border-slate-100">
+                          <button
+                            onClick={() => copyMessage(idx, msg.content)}
+                            className="text-xs text-slate-400 hover:text-slate-600 flex items-center gap-1 transition-colors"
+                          >
+                            {copied === idx ? (
+                              <>
+                                <Check className="w-3 h-3" /> Copied
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="w-3 h-3" /> Copy
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </>
                     )}
                   </div>
                 </div>

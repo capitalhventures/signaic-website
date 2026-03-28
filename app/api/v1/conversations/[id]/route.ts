@@ -35,3 +35,37 @@ export async function GET(
     return apiError("Internal server error", 500);
   }
 }
+
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const user = await getAuthUser();
+  if (!user) return apiError("Unauthorized", 401);
+
+  try {
+    const supabase = createClient();
+
+    // Verify the conversation belongs to the user
+    const { data: conv, error: convError } = await supabase
+      .from("conversations")
+      .select("id")
+      .eq("id", params.id)
+      .eq("user_id", user.id)
+      .single();
+
+    if (convError || !conv) return apiError("Conversation not found", 404);
+
+    // Delete conversation (CASCADE handles messages)
+    const { error } = await supabase
+      .from("conversations")
+      .delete()
+      .eq("id", params.id);
+
+    if (error) return apiError("Failed to delete conversation", 500);
+
+    return apiResponse({ deleted: true });
+  } catch {
+    return apiError("Internal server error", 500);
+  }
+}

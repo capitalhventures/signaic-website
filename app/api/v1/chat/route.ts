@@ -1,6 +1,8 @@
 import { NextRequest } from "next/server";
 import { apiError, getAuthUser, checkRateLimit } from "@/lib/api-utils";
 import { createClient } from "@/lib/supabase/server";
+import { retrieveContext, buildSystemPrompt } from "@/lib/rag";
+import type { RAGContext } from "@/lib/rag";
 
 export async function POST(request: NextRequest) {
   const user = await getAuthUser();
@@ -50,9 +52,24 @@ export async function POST(request: NextRequest) {
       .order("created_at", { ascending: true })
       .limit(20);
 
-    // Build messages for Claude
-    const systemPrompt = `You are Raptor, the AI intelligence analyst powering Signaic's competitive intelligence platform for the space and defense sector. You are confident, precise, and analytical. Always cite your sources with numbered references [1], [2], etc. Structure your responses with clear headers and sections. When mentioning companies, agencies, or programs, highlight them clearly. Focus on actionable intelligence and strategic implications.`;
+    // -----------------------------------------------------------------------
+    // RAG: Embed the query and retrieve relevant documents
+    // -----------------------------------------------------------------------
+    let ragContext: RAGContext;
+    try {
+      ragContext = await retrieveContext(message, {
+        limit: 10,
+        threshold: 0.7,
+      });
+    } catch (ragError) {
+      console.error("[Chat] RAG retrieval failed, proceeding without context:", ragError);
+      ragContext = { documents: [], contextBlock: "", sources: [] };
+    }
 
+    // Build system prompt with RAG context (or no-data instruction)
+    const systemPrompt = buildSystemPrompt(ragContext);
+
+    // Build messages for Claude
     const messages = (history || []).map((m) => ({
       role: m.role as "user" | "assistant",
       content: m.content,
@@ -84,11 +101,24 @@ export async function POST(request: NextRequest) {
     const decoder = new TextDecoder();
     let fullContent = "";
 
+    // Capture sources to save with the assistant message
+    const sourcesToSave = ragContext.sources.length > 0 ? ragContext.sources : null;
+
     const stream = new ReadableStream({
       async start(controller) {
         const reader = response.body!.getReader();
 
         try {
+          // Send sources metadata as the first SSE event so the client
+          // can render citation badges while the text streams in
+          if (sourcesToSave) {
+            controller.enqueue(
+              encoder.encode(
+                `data: ${JSON.stringify({ sources: sourcesToSave, conversationId: convId })}\n\n`
+              )
+            );
+          }
+
           while (true) {
             const { done, value } = await reader.read();
             if (done) break;
@@ -121,14 +151,15 @@ export async function POST(request: NextRequest) {
             }
           }
 
-          // Save assistant response
+          // Save assistant response with sources
           await supabase.from("messages").insert({
             conversation_id: convId,
             role: "assistant",
             content: fullContent,
+            sources: sourcesToSave,
           });
 
-          // Update conversation title if it was the first message
+          // Update conversation timestamp
           if (!conversationId) {
             await supabase
               .from("conversations")
