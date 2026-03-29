@@ -13,11 +13,13 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 const BATCH_SIZE = 50;
 const DELAY_MS = 1000;
-// Cap very large tables to keep total run time ~15 min and target 3500+ embeddings
+// Cap very large tables to keep total run time ~20 min and target 3000+ embeddings
 const TABLE_ROW_LIMITS: Record<string, number> = {
-  news: 1000,        // 7K+ rows — most recent 1000
-  gov_contracts: 1500, // 2.8K rows — most valuable 1500
-  orbital_data: 500,  // 120K+ rows — representative sample
+  news: 1000,              // 7K+ rows — most recent 1000
+  gov_contracts: 1500,     // 2.8K rows — most valuable 1500
+  orbital_data: 1000,      // 120K+ rows — representative sample
+  conjunction_events: 500, // limit to avoid timeout
+  ucs_satellites: 500,     // limit to avoid timeout
 };
 
 async function generateEmbedding(text: string): Promise<number[]> {
@@ -407,10 +409,381 @@ const tables: TableConfig[] = [
       entity_id: r.entity_id,
     }),
   },
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // E-SOURCES-1: Free API Data Sources (3 tables)
+  // ═══════════════════════════════════════════════════════════════════════
+
+  // ── Space Weather (NOAA DONKI) ─────────────────────────────────────────
+  {
+    name: "space_weather",
+    sourceType: "space_weather",
+    titleFn: (r) => `Space Weather: ${str(r.event_type)}`,
+    contentFn: (r) => {
+      const parts = [
+        `Space weather event: ${str(r.event_type)}.`,
+        str(r.message),
+        r.severity ? `Severity: ${str(r.severity)}.` : "",
+        r.issue_time ? `Issued: ${str(r.issue_time)}.` : "",
+      ];
+      return parts.filter(Boolean).join(" ").slice(0, 8000);
+    },
+    urlFn: (r) => str(r.source_url) || null,
+    metadataFn: (r) => ({
+      event_type: r.event_type,
+      severity: r.severity,
+      issue_time: r.issue_time,
+    }),
+  },
+
+  // ── Conjunction Events (CelesTrak) ─────────────────────────────────────
+  {
+    name: "conjunction_events",
+    sourceType: "conjunction",
+    titleFn: (r) =>
+      `Conjunction: ${str(r.object1_name)} / ${str(r.object2_name)}`,
+    contentFn: (r) => {
+      const parts = [
+        `Close approach between ${str(r.object1_name)} and ${str(r.object2_name)}.`,
+        r.min_range_km ? `Minimum range: ${str(r.min_range_km)} km.` : "",
+        r.tca ? `Time of closest approach: ${str(r.tca)}.` : "",
+        r.probability ? `Collision probability: ${str(r.probability)}.` : "",
+        r.object1_norad_id ? `Object 1 NORAD ID: ${str(r.object1_norad_id)}.` : "",
+        r.object2_norad_id ? `Object 2 NORAD ID: ${str(r.object2_norad_id)}.` : "",
+      ];
+      return parts.filter(Boolean).join(" ").slice(0, 8000);
+    },
+    urlFn: () => "https://celestrak.org/SOCRATES/",
+    metadataFn: (r) => ({
+      object1_name: r.object1_name,
+      object1_norad_id: r.object1_norad_id,
+      object2_name: r.object2_name,
+      object2_norad_id: r.object2_norad_id,
+      min_range_km: r.min_range_km,
+      probability: r.probability,
+      tca: r.tca,
+    }),
+  },
+
+  // ── Launch Licenses (FAA) ──────────────────────────────────────────────
+  {
+    name: "launch_licenses",
+    sourceType: "launch_license",
+    titleFn: (r) =>
+      `FAA Launch License: ${str(r.licensee)} - ${str(r.vehicle)}`,
+    contentFn: (r) => {
+      const parts = [
+        `FAA launch license for ${str(r.licensee)}.`,
+        r.vehicle ? `Vehicle: ${str(r.vehicle)}.` : "",
+        r.license_number ? `License #: ${str(r.license_number)}.` : "",
+        r.launch_site ? `Launch site: ${str(r.launch_site)}.` : "",
+        r.status ? `Status: ${str(r.status)}.` : "",
+        r.issue_date ? `Issued: ${str(r.issue_date)}.` : "",
+        r.expiry_date ? `Expires: ${str(r.expiry_date)}.` : "",
+      ];
+      return parts.filter(Boolean).join(" ").slice(0, 8000);
+    },
+    urlFn: () => "https://www.faa.gov/space/licenses",
+    metadataFn: (r) => ({
+      licensee: r.licensee,
+      license_number: r.license_number,
+      vehicle: r.vehicle,
+      launch_site: r.launch_site,
+      status: r.status,
+      issue_date: r.issue_date,
+      expiry_date: r.expiry_date,
+    }),
+  },
+
+  // ═══════════════════════════════════════════════════════════════════════
+  // E-SOURCES-2: 11 Additional Data Sources
+  // ═══════════════════════════════════════════════════════════════════════
+
+  // ── DARPA Opportunities ────────────────────────────────────────────────
+  {
+    name: "darpa_opportunities",
+    sourceType: "darpa",
+    titleFn: (r) => str(r.title) || "DARPA Opportunity",
+    contentFn: (r) => {
+      const parts = [
+        str(r.title) + ".",
+        r.agency ? `Agency: ${str(r.agency)}.` : "",
+        str(r.description),
+        r.solicitation_number ? `Solicitation #: ${str(r.solicitation_number)}.` : "",
+        r.estimated_value ? `Estimated value: ${currency(r.estimated_value)}.` : "",
+        r.naics_code ? `NAICS: ${str(r.naics_code)}.` : "",
+        r.psc_code ? `PSC: ${str(r.psc_code)}.` : "",
+        r.opportunity_type ? `Type: ${str(r.opportunity_type)}.` : "",
+        r.set_aside_type ? `Set-aside: ${str(r.set_aside_type)}.` : "",
+        r.response_deadline ? `Deadline: ${str(r.response_deadline)}.` : "",
+        r.place_of_performance ? `Location: ${str(r.place_of_performance)}.` : "",
+        r.posted_date ? `Posted: ${str(r.posted_date)}.` : "",
+      ];
+      return parts.filter(Boolean).join(" ").slice(0, 8000);
+    },
+    urlFn: (r) => str(r.sam_gov_url) || null,
+    metadataFn: (r) => ({
+      solicitation_number: r.solicitation_number,
+      agency: r.agency,
+      naics_code: r.naics_code,
+      opportunity_type: r.opportunity_type,
+      estimated_value: r.estimated_value,
+      response_deadline: r.response_deadline,
+      posted_date: r.posted_date,
+    }),
+  },
+
+  // ── UCS Satellites ─────────────────────────────────────────────────────
+  {
+    name: "ucs_satellites",
+    sourceType: "ucs_satellite",
+    titleFn: (r) => `${str(r.name)} (${str(r.operator) || str(r.country)})`,
+    contentFn: (r) => {
+      const parts = [
+        `${str(r.name)} satellite operated by ${str(r.operator)} from ${str(r.country)}.`,
+        r.purpose ? `Purpose: ${str(r.purpose)}.` : "",
+        r.orbit_class ? `Orbit: ${str(r.orbit_class)}.` : "",
+        r.orbit_type ? `Orbit type: ${str(r.orbit_type)}.` : "",
+        r.contractor ? `Contractor: ${str(r.contractor)}.` : "",
+        r.launch_date ? `Launched: ${str(r.launch_date)}.` : "",
+        r.launch_site ? `Launch site: ${str(r.launch_site)}.` : "",
+        r.launch_mass_kg ? `Launch mass: ${str(r.launch_mass_kg)} kg.` : "",
+        r.perigee_km ? `Perigee: ${str(r.perigee_km)} km.` : "",
+        r.apogee_km ? `Apogee: ${str(r.apogee_km)} km.` : "",
+        r.period_minutes ? `Period: ${str(r.period_minutes)} min.` : "",
+        r.norad_id ? `NORAD ID: ${str(r.norad_id)}.` : "",
+      ];
+      return parts.filter(Boolean).join(" ").slice(0, 8000);
+    },
+    urlFn: (r) =>
+      r.norad_id
+        ? `https://celestrak.org/NORAD/elements/gp.php?CATNR=${r.norad_id}`
+        : "https://www.ucsusa.org/resources/satellite-database",
+    metadataFn: (r) => ({
+      name: r.name,
+      country: r.country,
+      operator: r.operator,
+      purpose: r.purpose,
+      orbit_class: r.orbit_class,
+      norad_id: r.norad_id,
+      launch_date: r.launch_date,
+    }),
+  },
+
+  // ── CSIS Reports ───────────────────────────────────────────────────────
+  {
+    name: "csis_reports",
+    sourceType: "csis_report",
+    titleFn: (r) => str(r.title) || "CSIS Report",
+    contentFn: (r) => {
+      const parts = [
+        str(r.title) + ".",
+        str(r.description),
+        r.author ? `Author: ${str(r.author)}.` : "",
+        r.category ? `Category: ${str(r.category)}.` : "",
+        r.published_at ? `Published: ${str(r.published_at)}.` : "",
+      ];
+      return parts.filter(Boolean).join(" ").slice(0, 8000);
+    },
+    urlFn: (r) => str(r.url) || null,
+    metadataFn: (r) => ({
+      author: r.author,
+      category: r.category,
+      published_at: r.published_at,
+    }),
+  },
+
+  // ── DIU Projects ───────────────────────────────────────────────────────
+  {
+    name: "diu_projects",
+    sourceType: "diu_project",
+    titleFn: (r) => str(r.title) || "DIU Project",
+    contentFn: (r) => {
+      const parts = [
+        str(r.title) + ".",
+        str(r.description),
+        r.focus_area ? `Focus area: ${str(r.focus_area)}.` : "",
+        r.status ? `Status: ${str(r.status)}.` : "",
+        r.published_at ? `Published: ${str(r.published_at)}.` : "",
+      ];
+      return parts.filter(Boolean).join(" ").slice(0, 8000);
+    },
+    urlFn: (r) => str(r.url) || null,
+    metadataFn: (r) => ({
+      focus_area: r.focus_area,
+      status: r.status,
+      published_at: r.published_at,
+    }),
+  },
+
+  // ── Bryce Tech Reports ─────────────────────────────────────────────────
+  {
+    name: "bryce_reports",
+    sourceType: "bryce_report",
+    titleFn: (r) => str(r.title) || "Bryce Tech Report",
+    contentFn: (r) => {
+      const parts = [
+        str(r.title) + ".",
+        str(r.description),
+        r.report_type ? `Report type: ${str(r.report_type)}.` : "",
+        r.published_at ? `Published: ${str(r.published_at)}.` : "",
+      ];
+      return parts.filter(Boolean).join(" ").slice(0, 8000);
+    },
+    urlFn: (r) => str(r.url) || null,
+    metadataFn: (r) => ({
+      report_type: r.report_type,
+      published_at: r.published_at,
+    }),
+  },
+
+  // ── Space Capital Reports ──────────────────────────────────────────────
+  {
+    name: "space_capital_reports",
+    sourceType: "space_capital",
+    titleFn: (r) => str(r.title) || "Space Capital Report",
+    contentFn: (r) => {
+      const parts = [
+        str(r.title) + ".",
+        str(r.description),
+        r.quarter ? `Quarter: ${str(r.quarter)}.` : "",
+        r.year ? `Year: ${str(r.year)}.` : "",
+        r.published_at ? `Published: ${str(r.published_at)}.` : "",
+      ];
+      return parts.filter(Boolean).join(" ").slice(0, 8000);
+    },
+    urlFn: (r) => str(r.url) || null,
+    metadataFn: (r) => ({
+      quarter: r.quarter,
+      year: r.year,
+      published_at: r.published_at,
+    }),
+  },
+
+  // ── SIA Resources ─────────────────────────────────────────────────────
+  {
+    name: "sia_resources",
+    sourceType: "sia_resource",
+    titleFn: (r) => str(r.title) || "SIA Resource",
+    contentFn: (r) => {
+      const parts = [
+        str(r.title) + ".",
+        str(r.description),
+        r.resource_type ? `Type: ${str(r.resource_type)}.` : "",
+        r.published_at ? `Published: ${str(r.published_at)}.` : "",
+      ];
+      return parts.filter(Boolean).join(" ").slice(0, 8000);
+    },
+    urlFn: (r) => str(r.url) || null,
+    metadataFn: (r) => ({
+      resource_type: r.resource_type,
+      published_at: r.published_at,
+    }),
+  },
+
+  // ── NATO Procurement ───────────────────────────────────────────────────
+  {
+    name: "nato_procurement",
+    sourceType: "nato",
+    titleFn: (r) => str(r.title) || "NATO Procurement",
+    contentFn: (r) => {
+      const parts = [
+        str(r.title) + ".",
+        str(r.description),
+        r.reference_number ? `Reference: ${str(r.reference_number)}.` : "",
+        r.procurement_type ? `Type: ${str(r.procurement_type)}.` : "",
+        r.deadline ? `Deadline: ${str(r.deadline)}.` : "",
+        r.published_at ? `Published: ${str(r.published_at)}.` : "",
+      ];
+      return parts.filter(Boolean).join(" ").slice(0, 8000);
+    },
+    urlFn: (r) => str(r.url) || null,
+    metadataFn: (r) => ({
+      reference_number: r.reference_number,
+      procurement_type: r.procurement_type,
+      deadline: r.deadline,
+      published_at: r.published_at,
+    }),
+  },
+
+  // ── ESA Copernicus ─────────────────────────────────────────────────────
+  {
+    name: "esa_copernicus",
+    sourceType: "esa_copernicus",
+    titleFn: (r) => str(r.title) || "ESA Copernicus Dataset",
+    contentFn: (r) => {
+      const parts = [
+        str(r.title) + ".",
+        str(r.description),
+        r.dataset ? `Dataset: ${str(r.dataset)}.` : "",
+        r.satellite ? `Satellite: ${str(r.satellite)}.` : "",
+        r.published_at ? `Published: ${str(r.published_at)}.` : "",
+      ];
+      return parts.filter(Boolean).join(" ").slice(0, 8000);
+    },
+    urlFn: (r) => str(r.url) || null,
+    metadataFn: (r) => ({
+      dataset: r.dataset,
+      satellite: r.satellite,
+      published_at: r.published_at,
+    }),
+  },
+
+  // ── ITU BRIFIC ─────────────────────────────────────────────────────────
+  {
+    name: "itu_brific",
+    sourceType: "itu_brific",
+    titleFn: (r) => str(r.title) || "ITU BRIFIC Entry",
+    contentFn: (r) => {
+      const parts = [
+        str(r.title) + ".",
+        str(r.description),
+        r.frequency_band ? `Frequency band: ${str(r.frequency_band)}.` : "",
+        r.administration ? `Administration: ${str(r.administration)}.` : "",
+        r.service_type ? `Service type: ${str(r.service_type)}.` : "",
+        r.published_at ? `Published: ${str(r.published_at)}.` : "",
+      ];
+      return parts.filter(Boolean).join(" ").slice(0, 8000);
+    },
+    urlFn: (r) => str(r.url) || null,
+    metadataFn: (r) => ({
+      frequency_band: r.frequency_band,
+      administration: r.administration,
+      service_type: r.service_type,
+      published_at: r.published_at,
+    }),
+  },
+
+  // ── Congressional Space Budget ─────────────────────────────────────────
+  {
+    name: "congressional_space_budget",
+    sourceType: "space_budget",
+    titleFn: (r) => str(r.title) || "Space Budget Entry",
+    contentFn: (r) => {
+      const parts = [
+        str(r.title) + ".",
+        str(r.description),
+        r.agency ? `Agency: ${str(r.agency)}.` : "",
+        r.fiscal_year ? `Fiscal year: ${str(r.fiscal_year)}.` : "",
+        r.amount_millions ? `Amount: $${str(r.amount_millions)}M.` : "",
+        r.budget_type ? `Budget type: ${str(r.budget_type)}.` : "",
+        r.published_at ? `Published: ${str(r.published_at)}.` : "",
+      ];
+      return parts.filter(Boolean).join(" ").slice(0, 8000);
+    },
+    urlFn: (r) => str(r.url) || null,
+    metadataFn: (r) => ({
+      agency: r.agency,
+      fiscal_year: r.fiscal_year,
+      amount_millions: r.amount_millions,
+      budget_type: r.budget_type,
+      published_at: r.published_at,
+    }),
+  },
 ];
 
 async function main() {
-  console.log("=== Session E-10: Regenerating ALL Embeddings ===\n");
+  console.log("=== Session E-EMBEDDINGS: Regenerating ALL Embeddings (25 tables) ===\n");
   console.log(`Config: batch=${BATCH_SIZE}, delay=${DELAY_MS}ms\n`);
 
   // Clear existing embeddings to avoid duplicates on re-run
