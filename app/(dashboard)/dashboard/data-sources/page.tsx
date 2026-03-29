@@ -42,6 +42,9 @@ const refreshFrequencyMap: Record<string, string> = {
   federal_register: "Daily",
   sbir_awards: "Daily",
   sam_opportunities: "Every 6 hours",
+  space_weather: "Every 2 hours",
+  conjunction_events: "Every 6 hours",
+  launch_licenses: "Daily",
   entities: "On-demand",
   daily_briefings: "Daily",
   rss_feeds: "Every hour",
@@ -57,6 +60,9 @@ const tableToCronSource: Record<string, string> = {
   fcc_filings: "fcc",
   federal_register: "federal_register",
   sbir_awards: "sbir",
+  space_weather: "space_weather",
+  conjunction_events: "conjunctions",
+  launch_licenses: "faa_licenses",
 };
 
 const descriptionMap: Record<string, string> = {
@@ -71,6 +77,9 @@ const descriptionMap: Record<string, string> = {
   sam_opportunities: "System for Award Management contract opportunities",
   entities: "Tracked companies, agencies, and programs",
   daily_briefings: "AI-generated daily intelligence briefings",
+  space_weather: "NOAA Space Weather Prediction Center alerts and warnings",
+  conjunction_events: "CelesTrak SOCRATES satellite close approach predictions",
+  launch_licenses: "FAA Office of Commercial Space Transportation licenses",
   rss_feeds: "RSS feed from space and defense industry publications",
 };
 

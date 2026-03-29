@@ -14,6 +14,9 @@
     { "path": "/api/cron/feeds/viasatellite", "schedule": "15 * * * *" },
     { "path": "/api/cron/feeds/defenseone", "schedule": "20 * * * *" },
     { "path": "/api/cron/feeds/spaceflightnow", "schedule": "25 * * * *" },
-    { "path": "/api/cron/feeds/spacecom", "schedule": "30 * * * *" }
+    { "path": "/api/cron/feeds/spacecom", "schedule": "30 * * * *" },
+    { "path": "/api/cron/space-weather", "schedule": "30 */2 * * *" },
+    { "path": "/api/cron/conjunctions", "schedule": "15 */6 * * *" },
+    { "path": "/api/cron/faa-licenses", "schedule": "0 3 * * *" }
   ]
 }

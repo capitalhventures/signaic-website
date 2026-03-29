@@ -24,6 +24,9 @@ const expectedRefreshMap: Record<string, number> = {
   federal_register: 24,
   sbir_awards: 24,
   sam_opportunities: 6,
+  space_weather: 2,
+  conjunction_events: 6,
+  launch_licenses: 24,
   entities: 168,
   daily_briefings: 24,
   rss_spacenews: 1,
@@ -56,6 +59,9 @@ export async function GET() {
       { name: "SAM.gov Opportunities", table: "sam_opportunities" },
       { name: "SBIR/STTR Awards", table: "sbir_awards" },
       { name: "Daily Briefings", table: "daily_briefings" },
+      { name: "Space Weather (NOAA)", table: "space_weather" },
+      { name: "Conjunction Events", table: "conjunction_events" },
+      { name: "FAA Launch Licenses", table: "launch_licenses" },
     ];
 
     // RSS feed sources (share rss_feeds table, filtered by source)
