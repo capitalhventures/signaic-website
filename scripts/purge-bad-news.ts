@@ -1,6 +1,6 @@
 /**
- * One-time cleanup script: purge ALL records from the bloated news table.
- * The table has 198K+ duplicate records from repeated NewsAPI calls.
+ * One-time cleanup script: purge BAD records from the news table.
+ * Deletes records where title IS NULL, empty string, or "Untitled".
  * After purge, call /api/v1/news/refresh to backfill clean data.
  *
  * Usage: npx tsx scripts/purge-bad-news.ts
@@ -25,53 +25,61 @@ const admin = createClient(supabaseUrl, serviceRoleKey, {
 });
 
 async function main() {
-  console.log("=== News Table Purge ===\n");
+  console.log("=== News Table: Purge Bad Records ===\n");
 
-  // Delete in batches to avoid statement timeout
-  let totalDeleted = 0;
-  const batchSize = 500;
+  // Count total records before purge
+  const { count: totalBefore } = await admin
+    .from("news")
+    .select("*", { count: "exact", head: true });
+  console.log(`Total records before purge: ${totalBefore}`);
 
-  while (true) {
-    // Fetch a batch of IDs
-    const { data: batch, error: fetchErr } = await admin
-      .from("news")
-      .select("id")
-      .limit(batchSize);
+  // Count bad records (null title, empty title, or "Untitled")
+  // Supabase doesn't support OR on .is() and .eq() in a single query easily,
+  // so we delete in three passes.
 
-    if (fetchErr) {
-      console.error("Error fetching batch:", fetchErr.message);
-      break;
-    }
+  // Pass 1: Delete where title IS NULL
+  const { data: nullTitles, error: err1 } = await admin
+    .from("news")
+    .delete()
+    .is("title", null)
+    .select("id");
 
-    if (!batch || batch.length === 0) {
-      console.log("No more records to delete.");
-      break;
-    }
+  const nullCount = nullTitles?.length ?? 0;
+  if (err1) console.error("Error deleting null titles:", err1.message);
+  else console.log(`Deleted ${nullCount} records with NULL title`);
 
-    const ids = batch.map((r) => r.id);
+  // Pass 2: Delete where title = '' (empty string)
+  const { data: emptyTitles, error: err2 } = await admin
+    .from("news")
+    .delete()
+    .eq("title", "")
+    .select("id");
 
-    const { error: deleteErr } = await admin
-      .from("news")
-      .delete()
-      .in("id", ids);
+  const emptyCount = emptyTitles?.length ?? 0;
+  if (err2) console.error("Error deleting empty titles:", err2.message);
+  else console.log(`Deleted ${emptyCount} records with empty title`);
 
-    if (deleteErr) {
-      console.error("Error deleting batch:", deleteErr.message);
-      break;
-    }
+  // Pass 3: Delete where title = 'Untitled'
+  const { data: untitledTitles, error: err3 } = await admin
+    .from("news")
+    .delete()
+    .eq("title", "Untitled")
+    .select("id");
 
-    totalDeleted += ids.length;
-    if (totalDeleted % 5000 === 0 || batch.length < batchSize) {
-      console.log(`  Deleted ${totalDeleted} records so far...`);
-    }
-  }
+  const untitledCount = untitledTitles?.length ?? 0;
+  if (err3) console.error("Error deleting 'Untitled' titles:", err3.message);
+  else console.log(`Deleted ${untitledCount} records with title 'Untitled'`);
 
-  // Verify empty
-  const { data: remaining } = await admin.from("news").select("id").limit(1);
+  // Count remaining
+  const { count: totalAfter } = await admin
+    .from("news")
+    .select("*", { count: "exact", head: true });
+
+  const totalDeleted = nullCount + emptyCount + untitledCount;
 
   console.log(`\n--- Summary ---`);
   console.log(`Total deleted: ${totalDeleted}`);
-  console.log(`Records remaining: ${remaining?.length ?? 0}`);
+  console.log(`Records remaining: ${totalAfter}`);
   console.log("Purge complete.");
 }
 
