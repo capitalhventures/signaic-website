@@ -325,20 +325,33 @@ export async function POST() {
 
     const admin = createAdminClient();
 
-    // Upsert by patent_number
-    const { data: upserted, error: upsertError } = await admin
+    // Dedup by patent_number (unique index may not exist in production)
+    const patNums = allPatents.map((p) => p.patent_number).filter(Boolean);
+    const { data: existing } = await admin
       .from("patents")
-      .upsert(allPatents, { onConflict: "patent_number" })
-      .select("id");
+      .select("patent_number")
+      .in("patent_number", patNums);
+    const existingNums = new Set(
+      (existing ?? []).map((r) => r.patent_number)
+    );
+    const newPatents = allPatents.filter(
+      (p) => !existingNums.has(p.patent_number)
+    );
 
-    if (upsertError) {
-      console.error("[patents] Upsert error:", upsertError.message);
-      return apiError("Database upsert failed: " + upsertError.message, 500);
+    let totalInserted = 0;
+    if (newPatents.length > 0) {
+      const { error } = await admin.from("patents").insert(newPatents);
+      if (error) {
+        console.error("[patents] Insert error:", error.message);
+        return apiError("Database insert failed: " + error.message, 500);
+      }
+      totalInserted = newPatents.length;
     }
 
     return apiResponse({
-      inserted: upserted?.length ?? allPatents.length,
+      inserted: totalInserted,
       total_fetched: allPatents.length,
+      already_existed: allPatents.length - newPatents.length,
       source,
       refreshed_at: new Date().toISOString(),
     });

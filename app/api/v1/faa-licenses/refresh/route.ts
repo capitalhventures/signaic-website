@@ -194,19 +194,31 @@ export async function POST() {
       });
     }
 
-    // Upsert - use license_number as conflict key
-    const { data: upserted, error: upsertError } = await admin
+    // Dedup by license_number
+    const licenseNumbers = allLicenses.map((l) => l.license_number).filter(Boolean);
+    const { data: existing } = await admin
       .from("launch_licenses")
-      .upsert(allLicenses, { onConflict: "license_number" })
-      .select("id");
+      .select("license_number")
+      .in("license_number", licenseNumbers);
+    const existingNumbers = new Set(
+      (existing ?? []).map((r) => r.license_number)
+    );
+    const newLicenses = allLicenses.filter(
+      (l) => !existingNumbers.has(l.license_number)
+    );
 
-    if (upsertError) {
-      console.error("[faa-licenses] Upsert error:", upsertError.message);
-      return apiError("Database upsert failed: " + upsertError.message, 500);
+    let totalInserted = 0;
+    if (newLicenses.length > 0) {
+      const { error } = await admin.from("launch_licenses").insert(newLicenses);
+      if (error) {
+        console.error("[faa-licenses] Insert error:", error.message);
+        return apiError("Database insert failed: " + error.message, 500);
+      }
+      totalInserted = newLicenses.length;
     }
 
     return apiResponse({
-      inserted: upserted?.length ?? allLicenses.length,
+      inserted: totalInserted,
       total_fetched: allLicenses.length,
       source: "firecrawl",
       refreshed_at: new Date().toISOString(),

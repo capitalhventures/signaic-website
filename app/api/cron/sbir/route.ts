@@ -339,18 +339,31 @@ export async function GET(request: NextRequest) {
 
     const admin = createAdminClient();
 
-    const { data: upserted, error: upsertError } = await admin
+    // Dedup by solicitation_number
+    const solNums = rows
+      .map((r) => r.solicitation_number)
+      .filter(Boolean);
+    const { data: existing } = await admin
       .from("sbir_awards")
-      .upsert(rows, { onConflict: "solicitation_number" })
-      .select("id");
+      .select("solicitation_number")
+      .in("solicitation_number", solNums);
+    const existingNums = new Set(
+      (existing ?? []).map((r) => r.solicitation_number)
+    );
+    const newRows = rows.filter(
+      (r) => !existingNums.has(r.solicitation_number)
+    );
 
-    if (upsertError) {
-      console.error("[cron/sbir] Upsert error:", upsertError.message);
-      await logCronExecution("sbir", "error", 0, upsertError.message);
-      return cronError("Database upsert failed: " + upsertError.message);
+    let count = 0;
+    if (newRows.length > 0) {
+      const { error } = await admin.from("sbir_awards").insert(newRows);
+      if (error) {
+        console.error("[cron/sbir] Insert error:", error.message);
+        await logCronExecution("sbir", "error", 0, error.message);
+        return cronError("Database insert failed: " + error.message);
+      }
+      count = newRows.length;
     }
-
-    const count = upserted?.length ?? rows.length;
     await logCronExecution("sbir", "success", count);
     return cronSuccess({
       source: "sbir",

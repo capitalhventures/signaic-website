@@ -338,18 +338,29 @@ export async function GET(request: NextRequest) {
 
     const admin = createAdminClient();
 
-    const { data: upserted, error: upsertError } = await admin
+    // Dedup by patent_number
+    const patNums = allPatents.map((p) => p.patent_number).filter(Boolean);
+    const { data: existing } = await admin
       .from("patents")
-      .upsert(allPatents, { onConflict: "patent_number" })
-      .select("id");
+      .select("patent_number")
+      .in("patent_number", patNums);
+    const existingNums = new Set(
+      (existing ?? []).map((r) => r.patent_number)
+    );
+    const newPatents = allPatents.filter(
+      (p) => !existingNums.has(p.patent_number)
+    );
 
-    if (upsertError) {
-      console.error("[cron/patents] Upsert error:", upsertError.message);
-      await logCronExecution("patents", "error", 0, upsertError.message);
-      return cronError("Database upsert failed: " + upsertError.message);
+    let count = 0;
+    if (newPatents.length > 0) {
+      const { error } = await admin.from("patents").insert(newPatents);
+      if (error) {
+        console.error("[cron/patents] Insert error:", error.message);
+        await logCronExecution("patents", "error", 0, error.message);
+        return cronError("Database insert failed: " + error.message);
+      }
+      count = newPatents.length;
     }
-
-    const count = upserted?.length ?? allPatents.length;
     await logCronExecution("patents", "success", count);
     return cronSuccess({
       source: "patents",

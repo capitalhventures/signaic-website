@@ -347,19 +347,33 @@ export async function POST() {
 
     const admin = createAdminClient();
 
-    // Upsert by solicitation_number
-    const { data: upserted, error: upsertError } = await admin
+    // Dedup by solicitation_number
+    const solNums = rows
+      .map((r) => r.solicitation_number)
+      .filter(Boolean);
+    const { data: existing } = await admin
       .from("sbir_awards")
-      .upsert(rows, { onConflict: "solicitation_number" })
-      .select("id");
+      .select("solicitation_number")
+      .in("solicitation_number", solNums);
+    const existingNums = new Set(
+      (existing ?? []).map((r) => r.solicitation_number)
+    );
+    const newRows = rows.filter(
+      (r) => !existingNums.has(r.solicitation_number)
+    );
 
-    if (upsertError) {
-      console.error("[sbir] Upsert error:", upsertError.message);
-      return apiError("Database upsert failed: " + upsertError.message, 500);
+    let totalInserted = 0;
+    if (newRows.length > 0) {
+      const { error } = await admin.from("sbir_awards").insert(newRows);
+      if (error) {
+        console.error("[sbir] Insert error:", error.message);
+        return apiError("Database insert failed: " + error.message, 500);
+      }
+      totalInserted = newRows.length;
     }
 
     return apiResponse({
-      inserted: upserted?.length ?? rows.length,
+      inserted: totalInserted,
       total_fetched: rows.length,
       source,
       refreshed_at: new Date().toISOString(),

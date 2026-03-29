@@ -183,17 +183,28 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const { data: upserted, error: upsertError } = await admin
+    // Dedup by license_number
+    const licenseNumbers = allLicenses.map((l) => l.license_number).filter(Boolean);
+    const { data: existing } = await admin
       .from("launch_licenses")
-      .upsert(allLicenses, { onConflict: "license_number" })
-      .select("id");
+      .select("license_number")
+      .in("license_number", licenseNumbers);
+    const existingNumbers = new Set(
+      (existing ?? []).map((r) => r.license_number)
+    );
+    const newLicenses = allLicenses.filter(
+      (l) => !existingNumbers.has(l.license_number)
+    );
 
-    if (upsertError) {
-      await logCronExecution("faa_licenses", "error", 0, upsertError.message);
-      return cronError("Database upsert failed: " + upsertError.message);
+    let count = 0;
+    if (newLicenses.length > 0) {
+      const { error } = await admin.from("launch_licenses").insert(newLicenses);
+      if (error) {
+        await logCronExecution("faa_licenses", "error", 0, error.message);
+        return cronError("Database insert failed: " + error.message);
+      }
+      count = newLicenses.length;
     }
-
-    const count = upserted?.length ?? allLicenses.length;
     await logCronExecution("faa_licenses", "success", count);
     return cronSuccess({ source: "faa_licenses", inserted: count, source_method: "firecrawl" });
   } catch (err) {
