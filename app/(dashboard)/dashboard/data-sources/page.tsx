@@ -36,7 +36,7 @@ const refreshFrequencyMap: Record<string, string> = {
   fcc_filings: "Every 6 hours",
   sec_filings: "Every 12 hours",
   patents: "Daily",
-  contracts: "Every 6 hours",
+  gov_contracts: "Every 6 hours",
   orbital_data: "Every 2 hours",
   news: "Every hour",
   federal_register: "Daily",
@@ -44,13 +44,14 @@ const refreshFrequencyMap: Record<string, string> = {
   sam_opportunities: "Every 6 hours",
   entities: "On-demand",
   daily_briefings: "Daily",
+  rss_feeds: "Every hour",
 };
 
 const tableToCronSource: Record<string, string> = {
   news: "news",
   orbital_data: "orbital",
   sam_opportunities: "sam",
-  contracts: "contracts",
+  gov_contracts: "contracts",
   sec_filings: "sec",
   patents: "patents",
   fcc_filings: "fcc",
@@ -62,7 +63,7 @@ const descriptionMap: Record<string, string> = {
   fcc_filings: "Federal Communications Commission electronic filings and orders",
   sec_filings: "Securities and Exchange Commission EDGAR filings",
   patents: "United States Patent and Trademark Office applications and grants",
-  contracts: "Federal contract awards and modifications from FPDS",
+  gov_contracts: "Federal contract awards and modifications from USASpending.gov",
   orbital_data: "Satellite catalog and orbital parameters via CelesTrak",
   news: "Aggregated space and defense industry news sources",
   federal_register: "Federal Register notices and proposed rules",
@@ -70,6 +71,7 @@ const descriptionMap: Record<string, string> = {
   sam_opportunities: "System for Award Management contract opportunities",
   entities: "Tracked companies, agencies, and programs",
   daily_briefings: "AI-generated daily intelligence briefings",
+  rss_feeds: "RSS feed from space and defense industry publications",
 };
 
 function formatLastRefresh(lastUpdated: string | null, hoursSinceUpdate: number | null): string {

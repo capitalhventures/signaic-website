@@ -18,7 +18,7 @@ const expectedRefreshMap: Record<string, number> = {
   fcc_filings: 6,
   sec_filings: 12,
   patents: 24,
-  contracts: 6,
+  gov_contracts: 6,
   orbital_data: 2,
   news: 1,
   federal_register: 24,
@@ -48,7 +48,7 @@ export async function GET() {
       { name: "FCC Filings", table: "fcc_filings" },
       { name: "SEC Filings", table: "sec_filings" },
       { name: "Patents", table: "patents" },
-      { name: "Government Contracts", table: "contracts" },
+      { name: "Government Contracts", table: "gov_contracts" },
       { name: "Orbital Data", table: "orbital_data" },
       { name: "News", table: "news" },
       { name: "Entities", table: "entities" },
@@ -129,15 +129,12 @@ export async function GET() {
         if (hoursSinceUpdate === null) {
           status = "yellow";
           message = "Could not determine last update time";
-        } else if (hoursSinceUpdate <= expectedRefreshHours) {
+        } else if (hoursSinceUpdate <= expectedRefreshHours * 2) {
           status = "green";
           message = `Updated ${hoursSinceUpdate.toFixed(1)}h ago`;
-        } else if (hoursSinceUpdate <= expectedRefreshHours * 3) {
+        } else {
           status = "yellow";
           message = `Stale: ${hoursSinceUpdate.toFixed(1)}h since last update`;
-        } else {
-          status = "red";
-          message = `Critical: ${hoursSinceUpdate.toFixed(1)}h since last update`;
         }
 
         statuses.push({
@@ -230,15 +227,12 @@ export async function GET() {
         if (hoursSinceUpdate === null) {
           status = "yellow";
           message = "Could not determine last update time";
-        } else if (hoursSinceUpdate <= expectedRefreshHours) {
+        } else if (hoursSinceUpdate <= expectedRefreshHours * 2) {
           status = "green";
           message = `Updated ${hoursSinceUpdate.toFixed(1)}h ago`;
-        } else if (hoursSinceUpdate <= expectedRefreshHours * 3) {
+        } else {
           status = "yellow";
           message = `Stale: ${hoursSinceUpdate.toFixed(1)}h since last update`;
-        } else {
-          status = "red";
-          message = `Critical: ${hoursSinceUpdate.toFixed(1)}h since last update`;
         }
 
         statuses.push({

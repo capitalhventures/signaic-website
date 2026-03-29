@@ -23,9 +23,26 @@ interface SecFiling {
   filing_type: string | null;
   filed_date: string | null;
   accession_number: string | null;
+  cik: string | null;
   description: string | null;
   document_url: string | null;
   companies: { id: string; name: string } | null;
+}
+
+function getEdgarUrl(filing: SecFiling): string | null {
+  // Best: direct archive link with CIK + accession number
+  if (filing.cik && filing.accession_number) {
+    return `https://www.sec.gov/Archives/edgar/data/${filing.cik}/${filing.accession_number.replace(/-/g, "")}/`;
+  }
+  // Fallback: company search filtered by form type
+  if (filing.cik && filing.filing_type) {
+    return `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${filing.cik}&type=${encodeURIComponent(filing.filing_type)}&dateb=&owner=include&count=40`;
+  }
+  // Use existing URL if not a generic search
+  if (filing.document_url && !filing.document_url.includes("action=getcompany&CIK=&")) {
+    return filing.document_url;
+  }
+  return null;
 }
 
 const FILING_TYPE_COLORS: Record<string, string> = {
@@ -247,17 +264,20 @@ export function SecFilingsClient({ filings }: { filings: SecFiling[] }) {
                     {filing.description || "N/A"}
                   </TableCell>
                   <TableCell>
-                    {filing.document_url && (
-                      <a
-                        href={filing.document_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="text-[#00D4FF] hover:text-[#00D4FF]/80"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
-                    )}
+                    {(() => {
+                      const url = getEdgarUrl(filing);
+                      return url ? (
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-[#00D4FF] hover:text-[#00D4FF]/80"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      ) : null;
+                    })()}
                   </TableCell>
                 </TableRow>
               ))}

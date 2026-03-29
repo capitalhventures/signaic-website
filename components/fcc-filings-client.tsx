@@ -454,15 +454,17 @@ export function FccFilingsClient({ filings }: { filings: Filing[] }) {
                       {(filing.frequency_bands || []).join(", ") || "N/A"}
                     </TableCell>
                     <TableCell>
-                      <a
-                        href={`https://www.google.com/search?q=site%3Afcc.gov+%22${encodeURIComponent(filing.file_number || "")}%22`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="text-[#00D4FF] hover:text-[#00D4FF]/80"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
+                      {filing.file_number && (
+                        <a
+                          href={`https://www.fcc.gov/ecfs/search/search-filings?q=${encodeURIComponent(filing.file_number)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-[#00D4FF] hover:text-[#00D4FF]/80"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      )}
                     </TableCell>
                   </TableRow>
                   {expandedId === filing.id && (
