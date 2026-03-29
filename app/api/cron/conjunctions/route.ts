@@ -4,11 +4,15 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 const SOCRATES_CSV_URL = "https://celestrak.org/SOCRATES/sort-minRange.csv";
 
-function parseCSV(csv: string): Record<string, string>[] {
+// Limit to top 500 closest approaches (CSV is sorted by min range, can be 130K+ rows)
+const MAX_RECORDS = 500;
+
+function parseCSV(csv: string, maxRows: number): Record<string, string>[] {
   const lines = csv.trim().split("\n");
   if (lines.length < 2) return [];
   const headers = lines[0].split(",").map((h) => h.trim());
-  return lines.slice(1).map((line) => {
+  const dataLines = lines.slice(1, 1 + maxRows);
+  return dataLines.map((line) => {
     const values = line.split(",").map((v) => v.trim());
     const record: Record<string, string> = {};
     headers.forEach((h, i) => {
@@ -33,7 +37,7 @@ export async function GET(request: NextRequest) {
     }
 
     const csvText = await res.text();
-    const records = parseCSV(csvText);
+    const records = parseCSV(csvText, MAX_RECORDS);
     if (records.length === 0) {
       await logCronExecution("conjunctions", "success", 0);
       return cronSuccess({ source: "conjunctions", inserted: 0 });
@@ -51,33 +55,19 @@ export async function GET(request: NextRequest) {
         probability: parseFloat(r.MAX_PROB) || null,
       }));
 
-    // Dedup on object1_norad_id + object2_norad_id + tca
-    const dedupKeys = rows.map((r) => `${r.object1_norad_id}|${r.object2_norad_id}|${r.tca}`);
-    const { data: existing } = await admin
-      .from("conjunction_events")
-      .select("object1_norad_id, object2_norad_id, tca");
-
-    const existingKeys = new Set(
-      (existing ?? []).map(
-        (r: { object1_norad_id: string; object2_norad_id: string; tca: string }) =>
-          `${r.object1_norad_id}|${r.object2_norad_id}|${r.tca}`
-      )
-    );
-
-    const newRows = rows.filter((_, i) => !existingKeys.has(dedupKeys[i]));
-
-    let totalInserted = 0;
-    if (newRows.length > 0) {
-      const batchSize = 50;
-      for (let i = 0; i < newRows.length; i += batchSize) {
-        const batch = newRows.slice(i, i + batchSize);
-        const { error } = await admin.from("conjunction_events").insert(batch);
-        if (!error) totalInserted += batch.length;
-      }
+    // Upsert using the unique index on (object1_norad_id, object2_norad_id, tca)
+    let totalUpserted = 0;
+    const batchSize = 50;
+    for (let i = 0; i < rows.length; i += batchSize) {
+      const batch = rows.slice(i, i + batchSize);
+      const { error } = await admin
+        .from("conjunction_events")
+        .upsert(batch, { onConflict: "object1_norad_id,object2_norad_id,tca", ignoreDuplicates: true });
+      if (!error) totalUpserted += batch.length;
     }
 
-    await logCronExecution("conjunctions", "success", totalInserted);
-    return cronSuccess({ source: "conjunctions", inserted: totalInserted });
+    await logCronExecution("conjunctions", "success", totalUpserted);
+    return cronSuccess({ source: "conjunctions", inserted: totalUpserted });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     await logCronExecution("conjunctions", "error", 0, message);
