@@ -191,6 +191,53 @@ function parseMarkdownSolicitations(markdown: string): SbirRow[] {
         count++;
       }
     }
+
+    // Strategy 4: Parse SAM.gov search result links
+    if (rows.length === 0) {
+      const samLinkPattern = /\[([^\]]+)\]\(https?:\/\/sam\.gov\/opp\/([a-f0-9]+)\/view\)/gi;
+      let linkMatch;
+      let count = 0;
+      while ((linkMatch = samLinkPattern.exec(markdown)) !== null && count < 50) {
+        const title = linkMatch[1].trim();
+        const oppId = linkMatch[2];
+        if (title.length < 5) continue;
+        if (!SPACE_KEYWORDS.test(title) && !/(SBIR|STTR)/i.test(title)) continue;
+
+        rows.push({
+          solicitation_number: `SAM-${oppId}`,
+          title: title.slice(0, 500),
+          agency: null,
+          phase: title.match(/Phase\s+(I{1,3}|[123])/i)?.[1] || null,
+          award_year: new Date().getFullYear().toString(),
+          abstract: null,
+          source_url: `https://sam.gov/opp/${oppId}/view`,
+        });
+        count++;
+      }
+    }
+
+    // Strategy 5: Extract any link with SBIR/STTR in the title
+    if (rows.length === 0) {
+      const anyLinkPattern = /\[([^\]]*(?:SBIR|STTR|solicitation)[^\]]*)\]\(([^)]+)\)/gi;
+      let linkMatch;
+      let count = 0;
+      while ((linkMatch = anyLinkPattern.exec(markdown)) !== null && count < 50) {
+        const title = linkMatch[1].trim();
+        const url = linkMatch[2].trim();
+        if (title.length < 5) continue;
+
+        rows.push({
+          solicitation_number: `FC-${Date.now()}-${count}`,
+          title: title.slice(0, 500),
+          agency: null,
+          phase: title.match(/Phase\s+(I{1,3}|[123])/i)?.[1] || null,
+          award_year: new Date().getFullYear().toString(),
+          abstract: null,
+          source_url: url.startsWith("http") ? url : "https://www.sbir.gov/solicitations/open",
+        });
+        count++;
+      }
+    }
   }
 
   return rows;
@@ -291,6 +338,8 @@ export async function GET(request: NextRequest) {
       "https://www.sbir.gov/solicitations/open",
       "https://www.sbir.gov/past-solicitations",
       "https://www.sbir.gov",
+      "https://sam.gov/search/?index=opp&q=SBIR+space+satellite&sort=-modifiedDate&page=1",
+      "https://sam.gov/search/?index=opp&q=STTR+defense+aerospace&sort=-modifiedDate&page=1",
     ];
 
     for (const url of sbirUrls) {
