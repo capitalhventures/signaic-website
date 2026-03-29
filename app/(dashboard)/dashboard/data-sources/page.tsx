@@ -48,6 +48,15 @@ const refreshFrequencyMap: Record<string, string> = {
   entities: "On-demand",
   daily_briefings: "Daily",
   rss_feeds: "Every hour",
+  darpa_opportunities: "Daily",
+  ucs_satellites: "Monthly",
+  diu_projects: "Daily",
+  bryce_reports: "Daily",
+  space_capital_reports: "Daily",
+  nato_procurement: "Daily",
+  esa_copernicus: "Daily",
+  itu_brific: "Daily",
+  congressional_space_budget: "Daily",
 };
 
 const tableToCronSource: Record<string, string> = {
@@ -63,6 +72,15 @@ const tableToCronSource: Record<string, string> = {
   space_weather: "space_weather",
   conjunction_events: "conjunctions",
   launch_licenses: "faa_licenses",
+  darpa_opportunities: "darpa",
+  ucs_satellites: "ucs_satellites",
+  diu_projects: "diu",
+  bryce_reports: "bryce_tech",
+  space_capital_reports: "space_capital",
+  nato_procurement: "nato_procurement",
+  esa_copernicus: "esa_copernicus",
+  itu_brific: "itu_brific",
+  congressional_space_budget: "congressional_budget",
 };
 
 const descriptionMap: Record<string, string> = {
@@ -81,6 +99,15 @@ const descriptionMap: Record<string, string> = {
   conjunction_events: "CelesTrak SOCRATES satellite close approach predictions",
   launch_licenses: "FAA Office of Commercial Space Transportation licenses",
   rss_feeds: "RSS feed from space and defense industry publications",
+  darpa_opportunities: "Defense Advanced Research Projects Agency contract opportunities via SAM.gov",
+  ucs_satellites: "Union of Concerned Scientists comprehensive satellite database",
+  diu_projects: "Defense Innovation Unit project listings and focus areas",
+  bryce_reports: "Bryce Tech space industry analysis and market reports",
+  space_capital_reports: "Space Capital quarterly investment and market reports",
+  nato_procurement: "NATO Support and Procurement Agency procurement notices",
+  esa_copernicus: "European Space Agency Copernicus Earth observation data catalog",
+  itu_brific: "ITU Bureau of Radiocommunications international frequency filings",
+  congressional_space_budget: "Congressional appropriations and budget data for space programs",
 };
 
 function formatLastRefresh(lastUpdated: string | null, hoursSinceUpdate: number | null): string {

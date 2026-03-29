@@ -53,7 +53,7 @@ export async function refreshRSSFeed(config: FeedConfig): Promise<{
   return { inserted, total: rows.length };
 }
 
-/** Feed configurations for all 5 RSS sources */
+/** Feed configurations for all 7 RSS sources */
 export const FEED_CONFIGS: Record<string, FeedConfig> = {
   spacenews: {
     sourceName: "SpaceNews",
@@ -74,5 +74,13 @@ export const FEED_CONFIGS: Record<string, FeedConfig> = {
   spacecom: {
     sourceName: "Space.com",
     feedUrl: "https://www.space.com/feeds/all",
+  },
+  csis: {
+    sourceName: "CSIS",
+    feedUrl: "https://www.csis.org/rss.xml",
+  },
+  sia: {
+    sourceName: "SIA",
+    feedUrl: "https://sia.org/feed/",
   },
 };

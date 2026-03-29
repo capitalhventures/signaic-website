@@ -34,6 +34,17 @@ const expectedRefreshMap: Record<string, number> = {
   rss_defenseone: 1,
   rss_spaceflightnow: 1,
   rss_spacecom: 1,
+  darpa_opportunities: 24,
+  ucs_satellites: 720,
+  rss_csis: 1,
+  rss_sia: 1,
+  diu_projects: 24,
+  bryce_reports: 24,
+  space_capital_reports: 24,
+  nato_procurement: 24,
+  esa_copernicus: 24,
+  itu_brific: 24,
+  congressional_space_budget: 24,
 };
 
 export async function GET() {
@@ -62,6 +73,15 @@ export async function GET() {
       { name: "Space Weather (NOAA)", table: "space_weather" },
       { name: "Conjunction Events", table: "conjunction_events" },
       { name: "FAA Launch Licenses", table: "launch_licenses" },
+      { name: "DARPA Opportunities", table: "darpa_opportunities" },
+      { name: "UCS Satellite Database", table: "ucs_satellites" },
+      { name: "Defense Innovation Unit", table: "diu_projects" },
+      { name: "Bryce Tech Reports", table: "bryce_reports" },
+      { name: "Space Capital Quarterly", table: "space_capital_reports" },
+      { name: "NATO Procurement", table: "nato_procurement" },
+      { name: "ESA Copernicus", table: "esa_copernicus" },
+      { name: "ITU BRIFIC", table: "itu_brific" },
+      { name: "Congressional Space Budget", table: "congressional_space_budget" },
     ];
 
     // RSS feed sources (share rss_feeds table, filtered by source)
@@ -71,6 +91,8 @@ export async function GET() {
       { name: "Defense One (RSS)", key: "rss_defenseone", sourceFilter: "Defense One" },
       { name: "SpaceFlightNow (RSS)", key: "rss_spaceflightnow", sourceFilter: "SpaceFlightNow" },
       { name: "Space.com (RSS)", key: "rss_spacecom", sourceFilter: "Space.com" },
+      { name: "CSIS (RSS)", key: "rss_csis", sourceFilter: "CSIS" },
+      { name: "SIA (RSS)", key: "rss_sia", sourceFilter: "SIA" },
     ];
 
     const statuses: SourceStatus[] = [];
