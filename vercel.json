@@ -9,6 +9,11 @@
     { "path": "/api/cron/patents", "schedule": "0 6 * * *" },
     { "path": "/api/cron/fcc", "schedule": "0 7 * * *" },
     { "path": "/api/cron/federal-register", "schedule": "0 8 * * *" },
-    { "path": "/api/cron/sbir", "schedule": "0 9 * * *" }
+    { "path": "/api/cron/sbir", "schedule": "0 9 * * *" },
+    { "path": "/api/cron/feeds/spacenews", "schedule": "10 * * * *" },
+    { "path": "/api/cron/feeds/viasatellite", "schedule": "15 * * * *" },
+    { "path": "/api/cron/feeds/defenseone", "schedule": "20 * * * *" },
+    { "path": "/api/cron/feeds/spaceflightnow", "schedule": "25 * * * *" },
+    { "path": "/api/cron/feeds/spacecom", "schedule": "30 * * * *" }
   ]
 }

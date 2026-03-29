@@ -26,6 +26,11 @@ const expectedRefreshMap: Record<string, number> = {
   sam_opportunities: 6,
   entities: 168,
   daily_briefings: 24,
+  rss_spacenews: 1,
+  rss_viasatellite: 1,
+  rss_defenseone: 1,
+  rss_spaceflightnow: 1,
+  rss_spacecom: 1,
 };
 
 export async function GET() {
@@ -51,6 +56,15 @@ export async function GET() {
       { name: "SAM.gov Opportunities", table: "sam_opportunities" },
       { name: "SBIR/STTR Awards", table: "sbir_awards" },
       { name: "Daily Briefings", table: "daily_briefings" },
+    ];
+
+    // RSS feed sources (share rss_feeds table, filtered by source)
+    const rssSources = [
+      { name: "SpaceNews (RSS)", key: "rss_spacenews", sourceFilter: "SpaceNews" },
+      { name: "Via Satellite (RSS)", key: "rss_viasatellite", sourceFilter: "Via Satellite" },
+      { name: "Defense One (RSS)", key: "rss_defenseone", sourceFilter: "Defense One" },
+      { name: "SpaceFlightNow (RSS)", key: "rss_spaceflightnow", sourceFilter: "SpaceFlightNow" },
+      { name: "Space.com (RSS)", key: "rss_spacecom", sourceFilter: "Space.com" },
     ];
 
     const statuses: SourceStatus[] = [];
@@ -149,6 +163,107 @@ export async function GET() {
           status: "coming_soon",
           hoursSinceUpdate: null,
           expectedRefreshHours: expectedRefreshMap[source.table] || 24,
+          message: "Coming soon",
+        });
+      }
+    }
+
+    // Check RSS feed sources (share rss_feeds table, filtered by source column)
+    for (const rss of rssSources) {
+      try {
+        const { count, error: countError } = await supabase
+          .from("rss_feeds")
+          .select("*", { count: "exact", head: true })
+          .eq("source", rss.sourceFilter);
+
+        if (countError) {
+          statuses.push({
+            name: rss.name,
+            table: "rss_feeds",
+            lastRefresh: null,
+            lastUpdated: null,
+            recordCount: 0,
+            totalRows: 0,
+            status: "coming_soon",
+            hoursSinceUpdate: null,
+            expectedRefreshHours: expectedRefreshMap[rss.key] || 1,
+            message: "Coming soon",
+          });
+          continue;
+        }
+
+        const totalRows = count || 0;
+        const expectedRefreshHours = expectedRefreshMap[rss.key] || 1;
+
+        if (totalRows === 0) {
+          statuses.push({
+            name: rss.name,
+            table: "rss_feeds",
+            lastRefresh: null,
+            lastUpdated: null,
+            recordCount: 0,
+            totalRows: 0,
+            status: "red",
+            hoursSinceUpdate: null,
+            expectedRefreshHours,
+            message: "No records yet",
+          });
+          continue;
+        }
+
+        const { data: latest } = await supabase
+          .from("rss_feeds")
+          .select("created_at")
+          .eq("source", rss.sourceFilter)
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .single();
+
+        const lastRefresh = latest?.created_at || null;
+        const hoursSinceUpdate = lastRefresh
+          ? (Date.now() - new Date(lastRefresh).getTime()) / (1000 * 60 * 60)
+          : null;
+
+        let status: "green" | "yellow" | "red";
+        let message: string;
+
+        if (hoursSinceUpdate === null) {
+          status = "yellow";
+          message = "Could not determine last update time";
+        } else if (hoursSinceUpdate <= expectedRefreshHours) {
+          status = "green";
+          message = `Updated ${hoursSinceUpdate.toFixed(1)}h ago`;
+        } else if (hoursSinceUpdate <= expectedRefreshHours * 3) {
+          status = "yellow";
+          message = `Stale: ${hoursSinceUpdate.toFixed(1)}h since last update`;
+        } else {
+          status = "red";
+          message = `Critical: ${hoursSinceUpdate.toFixed(1)}h since last update`;
+        }
+
+        statuses.push({
+          name: rss.name,
+          table: "rss_feeds",
+          lastRefresh,
+          lastUpdated: lastRefresh,
+          recordCount: totalRows,
+          totalRows,
+          status,
+          hoursSinceUpdate: hoursSinceUpdate ? Math.round(hoursSinceUpdate * 10) / 10 : null,
+          expectedRefreshHours,
+          message,
+        });
+      } catch {
+        statuses.push({
+          name: rss.name,
+          table: "rss_feeds",
+          lastRefresh: null,
+          lastUpdated: null,
+          recordCount: 0,
+          totalRows: 0,
+          status: "coming_soon",
+          hoursSinceUpdate: null,
+          expectedRefreshHours: expectedRefreshMap[rss.key] || 1,
           message: "Coming soon",
         });
       }

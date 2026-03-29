@@ -27,6 +27,7 @@ import {
   FileSearch,
   Award,
   BookMarked,
+  Rss,
 } from "lucide-react";
 
 const intelligenceLinks = [
@@ -62,6 +63,7 @@ const dataExplorerLinks = [
   { label: "SAM Opportunities", href: "/dashboard/sam-opportunities", icon: FileSearch },
   { label: "SBIR Awards", href: "/dashboard/sbir", icon: Award },
   { label: "Federal Register", href: "/dashboard/federal-register", icon: BookMarked },
+  { label: "Industry News", href: "/dashboard/industry-news", icon: Rss },
 ];
 
 const dataLinks = [
