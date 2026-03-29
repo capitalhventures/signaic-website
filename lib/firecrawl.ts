@@ -16,30 +16,51 @@ export interface ScrapeResult {
   error?: string;
 }
 
+export interface ScrapeOptions {
+  /** Milliseconds to wait for JS rendering (default: 5000) */
+  waitFor?: number;
+  /** Request timeout in ms (default: 45000) */
+  timeout?: number;
+}
+
 /**
  * Scrape a URL using the Firecrawl API and return markdown content.
+ * Supports waitFor for JavaScript-heavy pages.
  */
-export async function scrapeUrl(url: string): Promise<ScrapeResult> {
+export async function scrapeUrl(
+  url: string,
+  options?: ScrapeOptions
+): Promise<ScrapeResult> {
   const apiKey = process.env.FIRECRAWL_API_KEY;
   if (!apiKey) {
     return { markdown: "", success: false, error: "FIRECRAWL_API_KEY not configured" };
   }
 
+  const requestTimeout = options?.timeout ?? 45000;
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 30000);
+  const timer = setTimeout(() => controller.abort(), requestTimeout);
 
   try {
+    const body: Record<string, unknown> = {
+      url,
+      formats: ["markdown"],
+    };
+
+    if (options?.waitFor) {
+      body.waitFor = options.waitFor;
+    }
+
     const res = await fetch(FIRECRAWL_API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({ url, formats: ["markdown"] }),
+      body: JSON.stringify(body),
       signal: controller.signal,
     });
 
-    clearTimeout(timeout);
+    clearTimeout(timer);
 
     if (!res.ok) {
       const text = await res.text().catch(() => "");
@@ -62,7 +83,7 @@ export async function scrapeUrl(url: string): Promise<ScrapeResult> {
 
     return { markdown: json.data.markdown, success: true };
   } catch (err) {
-    clearTimeout(timeout);
+    clearTimeout(timer);
     const message = err instanceof Error ? err.message : "Unknown error";
     return { markdown: "", success: false, error: `Firecrawl scrape failed: ${message}` };
   }

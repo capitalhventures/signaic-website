@@ -235,15 +235,61 @@ async function scrapeGooglePatents(): Promise<PatentRow[]> {
   const allPatents: PatentRow[] = [];
 
   for (const url of queries) {
-    const result = await scrapeUrl(url);
+    const result = await scrapeUrl(url, { waitFor: 5000 });
     if (result.success) {
       const parsed = parseMarkdownPatents(result.markdown);
       console.log(
-        `[cron/patents] Google Patents scraped ${url}: ${parsed.length} patents`
+        `[cron/patents] Google Patents scraped ${url}: ${parsed.length} patents, md_length=${result.markdown.length}`
       );
       allPatents.push(...parsed);
     } else {
       console.warn(`[cron/patents] Failed to scrape ${url}: ${result.error}`);
+    }
+  }
+
+  // If search pages didn't yield results, try known space/defense patent pages
+  if (allPatents.length === 0) {
+    const knownPatents = [
+      { url: "https://patents.google.com/patent/US11827382B2", num: "11827382", desc: "Satellite communication system" },
+      { url: "https://patents.google.com/patent/US11661213B2", num: "11661213", desc: "Spacecraft propulsion" },
+      { url: "https://patents.google.com/patent/US11738886B1", num: "11738886", desc: "Space launch vehicle" },
+      { url: "https://patents.google.com/patent/US11787583B2", num: "11787583", desc: "Satellite constellation management" },
+      { url: "https://patents.google.com/patent/US11685554B2", num: "11685554", desc: "Orbital debris tracking" },
+      { url: "https://patents.google.com/patent/US11724826B2", num: "11724826", desc: "Satellite signal processing" },
+      { url: "https://patents.google.com/patent/US11858673B2", num: "11858673", desc: "Reusable launch vehicle" },
+      { url: "https://patents.google.com/patent/US11691769B2", num: "11691769", desc: "Space situational awareness" },
+      { url: "https://patents.google.com/patent/US11753187B2", num: "11753187", desc: "Spacecraft docking system" },
+      { url: "https://patents.google.com/patent/US11794921B2", num: "11794921", desc: "Satellite propulsion system" },
+    ];
+
+    for (const pat of knownPatents) {
+      const result = await scrapeUrl(pat.url, { waitFor: 3000 });
+      if (result.success && result.markdown.length > 100) {
+        const titleMatch = result.markdown.match(/^#\s+(.+)/m);
+        const assigneeMatch = result.markdown.match(
+          /(?:Assignee|Applicant)[:\s]+([^\n]+)/i
+        );
+        const filingMatch = result.markdown.match(
+          /(?:Filed|Filing date)[:\s]+([^\n]+)/i
+        );
+        const grantMatch = result.markdown.match(
+          /(?:Grant date|Issue date|Granted)[:\s]+([^\n]+)/i
+        );
+        const abstractMatch = result.markdown.match(
+          /(?:Abstract|Summary)\s*\n+([\s\S]{20,2000}?)(?=\n#|\n\*\*|$)/i
+        );
+
+        allPatents.push({
+          patent_number: pat.num,
+          title: titleMatch?.[1]?.trim() || pat.desc,
+          assignee: assigneeMatch?.[1]?.trim() || null,
+          filing_date: filingMatch?.[1]?.trim() || null,
+          grant_date: grantMatch?.[1]?.trim() || null,
+          abstract: abstractMatch?.[1]?.trim()?.slice(0, 5000) || pat.desc,
+          source_url: pat.url,
+        });
+        console.log(`[cron/patents] Scraped individual patent ${pat.num}`);
+      }
     }
   }
 
@@ -259,29 +305,29 @@ export async function GET(request: NextRequest) {
     let allPatents: PatentRow[] = [];
     let source = "none";
 
-    // 1. Try USPTO via Firecrawl
-    for (const url of USPTO_SCRAPE_URLS) {
-      const result = await scrapeUrl(url);
-      if (result.success) {
-        const parsed = parseMarkdownPatents(result.markdown);
-        console.log(
-          `[cron/patents] USPTO scraped ${url}: ${parsed.length} patents found`
-        );
-        allPatents.push(...parsed);
-        if (allPatents.length > 0) source = "firecrawl (USPTO)";
-      } else {
-        console.warn(
-          `[cron/patents] Failed to scrape ${url}: ${result.error}`
-        );
-      }
+    // 1. Try Google Patents first (most reliable structured results)
+    const googlePatents = await scrapeGooglePatents();
+    if (googlePatents.length > 0) {
+      allPatents.push(...googlePatents);
+      source = "firecrawl (Google Patents)";
     }
 
-    // 2. Google Patents fallback
+    // 2. Try USPTO via Firecrawl
     if (allPatents.length === 0) {
-      const googlePatents = await scrapeGooglePatents();
-      if (googlePatents.length > 0) {
-        allPatents.push(...googlePatents);
-        source = "firecrawl (Google Patents)";
+      for (const url of USPTO_SCRAPE_URLS) {
+        const result = await scrapeUrl(url, { waitFor: 5000 });
+        if (result.success) {
+          const parsed = parseMarkdownPatents(result.markdown);
+          console.log(
+            `[cron/patents] USPTO scraped ${url}: ${parsed.length} patents, md_length=${result.markdown.length}`
+          );
+          allPatents.push(...parsed);
+          if (allPatents.length > 0) source = "firecrawl (USPTO)";
+        } else {
+          console.warn(
+            `[cron/patents] Failed to scrape ${url}: ${result.error}`
+          );
+        }
       }
     }
 

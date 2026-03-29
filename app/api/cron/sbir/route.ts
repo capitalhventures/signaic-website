@@ -286,28 +286,22 @@ export async function GET(request: NextRequest) {
     let rows: SbirRow[] = [];
     let source = "none";
 
-    // 1. Firecrawl scraping first
-    const scrapeResult = await scrapeUrl(
-      "https://www.sbir.gov/solicitations/open"
-    );
-    if (scrapeResult.success) {
-      rows = parseMarkdownSolicitations(scrapeResult.markdown);
-      source = "firecrawl";
-      console.log(
-        `[cron/sbir] Firecrawl scraped: ${rows.length} solicitations found`
-      );
-    }
+    // 1. Firecrawl scraping - multiple URLs with JS wait
+    const sbirUrls = [
+      "https://www.sbir.gov/solicitations/open",
+      "https://www.sbir.gov/past-solicitations",
+      "https://www.sbir.gov",
+    ];
 
-    if (rows.length === 0) {
-      const pastResult = await scrapeUrl(
-        "https://www.sbir.gov/past-solicitations"
-      );
-      if (pastResult.success) {
-        rows = parseMarkdownSolicitations(pastResult.markdown);
-        source = "firecrawl (past)";
-        console.log(
-          `[cron/sbir] Firecrawl past solicitations: ${rows.length} found`
-        );
+    for (const url of sbirUrls) {
+      if (rows.length > 0) break;
+      const result = await scrapeUrl(url, { waitFor: 5000 });
+      if (result.success) {
+        rows = parseMarkdownSolicitations(result.markdown);
+        source = `firecrawl (${url})`;
+        console.log(`[cron/sbir] Firecrawl ${url}: ${rows.length} solicitations, md_length=${result.markdown.length}`);
+      } else {
+        console.warn(`[cron/sbir] Firecrawl failed for ${url}: ${result.error}`);
       }
     }
 
