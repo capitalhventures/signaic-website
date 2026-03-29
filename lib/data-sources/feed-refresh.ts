@@ -83,4 +83,32 @@ export const FEED_CONFIGS: Record<string, FeedConfig> = {
     sourceName: "SIA",
     feedUrl: "https://sia.org/feed/",
   },
+  breakingdefense: {
+    sourceName: "Breaking Defense",
+    feedUrl: "https://breakingdefense.com/feed/",
+  },
+  payloadspace: {
+    sourceName: "Payload Space",
+    feedUrl: "https://payloadspace.com/feed/",
+  },
+  warzone: {
+    sourceName: "The War Zone",
+    feedUrl: "https://www.twz.com/feed",
+  },
+  defensenews: {
+    sourceName: "Defense News",
+    feedUrl: "https://www.defensenews.com/arc/outboundfeeds/rss/category/space/",
+  },
+  esanews: {
+    sourceName: "ESA News",
+    feedUrl: "https://www.esa.int/rssfeed/Our_Activities/Space_Science",
+  },
+  spacepolicyonline: {
+    sourceName: "SpacePolicyOnline",
+    feedUrl: "https://spacepolicyonline.com/feed/",
+  },
+  nasawatch: {
+    sourceName: "NASA Watch",
+    feedUrl: "https://nasawatch.com/feed/",
+  },
 };

@@ -38,13 +38,13 @@ const expectedRefreshMap: Record<string, number> = {
   ucs_satellites: 720,
   rss_csis: 1,
   rss_sia: 1,
-  diu_projects: 24,
-  bryce_reports: 24,
-  space_capital_reports: 24,
-  nato_procurement: 24,
-  esa_copernicus: 24,
-  itu_brific: 24,
-  congressional_space_budget: 24,
+  rss_breakingdefense: 1,
+  rss_payloadspace: 1,
+  rss_warzone: 1,
+  rss_defensenews: 1,
+  rss_esanews: 1,
+  rss_spacepolicyonline: 1,
+  rss_nasawatch: 1,
 };
 
 export async function GET() {
@@ -75,13 +75,6 @@ export async function GET() {
       { name: "FAA Launch Licenses", table: "launch_licenses" },
       { name: "DARPA Opportunities", table: "darpa_opportunities" },
       { name: "UCS Satellite Database", table: "ucs_satellites" },
-      { name: "Defense Innovation Unit", table: "diu_projects" },
-      { name: "Bryce Tech Reports", table: "bryce_reports" },
-      { name: "Space Capital Quarterly", table: "space_capital_reports" },
-      { name: "NATO Procurement", table: "nato_procurement" },
-      { name: "ESA Copernicus", table: "esa_copernicus" },
-      { name: "ITU BRIFIC", table: "itu_brific" },
-      { name: "Congressional Space Budget", table: "congressional_space_budget" },
     ];
 
     // RSS feed sources (share rss_feeds table, filtered by source)
@@ -93,7 +86,57 @@ export async function GET() {
       { name: "Space.com (RSS)", key: "rss_spacecom", sourceFilter: "Space.com" },
       { name: "CSIS (RSS)", key: "rss_csis", sourceFilter: "CSIS" },
       { name: "SIA (RSS)", key: "rss_sia", sourceFilter: "SIA" },
+      { name: "Breaking Defense (RSS)", key: "rss_breakingdefense", sourceFilter: "Breaking Defense" },
+      { name: "Payload Space (RSS)", key: "rss_payloadspace", sourceFilter: "Payload Space" },
+      { name: "The War Zone (RSS)", key: "rss_warzone", sourceFilter: "The War Zone" },
+      { name: "Defense News (RSS)", key: "rss_defensenews", sourceFilter: "Defense News" },
+      { name: "ESA News (RSS)", key: "rss_esanews", sourceFilter: "ESA News" },
+      { name: "SpacePolicyOnline (RSS)", key: "rss_spacepolicyonline", sourceFilter: "SpacePolicyOnline" },
+      { name: "NASA Watch (RSS)", key: "rss_nasawatch", sourceFilter: "NASA Watch" },
     ];
+
+    // Fetch cron logs first so we can use them in status determination
+    const cronLogs: Record<string, { executed_at: string; status: string; records_processed: number }> = {};
+    try {
+      const { data: logs } = await supabase
+        .from("cron_logs")
+        .select("source, status, records_processed, executed_at")
+        .order("executed_at", { ascending: false })
+        .limit(100);
+      if (logs) {
+        for (const log of logs) {
+          if (!cronLogs[log.source]) {
+            cronLogs[log.source] = {
+              executed_at: log.executed_at,
+              status: log.status,
+              records_processed: log.records_processed,
+            };
+          }
+        }
+      }
+    } catch {
+      // cron_logs may not exist yet
+    }
+
+    // Map table names to cron source names for lookup
+    const tableToCronSource: Record<string, string> = {
+      fcc_filings: "fcc",
+      sec_filings: "sec",
+      patents: "patents",
+      gov_contracts: "contracts",
+      orbital_data: "orbital",
+      news: "news",
+      federal_register: "federal_register",
+      sbir_awards: "sbir",
+      sam_opportunities: "sam",
+      space_weather: "space_weather",
+      conjunction_events: "conjunctions",
+      launch_licenses: "faa_licenses",
+      darpa_opportunities: "darpa",
+      ucs_satellites: "ucs_satellites",
+      entities: "entities",
+      daily_briefings: "daily_briefings",
+    };
 
     const statuses: SourceStatus[] = [];
 
@@ -124,17 +167,21 @@ export async function GET() {
         const expectedRefreshHours = expectedRefreshMap[source.table] || 24;
 
         if (totalRows === 0) {
+          // Check if the cron ran successfully - if so, show Inactive not Down
+          const cronSource = tableToCronSource[source.table];
+          const lastCron = cronSource ? cronLogs[cronSource] : undefined;
+          const cronRanOk = lastCron && (lastCron.status === "success" || lastCron.status === "skipped");
           statuses.push({
             name: source.name,
             table: source.table,
-            lastRefresh: null,
-            lastUpdated: null,
+            lastRefresh: lastCron?.executed_at || null,
+            lastUpdated: lastCron?.executed_at || null,
             recordCount: 0,
             totalRows: 0,
-            status: "red",
+            status: cronRanOk ? "yellow" : "red",
             hoursSinceUpdate: null,
             expectedRefreshHours,
-            message: "Table is empty",
+            message: cronRanOk ? "No data currently available" : "Table is empty",
           });
           continue;
         }
@@ -157,7 +204,7 @@ export async function GET() {
         if (hoursSinceUpdate === null) {
           status = "yellow";
           message = "Could not determine last update time";
-        } else if (hoursSinceUpdate <= expectedRefreshHours * 2) {
+        } else if (hoursSinceUpdate <= expectedRefreshHours * 3) {
           status = "green";
           message = `Updated ${hoursSinceUpdate.toFixed(1)}h ago`;
         } else {
@@ -221,17 +268,20 @@ export async function GET() {
         const expectedRefreshHours = expectedRefreshMap[rss.key] || 1;
 
         if (totalRows === 0) {
+          // Check if the cron ran successfully - if so, show Inactive not Down
+          const lastCron = cronLogs[rss.key];
+          const cronRanOk = lastCron && (lastCron.status === "success" || lastCron.status === "skipped");
           statuses.push({
             name: rss.name,
             table: "rss_feeds",
-            lastRefresh: null,
-            lastUpdated: null,
+            lastRefresh: lastCron?.executed_at || null,
+            lastUpdated: lastCron?.executed_at || null,
             recordCount: 0,
             totalRows: 0,
-            status: "red",
+            status: cronRanOk ? "yellow" : "red",
             hoursSinceUpdate: null,
             expectedRefreshHours,
-            message: "No records yet",
+            message: cronRanOk ? "No data currently available" : "No records yet",
           });
           continue;
         }
@@ -255,7 +305,7 @@ export async function GET() {
         if (hoursSinceUpdate === null) {
           status = "yellow";
           message = "Could not determine last update time";
-        } else if (hoursSinceUpdate <= expectedRefreshHours * 2) {
+        } else if (hoursSinceUpdate <= expectedRefreshHours * 3) {
           status = "green";
           message = `Updated ${hoursSinceUpdate.toFixed(1)}h ago`;
         } else {
@@ -304,29 +354,6 @@ export async function GET() {
       sentinelLastCheck = lastLog?.created_at || null;
     } catch {
       // agent_logs may not exist yet
-    }
-
-    // Get latest cron execution per source
-    const cronLogs: Record<string, { executed_at: string; status: string; records_processed: number }> = {};
-    try {
-      const { data: logs } = await supabase
-        .from("cron_logs")
-        .select("source, status, records_processed, executed_at")
-        .order("executed_at", { ascending: false })
-        .limit(50);
-      if (logs) {
-        for (const log of logs) {
-          if (!cronLogs[log.source]) {
-            cronLogs[log.source] = {
-              executed_at: log.executed_at,
-              status: log.status,
-              records_processed: log.records_processed,
-            };
-          }
-        }
-      }
-    } catch {
-      // cron_logs may not exist yet
     }
 
     const totalEntities = statuses.find((s) => s.table === "entities")?.recordCount || 0;

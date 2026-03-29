@@ -22,12 +22,12 @@
     { "path": "/api/cron/ucs-satellites", "schedule": "0 2 1 * *" },
     { "path": "/api/cron/feeds/csis", "schedule": "35 * * * *" },
     { "path": "/api/cron/feeds/sia", "schedule": "40 * * * *" },
-    { "path": "/api/cron/diu", "schedule": "0 11 * * *" },
-    { "path": "/api/cron/bryce-tech", "schedule": "0 12 * * *" },
-    { "path": "/api/cron/space-capital", "schedule": "0 13 * * *" },
-    { "path": "/api/cron/nato-procurement", "schedule": "0 14 * * *" },
-    { "path": "/api/cron/esa-copernicus", "schedule": "0 15 * * *" },
-    { "path": "/api/cron/itu-brific", "schedule": "0 16 * * *" },
-    { "path": "/api/cron/congressional-budget", "schedule": "0 17 * * *" }
+    { "path": "/api/cron/feeds/breakingdefense", "schedule": "42 * * * *" },
+    { "path": "/api/cron/feeds/payloadspace", "schedule": "44 * * * *" },
+    { "path": "/api/cron/feeds/warzone", "schedule": "46 * * * *" },
+    { "path": "/api/cron/feeds/defensenews", "schedule": "48 * * * *" },
+    { "path": "/api/cron/feeds/esanews", "schedule": "50 * * * *" },
+    { "path": "/api/cron/feeds/spacepolicyonline", "schedule": "52 * * * *" },
+    { "path": "/api/cron/feeds/nasawatch", "schedule": "54 * * * *" }
   ]
 }

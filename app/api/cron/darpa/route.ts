@@ -49,24 +49,31 @@ export async function GET(request: NextRequest) {
     const admin = createAdminClient();
     let totalInserted = 0;
 
-    // Search SAM.gov for DARPA opportunities using keyword search
-    const keywords = [
-      "Defense Advanced Research Projects Agency",
-      "DARPA",
+    // Search SAM.gov for DARPA opportunities using multiple strategies
+    const searches: { q?: string; ncode?: string }[] = [
+      { q: "DARPA" },
+      { q: "Defense Advanced Research Projects Agency" },
+      { q: "DARPA", ncode: "541715" },
     ];
 
-    for (const keyword of keywords) {
+    for (const search of searches) {
       const params = new URLSearchParams({
         api_key: apiKey,
-        postedFrom: getDateDaysAgo(90),
+        postedFrom: getDateDaysAgo(365),
         postedTo: getTodayDate(),
-        q: keyword,
         limit: "100",
       });
+      if (search.q) params.set("q", search.q);
+      if (search.ncode) params.set("ncode", search.ncode);
 
-      const res = await fetch(
-        `https://api.sam.gov/opportunities/v2/search?${params.toString()}`
-      );
+      let res: Response;
+      try {
+        res = await fetch(
+          `https://api.sam.gov/opportunities/v2/search?${params.toString()}`
+        );
+      } catch {
+        continue;
+      }
 
       if (!res.ok) continue;
 
@@ -83,7 +90,8 @@ export async function GET(request: NextRequest) {
           o.title?.toUpperCase().includes("DARPA") ||
           o.fullParentPathName
             ?.toUpperCase()
-            .includes("DEFENSE ADVANCED RESEARCH PROJECTS AGENCY")
+            .includes("DEFENSE ADVANCED RESEARCH PROJECTS AGENCY") ||
+          o.description?.toUpperCase().includes("DARPA")
       );
 
       if (darpaOpps.length === 0) continue;
