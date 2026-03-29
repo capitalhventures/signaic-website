@@ -28,6 +28,7 @@ import {
   Award,
   BookMarked,
   Rss,
+  Zap,
 } from "lucide-react";
 
 const intelligenceLinks = [
@@ -50,6 +51,11 @@ const intelligenceLinks = [
     label: "Entities",
     href: "/dashboard/entities",
     icon: Building2,
+  },
+  {
+    label: "Daily Briefings",
+    href: "/dashboard/daily-briefings",
+    icon: Zap,
   },
 ];
 
