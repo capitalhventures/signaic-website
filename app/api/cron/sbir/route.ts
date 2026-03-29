@@ -15,7 +15,6 @@ interface SbirRow {
   phase: string | null;
   award_year: string | null;
   abstract: string | null;
-  source_url: string | null;
 }
 
 interface SbirSolicitation {
@@ -125,7 +124,6 @@ function parseMarkdownSolicitations(markdown: string): SbirRow[] {
       award_year:
         get("date")?.slice(0, 4) || new Date().getFullYear().toString(),
       abstract: get("description")?.slice(0, 5000) || null,
-      source_url: "https://www.sbir.gov/solicitations/open",
     });
   }
 
@@ -157,7 +155,6 @@ function parseMarkdownSolicitations(markdown: string): SbirRow[] {
           phase: context.match(/Phase\s+(I{1,3}|[123])/i)?.[1] || null,
           award_year: new Date().getFullYear().toString(),
           abstract: context.slice(0, 2000) || null,
-          source_url: "https://www.sbir.gov/solicitations/open",
         });
       }
     }
@@ -186,7 +183,6 @@ function parseMarkdownSolicitations(markdown: string): SbirRow[] {
           phase: phaseMatch?.[1] || null,
           award_year: new Date().getFullYear().toString(),
           abstract: section.slice(0, 5000),
-          source_url: "https://www.sbir.gov/solicitations/open",
         });
         count++;
       }
@@ -210,7 +206,6 @@ function parseMarkdownSolicitations(markdown: string): SbirRow[] {
           phase: title.match(/Phase\s+(I{1,3}|[123])/i)?.[1] || null,
           award_year: new Date().getFullYear().toString(),
           abstract: null,
-          source_url: `https://sam.gov/opp/${oppId}/view`,
         });
         count++;
       }
@@ -223,7 +218,6 @@ function parseMarkdownSolicitations(markdown: string): SbirRow[] {
       let count = 0;
       while ((linkMatch = anyLinkPattern.exec(markdown)) !== null && count < 50) {
         const title = linkMatch[1].trim();
-        const url = linkMatch[2].trim();
         if (title.length < 5) continue;
 
         rows.push({
@@ -233,7 +227,6 @@ function parseMarkdownSolicitations(markdown: string): SbirRow[] {
           phase: title.match(/Phase\s+(I{1,3}|[123])/i)?.[1] || null,
           award_year: new Date().getFullYear().toString(),
           abstract: null,
-          source_url: url.startsWith("http") ? url : "https://www.sbir.gov/solicitations/open",
         });
         count++;
       }
@@ -277,9 +270,6 @@ async function fetchFromSbirGov(): Promise<SbirRow[] | null> {
         phase: s.phase || s.program || null,
         award_year: s.solicitation_year || s.open_date?.slice(0, 4) || null,
         abstract: s.description?.slice(0, 5000) || null,
-        source_url: s.solicitation_id
-          ? `https://www.sbir.gov/node/${s.solicitation_id}`
-          : "https://www.sbir.gov/solicitations/open",
       }));
 
     return rows.length > 0 ? rows : null;
@@ -317,7 +307,6 @@ async function fetchFromSamGov(): Promise<SbirRow[] | null> {
       phase: o.type || null,
       award_year: o.postedDate?.slice(0, 4) || null,
       abstract: o.description?.slice(0, 5000) || null,
-      source_url: o.uiLink || `https://sam.gov/opp/${o.noticeId}/view`,
     }));
   } catch {
     return null;
