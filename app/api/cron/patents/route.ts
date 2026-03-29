@@ -11,11 +11,9 @@ import { scrapeUrl } from "@/lib/firecrawl";
 interface PatentRow {
   patent_number: string;
   title: string;
-  assignee: string | null;
   filing_date: string | null;
   grant_date: string | null;
   abstract: string | null;
-  source_url: string;
 }
 
 const SPACE_DEFENSE_KEYWORDS =
@@ -110,11 +108,9 @@ function parseMarkdownPatents(markdown: string): PatentRow[] {
     patents.push({
       patent_number: patentNumber.replace(/[,\s]/g, ""),
       title: title.slice(0, 500),
-      assignee: get("assignee"),
       filing_date: get("filing_date"),
       grant_date: get("grant_date"),
       abstract: get("abstract")?.slice(0, 5000) || null,
-      source_url: `https://patents.google.com/patent/US${patentNumber.replace(/[^0-9]/g, "")}`,
     });
   }
 
@@ -143,9 +139,6 @@ function parseMarkdownPatents(markdown: string): PatentRow[] {
       const titleMatch = context.match(
         /(?:titled?|entitled)\s*[""']?([^""'\n]{10,150})/i
       );
-      const assigneeMatch = context.match(
-        /(?:assign(?:ee|ed to)|applicant|inventor)[:\s]+([^\n,;]{3,80})/i
-      );
       const dateMatch = context.match(
         /(?:grant|issued?|filed?)[:\s]+(\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|\d{4}[/-]\d{2}[/-]\d{2})/i
       );
@@ -153,11 +146,9 @@ function parseMarkdownPatents(markdown: string): PatentRow[] {
       patents.push({
         patent_number: num,
         title: titleMatch?.[1]?.trim() || `US Patent ${num}`,
-        assignee: assigneeMatch?.[1]?.trim() || null,
         filing_date: null,
         grant_date: dateMatch?.[1] || null,
         abstract: context.slice(0, 2000),
-        source_url: `https://patents.google.com/patent/US${num}`,
       });
     }
 
@@ -181,11 +172,9 @@ function parseMarkdownPatents(markdown: string): PatentRow[] {
       patents.push({
         patent_number: num,
         title: titleMatch?.[1]?.trim() || `US Application ${num}`,
-        assignee: null,
         filing_date: null,
         grant_date: null,
         abstract: context.slice(0, 2000),
-        source_url: `https://patents.google.com/patent/US${num.replace("/", "")}`,
       });
     }
   }
@@ -212,11 +201,9 @@ function parseMarkdownPatents(markdown: string): PatentRow[] {
       patents.push({
         patent_number: num,
         title: firstLine.slice(0, 500),
-        assignee: null,
         filing_date: null,
         grant_date: null,
         abstract: section.slice(0, 5000),
-        source_url: `https://patents.google.com/patent/US${num}`,
       });
       count++;
     }
@@ -266,9 +253,6 @@ async function scrapeGooglePatents(): Promise<PatentRow[]> {
       const result = await scrapeUrl(pat.url, { waitFor: 3000 });
       if (result.success && result.markdown.length > 100) {
         const titleMatch = result.markdown.match(/^#\s+(.+)/m);
-        const assigneeMatch = result.markdown.match(
-          /(?:Assignee|Applicant)[:\s]+([^\n]+)/i
-        );
         const filingMatch = result.markdown.match(
           /(?:Filed|Filing date)[:\s]+([^\n]+)/i
         );
@@ -282,11 +266,9 @@ async function scrapeGooglePatents(): Promise<PatentRow[]> {
         allPatents.push({
           patent_number: pat.num,
           title: titleMatch?.[1]?.trim() || pat.desc,
-          assignee: assigneeMatch?.[1]?.trim() || null,
           filing_date: filingMatch?.[1]?.trim() || null,
           grant_date: grantMatch?.[1]?.trim() || null,
           abstract: abstractMatch?.[1]?.trim()?.slice(0, 5000) || pat.desc,
-          source_url: pat.url,
         });
         console.log(`[cron/patents] Scraped individual patent ${pat.num}`);
       }
