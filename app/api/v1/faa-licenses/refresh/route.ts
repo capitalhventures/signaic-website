@@ -15,7 +15,6 @@ interface ParsedLicense {
   issue_date: string | null;
   expiry_date: string | null;
   status: string;
-  source_url: string;
 }
 
 /**
@@ -113,7 +112,6 @@ function parseMarkdownLicenses(markdown: string): ParsedLicense[] {
       issue_date: get("issue_date"),
       expiry_date: get("expiry_date"),
       status: get("status") || "active",
-      source_url: "https://www.faa.gov/space/licenses",
     });
   }
 
@@ -147,7 +145,6 @@ function parseMarkdownLicenses(markdown: string): ParsedLicense[] {
           issue_date: null,
           expiry_date: null,
           status: "active",
-          source_url: "https://www.faa.gov/space/licenses",
         });
       }
     }
