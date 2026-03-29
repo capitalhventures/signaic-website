@@ -89,6 +89,13 @@ export interface Entity {
   description?: string;
   last_activity?: string;
   source_counts?: Record<string, number>;
+  website?: string;
+  ticker_symbol?: string | null;
+  headquarters?: string;
+  key_programs?: string[];
+  founded_year?: number;
+  employee_count_estimate?: number;
+  annual_revenue_estimate?: string | null;
 }
 
 // API response wrapper
