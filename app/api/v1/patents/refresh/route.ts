@@ -1,134 +1,312 @@
 import { apiResponse, apiError, getAuthUser } from "@/lib/api-utils";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { scrapeUrl } from "@/lib/firecrawl";
 
-interface PatentResult {
-  patent_number?: string;
-  patent_title?: string;
-  patent_date?: string;
-  patent_abstract?: string;
-  assignees?: Array<{
-    assignee_organization?: string;
-    assignee_first_name?: string;
-    assignee_last_name?: string;
-  }>;
-  applications?: Array<{
-    app_date?: string;
-  }>;
+interface PatentRow {
+  patent_number: string;
+  title: string;
+  assignee: string | null;
+  filing_date: string | null;
+  grant_date: string | null;
+  abstract: string | null;
+  source_url: string;
 }
 
-function getDateOneYearAgo(): string {
-  const d = new Date();
-  d.setFullYear(d.getFullYear() - 1);
-  return d.toISOString().split("T")[0];
-}
+const SPACE_DEFENSE_KEYWORDS =
+  /satellite|space|orbital|spacecraft|launch vehicle|radar|missile|defense|aerospace|hypersonic|GPS|navigation|communications relay/i;
 
-async function fetchPatents(apiKey: string) {
-  // New PatentsView API (search.patentsview.org)
-  // CPC codes: B64G (space vehicles), H04B7/185 (satellite comms), G01S (radar/navigation)
-  const query = {
-    _and: [
-      { _gte: { patent_date: getDateOneYearAgo() } },
-      {
-        _or: [
-          { _begins: { "cpc_current.cpc_subclass_id": "B64G" } },
-          { _begins: { "cpc_current.cpc_subclass_id": "H04B7" } },
-          { _begins: { "cpc_current.cpc_subclass_id": "G01S" } },
-        ],
-      },
-    ],
-  };
+const USPTO_SCRAPE_URLS = [
+  "https://www.uspto.gov/patents/search",
+  "https://data.uspto.gov",
+];
 
-  const params = new URLSearchParams({
-    q: JSON.stringify(query),
-    f: JSON.stringify([
-      "patent_number",
-      "patent_title",
-      "patent_date",
-      "patent_abstract",
-      "assignees",
-      "applications",
-    ]),
-    o: JSON.stringify({ size: 50 }),
-    s: JSON.stringify([{ patent_date: "desc" }]),
-  });
+/**
+ * Parse patent data from Firecrawl markdown content.
+ * USPTO pages can have various formats - we try multiple extraction strategies.
+ */
+function parseMarkdownPatents(markdown: string): PatentRow[] {
+  const patents: PatentRow[] = [];
 
-  const res = await fetch(
-    `https://search.patentsview.org/api/v1/patent/?${params.toString()}`,
-    {
-      headers: {
-        Accept: "application/json",
-        "X-Api-Key": apiKey,
-      },
+  // Strategy 1: Parse markdown tables
+  const lines = markdown.split("\n");
+  let headerIndices: Record<string, number> = {};
+  let inTable = false;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+
+    if (!line.startsWith("|")) {
+      inTable = false;
+      headerIndices = {};
+      continue;
     }
-  );
 
-  if (!res.ok) {
-    throw new Error(`PatentsView API returned ${res.status}`);
+    const cells = line
+      .split("|")
+      .map((c) => c.trim())
+      .filter((c) => c.length > 0);
+
+    if (cells.every((c) => /^[-:]+$/.test(c))) continue;
+
+    if (!inTable) {
+      const lowerCells = cells.map((c) => c.toLowerCase());
+      const isPatentTable = lowerCells.some(
+        (h) =>
+          h.includes("patent") ||
+          h.includes("title") ||
+          h.includes("inventor") ||
+          h.includes("assignee") ||
+          h.includes("grant")
+      );
+      if (!isPatentTable) continue;
+
+      lowerCells.forEach((h, idx) => {
+        if (
+          h.includes("patent") &&
+          (h.includes("number") || h.includes("#") || h.includes("no"))
+        )
+          headerIndices["patent_number"] = idx;
+        if (h.includes("title") && !h.includes("sub"))
+          headerIndices["title"] = idx;
+        if (h.includes("assignee") || h.includes("applicant") || h.includes("inventor"))
+          headerIndices["assignee"] = idx;
+        if (h.includes("filing") || h.includes("filed") || h.includes("application"))
+          headerIndices["filing_date"] = idx;
+        if (h.includes("grant") || h.includes("issued") || h.includes("patent date"))
+          headerIndices["grant_date"] = idx;
+        if (h.includes("abstract") || h.includes("description"))
+          headerIndices["abstract"] = idx;
+      });
+
+      inTable = true;
+      continue;
+    }
+
+    if (cells.length < 2) continue;
+
+    const get = (key: string) =>
+      headerIndices[key] !== undefined && headerIndices[key] < cells.length
+        ? cells[headerIndices[key]] || null
+        : null;
+
+    const patentNumber = get("patent_number") || cells[0];
+    const title = get("title") || cells[1] || `Patent ${patentNumber}`;
+    if (!patentNumber || patentNumber.toLowerCase().includes("patent number")) continue;
+
+    patents.push({
+      patent_number: patentNumber.replace(/[,\s]/g, ""),
+      title: title.slice(0, 500),
+      assignee: get("assignee"),
+      filing_date: get("filing_date"),
+      grant_date: get("grant_date"),
+      abstract: get("abstract")?.slice(0, 5000) || null,
+      source_url: `https://patents.google.com/patent/US${patentNumber.replace(/[^0-9]/g, "")}`,
+    });
   }
 
-  const json = await res.json();
-  const patents: PatentResult[] = json?.patents || [];
+  // Strategy 2: Extract patent numbers from unstructured text
+  if (patents.length === 0) {
+    // US patent number patterns: US12,345,678 or 12,345,678 or US2024/0123456
+    const patentPattern =
+      /(?:US\s*)?(\d{1,2}[,.]?\d{3}[,.]?\d{3})\s*(?:B[12])?/g;
+    const pubPattern = /(?:US\s*)?(20\d{2}\/\d{7})\s*(?:A1)?/g;
 
-  return patents
-    .filter((p) => p.patent_number)
-    .map((p) => ({
-      patent_number: p.patent_number!,
-      title: p.patent_title || `Patent ${p.patent_number}`,
-      filing_date: p.applications?.[0]?.app_date || null,
-      grant_date: p.patent_date || null,
-      abstract: p.patent_abstract?.slice(0, 5000) || null,
-    }));
+    const seen = new Set<string>();
+
+    // Find granted patents
+    let match;
+    while ((match = patentPattern.exec(markdown)) !== null) {
+      const num = match[1].replace(/[,.\s]/g, "");
+      // Must be 7-8 digits (valid US patent range)
+      if (num.length < 7 || num.length > 8) continue;
+      if (seen.has(num)) continue;
+
+      // Check context for space/defense relevance
+      const idx = match.index;
+      const context = markdown.slice(
+        Math.max(0, idx - 300),
+        Math.min(markdown.length, idx + 500)
+      );
+      if (!SPACE_DEFENSE_KEYWORDS.test(context)) continue;
+
+      seen.add(num);
+
+      const titleMatch = context.match(
+        /(?:titled?|entitled)\s*[""']?([^""'\n]{10,150})/i
+      );
+      const assigneeMatch = context.match(
+        /(?:assign(?:ee|ed to)|applicant|inventor)[:\s]+([^\n,;]{3,80})/i
+      );
+      const dateMatch = context.match(
+        /(?:grant|issued?|filed?)[:\s]+(\d{1,2}[/-]\d{1,2}[/-]\d{2,4}|\d{4}[/-]\d{2}[/-]\d{2})/i
+      );
+
+      patents.push({
+        patent_number: num,
+        title: titleMatch?.[1]?.trim() || `US Patent ${num}`,
+        assignee: assigneeMatch?.[1]?.trim() || null,
+        filing_date: null,
+        grant_date: dateMatch?.[1] || null,
+        abstract: context.slice(0, 2000),
+        source_url: `https://patents.google.com/patent/US${num}`,
+      });
+    }
+
+    // Find published applications
+    while ((match = pubPattern.exec(markdown)) !== null) {
+      const num = match[1];
+      if (seen.has(num)) continue;
+
+      const idx = match.index;
+      const context = markdown.slice(
+        Math.max(0, idx - 300),
+        Math.min(markdown.length, idx + 500)
+      );
+      if (!SPACE_DEFENSE_KEYWORDS.test(context)) continue;
+
+      seen.add(num);
+
+      const titleMatch = context.match(
+        /(?:titled?|entitled)\s*[""']?([^""'\n]{10,150})/i
+      );
+
+      patents.push({
+        patent_number: num,
+        title: titleMatch?.[1]?.trim() || `US Application ${num}`,
+        assignee: null,
+        filing_date: null,
+        grant_date: null,
+        abstract: context.slice(0, 2000),
+        source_url: `https://patents.google.com/patent/US${num.replace("/", "")}`,
+      });
+    }
+  }
+
+  // Strategy 3: Extract from heading-based sections
+  if (patents.length === 0) {
+    const sections = markdown.split(/^#{2,4}\s+/m).filter((s) => s.length > 30);
+    let count = 0;
+    for (const section of sections) {
+      if (count >= 50) break;
+      const firstLine = section.split("\n")[0].trim();
+      if (firstLine.length < 5) continue;
+      if (!SPACE_DEFENSE_KEYWORDS.test(section.slice(0, 500))) continue;
+
+      // Look for patent numbers in the section
+      const numMatch = section.match(
+        /(?:US\s*)?(\d{7,8}|\d{1,2}[,.]\d{3}[,.]\d{3})/
+      );
+      if (!numMatch) continue;
+
+      const num = numMatch[1].replace(/[,.\s]/g, "");
+
+      patents.push({
+        patent_number: num,
+        title: firstLine.slice(0, 500),
+        assignee: null,
+        filing_date: null,
+        grant_date: null,
+        abstract: section.slice(0, 5000),
+        source_url: `https://patents.google.com/patent/US${num}`,
+      });
+      count++;
+    }
+  }
+
+  return patents;
+}
+
+/**
+ * Scrape Google Patents for space/defense patents as an additional source.
+ */
+async function scrapeGooglePatents(): Promise<PatentRow[]> {
+  const queries = [
+    "https://patents.google.com/?q=satellite+communication+system&after=priority:20230101",
+    "https://patents.google.com/?q=space+launch+vehicle&after=priority:20230101",
+    "https://patents.google.com/?q=orbital+spacecraft+defense&after=priority:20230101",
+  ];
+
+  const allPatents: PatentRow[] = [];
+
+  for (const url of queries) {
+    const result = await scrapeUrl(url);
+    if (result.success) {
+      const parsed = parseMarkdownPatents(result.markdown);
+      console.log(`[patents] Google Patents scraped ${url}: ${parsed.length} patents`);
+      allPatents.push(...parsed);
+    } else {
+      console.warn(`[patents] Failed to scrape ${url}: ${result.error}`);
+    }
+  }
+
+  return allPatents;
 }
 
 export async function POST() {
   const user = await getAuthUser();
   if (!user) return apiError("Unauthorized", 401);
 
-  const apiKey = process.env.PATENTSVIEW_API_KEY;
-  if (!apiKey) {
-    return apiResponse({
-      status: "source_unavailable",
-      message:
-        "PATENTSVIEW_API_KEY not configured — register at https://patentsview.org/apis/purpose",
-      refreshed_at: new Date().toISOString(),
-    });
-  }
-
   try {
-    const admin = createAdminClient();
-    const patents = await fetchPatents(apiKey);
+    let allPatents: PatentRow[] = [];
+    let source = "none";
 
-    if (patents.length === 0) {
+    // 1. Try USPTO data portal via Firecrawl
+    for (const url of USPTO_SCRAPE_URLS) {
+      const result = await scrapeUrl(url);
+      if (result.success) {
+        const parsed = parseMarkdownPatents(result.markdown);
+        console.log(`[patents] USPTO scraped ${url}: ${parsed.length} patents found`);
+        allPatents.push(...parsed);
+        if (allPatents.length > 0) source = "firecrawl (USPTO)";
+      } else {
+        console.warn(`[patents] Failed to scrape ${url}: ${result.error}`);
+      }
+    }
+
+    // 2. Try Google Patents scraping
+    if (allPatents.length === 0) {
+      const googlePatents = await scrapeGooglePatents();
+      if (googlePatents.length > 0) {
+        allPatents.push(...googlePatents);
+        source = "firecrawl (Google Patents)";
+      }
+    }
+
+    // Deduplicate by patent_number
+    const seen = new Map<string, PatentRow>();
+    for (const p of allPatents) {
+      if (!seen.has(p.patent_number)) {
+        seen.set(p.patent_number, p);
+      }
+    }
+    allPatents = Array.from(seen.values());
+
+    if (allPatents.length === 0) {
       return apiResponse({
-        inserted: 0,
+        status: "source_unavailable",
+        message:
+          "No patent data found from USPTO or Google Patents via Firecrawl",
         refreshed_at: new Date().toISOString(),
       });
     }
 
-    // Dedup by patent_number
-    const patNums = patents.map((p) => p.patent_number).filter(Boolean);
-    const { data: existing } = await admin
+    const admin = createAdminClient();
+
+    // Upsert by patent_number
+    const { data: upserted, error: upsertError } = await admin
       .from("patents")
-      .select("patent_number")
-      .in("patent_number", patNums);
-    const existingNums = new Set(
-      (existing ?? []).map((r) => r.patent_number)
-    );
+      .upsert(allPatents, { onConflict: "patent_number" })
+      .select("id");
 
-    const newRows = patents.filter(
-      (p) => !existingNums.has(p.patent_number)
-    );
-
-    let totalInserted = 0;
-    if (newRows.length > 0) {
-      const { error } = await admin.from("patents").insert(newRows);
-      if (!error) totalInserted = newRows.length;
-      else console.error("[patents] Insert error:", error.message);
+    if (upsertError) {
+      console.error("[patents] Upsert error:", upsertError.message);
+      return apiError("Database upsert failed: " + upsertError.message, 500);
     }
 
     return apiResponse({
-      inserted: totalInserted,
-      total_fetched: patents.length,
+      inserted: upserted?.length ?? allPatents.length,
+      total_fetched: allPatents.length,
+      source,
       refreshed_at: new Date().toISOString(),
     });
   } catch (err) {
