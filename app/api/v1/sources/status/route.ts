@@ -169,12 +169,36 @@ export async function GET() {
       // agent_logs may not exist yet
     }
 
+    // Get latest cron execution per source
+    const cronLogs: Record<string, { executed_at: string; status: string; records_processed: number }> = {};
+    try {
+      const { data: logs } = await supabase
+        .from("cron_logs")
+        .select("source, status, records_processed, executed_at")
+        .order("executed_at", { ascending: false })
+        .limit(50);
+      if (logs) {
+        for (const log of logs) {
+          if (!cronLogs[log.source]) {
+            cronLogs[log.source] = {
+              executed_at: log.executed_at,
+              status: log.status,
+              records_processed: log.records_processed,
+            };
+          }
+        }
+      }
+    } catch {
+      // cron_logs may not exist yet
+    }
+
     const totalEntities = statuses.find((s) => s.table === "entities")?.recordCount || 0;
     const totalDocuments = statuses.reduce((acc, s) => acc + s.recordCount, 0) - totalEntities;
 
     return apiResponse({
       sources: statuses,
       sentinel_last_check: sentinelLastCheck,
+      cron_logs: cronLogs,
       summary: {
         totalEntities,
         totalDocuments,

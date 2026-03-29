@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui";
-import { Database, RefreshCw, Clock, Shield } from "lucide-react";
+import { Database, RefreshCw, Clock, Shield, Zap } from "lucide-react";
 
 interface SourceHealth {
   name: string;
@@ -15,6 +15,12 @@ interface SourceHealth {
   message: string;
 }
 
+interface CronLogEntry {
+  executed_at: string;
+  status: string;
+  records_processed: number;
+}
+
 interface DataSource {
   name: string;
   description: string;
@@ -22,6 +28,8 @@ interface DataSource {
   recordCount: string;
   status: "green" | "yellow" | "red" | "coming_soon";
   refreshFrequency: string;
+  lastCronRun: string | null;
+  cronStatus: string | null;
 }
 
 const refreshFrequencyMap: Record<string, string> = {
@@ -36,6 +44,18 @@ const refreshFrequencyMap: Record<string, string> = {
   sam_opportunities: "Every 6 hours",
   entities: "On-demand",
   daily_briefings: "Daily",
+};
+
+const tableToCronSource: Record<string, string> = {
+  news: "news",
+  orbital_data: "orbital",
+  sam_opportunities: "sam",
+  contracts: "contracts",
+  sec_filings: "sec",
+  patents: "patents",
+  fcc_filings: "fcc",
+  federal_register: "federal_register",
+  sbir_awards: "sbir",
 };
 
 const descriptionMap: Record<string, string> = {
@@ -92,6 +112,7 @@ function statusDot(status: string): string {
 export default function DataSourcesPage() {
   const [liveData, setLiveData] = useState<SourceHealth[] | null>(null);
   const [sentinelLastCheck, setSentinelLastCheck] = useState<string | null>(null);
+  const [cronLogs, setCronLogs] = useState<Record<string, CronLogEntry>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -103,6 +124,7 @@ export default function DataSourcesPage() {
         if (json.success && json.data?.sources) {
           setLiveData(json.data.sources);
           setSentinelLastCheck(json.data.sentinel_last_check || null);
+          setCronLogs(json.data.cron_logs || {});
         }
       } catch {
         // Keep loading state
@@ -113,14 +135,20 @@ export default function DataSourcesPage() {
     fetchStatus();
   }, []);
 
-  const displaySources: DataSource[] = (liveData || []).map((s) => ({
-    name: s.name,
-    description: descriptionMap[s.table] || s.table,
-    lastRefresh: s.status === "coming_soon" ? "\u2014" : formatLastRefresh(s.lastUpdated, s.hoursSinceUpdate),
-    recordCount: s.status === "coming_soon" ? "\u2014" : s.totalRows.toLocaleString(),
-    status: s.status,
-    refreshFrequency: refreshFrequencyMap[s.table] || "Unknown",
-  }));
+  const displaySources: DataSource[] = (liveData || []).map((s) => {
+    const cronSource = tableToCronSource[s.table];
+    const cronLog = cronSource ? cronLogs[cronSource] : undefined;
+    return {
+      name: s.name,
+      description: descriptionMap[s.table] || s.table,
+      lastRefresh: s.status === "coming_soon" ? "\u2014" : formatLastRefresh(s.lastUpdated, s.hoursSinceUpdate),
+      recordCount: s.status === "coming_soon" ? "\u2014" : s.totalRows.toLocaleString(),
+      status: s.status,
+      refreshFrequency: refreshFrequencyMap[s.table] || "Unknown",
+      lastCronRun: cronLog?.executed_at || null,
+      cronStatus: cronLog?.status || null,
+    };
+  });
 
   const healthyCount = displaySources.filter((s) => s.status === "green").length;
   const degradedCount = displaySources.filter((s) => s.status === "yellow").length;
@@ -254,6 +282,12 @@ export default function DataSourcesPage() {
                       <Clock className="w-3.5 h-3.5 text-slate-400" />
                       {source.lastRefresh}
                     </span>
+                    {source.lastCronRun && (
+                      <span className="text-xs text-slate-400 flex items-center gap-1 mt-0.5">
+                        <Zap className={`w-3 h-3 ${source.cronStatus === "success" ? "text-emerald-500" : source.cronStatus === "error" ? "text-red-500" : "text-slate-400"}`} />
+                        Cron: {new Date(source.lastCronRun).toLocaleString()}
+                      </span>
+                    )}
                   </td>
                   <td className="px-6 py-4 text-right">
                     <span className="text-sm font-mono font-medium text-slate-900">
